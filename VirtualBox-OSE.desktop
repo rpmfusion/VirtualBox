@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=VirtualBox
+GenericName=Emulator
+Comment=VirtualBox is an Emulator
+Exec=VirtualBox
+Terminal=False
+TryExec=VirtualBox

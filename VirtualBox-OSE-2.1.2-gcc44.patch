@@ -1,0 +1,53 @@
+Make the beast build with GCC 4.4
+
+Lubomir Rintel <lkundrak@v3.sk>
+
+diff -up VirtualBox-2.1.2_OSE/configure.gcc44 VirtualBox-2.1.2_OSE/configure
+--- VirtualBox-2.1.2_OSE/configure.gcc44	2009-03-14 13:47:48.086155215 +0100
++++ VirtualBox-2.1.2_OSE/configure	2009-03-14 13:47:48.099155125 +0100
+@@ -372,9 +372,9 @@ check_gcc()
+       elif [ $cc_maj -lt 3 \
+              -o \( $cc_maj -eq 3 -a $cc_min -lt 2 \) \
+              -o \( $cc_maj -eq 4 -a $cc_min -lt 1 -a "$OS" != "darwin" \) \
+-             -o \( $cc_maj -eq 4 -a $cc_min -gt 3 \) \
++             -o \( $cc_maj -eq 4 -a $cc_min -gt 4 \) \
+              -o $cc_maj -gt 4 ]; then
+-        log_failure "gcc version $cc_ver found, expected gcc 3.x with x>1 or gcc 4.x with 0<x<4"
++        log_failure "gcc version $cc_ver found, expected gcc 3.x with x>1 or gcc 4.x with 0<x<5"
+         fail really
+       else
+         log_success "found version $cc_ver"
+diff -up VirtualBox-2.1.2_OSE/src/recompiler_new/exec.c.gcc44 VirtualBox-2.1.2_OSE/src/recompiler_new/exec.c
+--- VirtualBox-2.1.2_OSE/src/recompiler_new/exec.c.gcc44	2009-03-14 15:32:13.205157315 +0100
++++ VirtualBox-2.1.2_OSE/src/recompiler_new/exec.c	2009-03-14 15:33:13.804150888 +0100
+@@ -2751,7 +2751,7 @@ static void notdirty_mem_writeb(void *op
+     int dirty_flags;
+ #if defined(VBOX)
+     ram_addr = addr;
+-#elif
++#else
+     ram_addr = addr - (unsigned long)phys_ram_base;
+ #endif
+ #ifdef VBOX
+diff -up VirtualBox-2.1.2_OSE/src/VBox/Frontends/VirtualBox4/src/main.cpp.gcc44 VirtualBox-2.1.2_OSE/src/VBox/Frontends/VirtualBox4/src/main.cpp
+--- VirtualBox-2.1.2_OSE/src/VBox/Frontends/VirtualBox4/src/main.cpp.gcc44	2009-03-14 15:37:17.874151958 +0100
++++ VirtualBox-2.1.2_OSE/src/VBox/Frontends/VirtualBox4/src/main.cpp	2009-03-14 15:38:07.678153113 +0100
+@@ -20,6 +20,7 @@
+  * additional information or have any questions.
+  */
+ 
++#include <cstdio>
+ #include "VBoxGlobal.h"
+ #include "VBoxProblemReporter.h"
+ #include "VBoxSelectorWnd.h"
+diff -up VirtualBox-2.1.2_OSE/src/VBox/Main/linux/HostHardwareLinux.cpp.gcc44 VirtualBox-2.1.2_OSE/src/VBox/Main/linux/HostHardwareLinux.cpp
+--- VirtualBox-2.1.2_OSE/src/VBox/Main/linux/HostHardwareLinux.cpp.gcc44	2009-03-14 15:56:02.806148287 +0100
++++ VirtualBox-2.1.2_OSE/src/VBox/Main/linux/HostHardwareLinux.cpp	2009-03-14 16:15:22.049162257 +0100
+@@ -27,6 +27,7 @@
+ *   Header Files                                                               *
+ *******************************************************************************/
+ 
++#include <cstdio>
+ #include <HostHardwareLinux.h>
+ 
+ #include <VBox/log.h>

@@ -1,0 +1,97 @@
+Build on x86_64 without 32bit toolchain.
+This disables the check for 32bit toolchain and tests that need it (boo).
+
+Lubomir Rintel <lkundrak@v3.sk>
+
+--- VirtualBox-2.1.0/src/VBox/Devices/testcase/Makefile.kmk.32bit	2008-12-15 18:25:25.000000000 +0100
++++ VirtualBox-2.1.0/src/VBox/Devices/testcase/Makefile.kmk	2009-01-11 11:36:52.000000000 +0100
+@@ -33,22 +33,28 @@
+ # We setup one 'other' target for executing the structure & alignment
+ # validation testcases. Perhaps a bit hackish, but extremely useful.
+ #
++ifneq ($(KBUILD_HOST_ARCH),amd64)
+ ifeq ($(KBUILD_TARGET),$(KBUILD_HOST))
+  ifeq ($(filter-out x86.x86 amd64.amd64 x86.amd64, $(KBUILD_TARGET_ARCH).$(KBUILD_HOST_ARCH)),)
+   OTHERS += \
+ 	$(VBOX_DEVICES_TEST_OUT_DIR)/tstDeviceStructSize.run
+  endif
+ endif
++endif
+ 
+ # The normal testing pass.
++ifneq ($(KBUILD_HOST_ARCH),amd64)
+ TESTING += \
+ 	$(VBOX_DEVICES_TEST_OUT_DIR)/tstDeviceStructSize.run
++endif
+ 
+ 
+ #
+ # The testcase generator.
+ #
++ifneq ($(KBUILD_HOST_ARCH),amd64)
+ PROGRAMS += tstDeviceStructSizeGC
++endif
+ tstDeviceStructSizeGC_TEMPLATE  = VBOXGCEXE
+ tstDeviceStructSizeGC_DEFS      =
+ ifdef VBOX_WITH_USB
+@@ -78,7 +84,9 @@
+ #
+ # The testcase it self.
+ #
++ifneq ($(KBUILD_HOST_ARCH),amd64)
+ PROGRAMS += tstDeviceStructSize
++endif
+ tstDeviceStructSize_TEMPLATE = VBOXR3AUTOTST
+ tstDeviceStructSize_DEFS     =
+ ifdef VBOX_WITH_USB
+--- VirtualBox-2.1.0/src/VBox/VMM/testcase/Makefile.kmk.32bit	2008-12-13 22:59:41.000000000 +0100
++++ VirtualBox-2.1.0/src/VBox/VMM/testcase/Makefile.kmk	2009-01-11 12:29:14.000000000 +0100
+@@ -25,7 +25,10 @@
+ #
+ # Target lists.
+ #
+-PROGRAMS   += tstVMStructSize tstVMStructGC tstAsmStructs tstAsmStructsGC tstVMM tstVMM-HwAccm tstGlobalConfig tstInstrEmul
++PROGRAMS   += tstVMM tstVMM-HwAccm tstGlobalConfig tstInstrEmul
++ifneq ($(KBUILD_HOST_ARCH),amd64)
++  PROGRAMS   += tstVMStructSize tstVMStructGC tstAsmStructs tstAsmStructsGC
++endif
+ ifneq ($(KBUILD_TARGET),win)
+ PROGRAMS   += tstVMMFork
+ endif
+@@ -51,17 +54,23 @@
+ #
+ ifeq ($(KBUILD_TARGET),$(KBUILD_HOST))
+  ifeq ($(filter-out x86.x86 amd64.amd64 x86.amd64, $(KBUILD_TARGET_ARCH).$(KBUILD_HOST_ARCH)),)
++  ifneq ($(KBUILD_HOST_ARCH),amd64)
+   OTHERS += \
+ 	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstAsmStructs.run \
+-	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstVMStructSize.run \
++	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstVMStructSize.run
++  endif
++  OTHERS += \
+ 	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstInstrEmul.run
+  endif
+ endif
+ 
+ # The normal testing pass.
++ifneq ($(KBUILD_HOST_ARCH),amd64)
+ TESTING += \
+ 	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstAsmStructs.run \
+-	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstVMStructSize.run \
++	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstVMStructSize.run
++endif
++TESTING += \
+         $(VBOX_VMM_TESTCASE_OUT_DIR)/tstInstrEmul.run
+ 
+ OTHER_CLEAN += \
+--- VirtualBox-2.1.0/configure.32bit	2008-12-17 10:49:00.000000000 +0100
++++ VirtualBox-2.1.0/configure	2009-01-11 11:36:52.000000000 +0100
+@@ -2092,7 +2092,7 @@
+   fi
+   check_libcap
+   check_compiler_h
+-  [ "$BUILD_MACHINE" = "amd64" ] && check_32bit
++  #[ "$BUILD_MACHINE" = "amd64" ] && check_32bit
+ fi
+ 
+ [ -n "$SETUP_WINE" ] && setup_wine

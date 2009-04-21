@@ -1,0 +1,25 @@
+This makes the Desktop Entry compliant with the Specification
+and corrects the name eliminating possibly unlicensed use of trademark
+and confision with differently licensed commercial product.
+
+Lubomir Rintel <lkundrak@v3.sk>
+
+--- VirtualBox-1.6.4/src/VBox/Installer/linux/VirtualBox.desktop.desktop	2008-09-02 18:56:23.000000000 +0200
++++ VirtualBox-1.6.4/src/VBox/Installer/linux/VirtualBox.desktop	2008-09-02 18:58:57.000000000 +0200
+@@ -1,14 +1,13 @@
+ [Desktop Entry]
+ Encoding=UTF-8
+ Version=1.0
+-Name=Sun xVM VirtualBox
++Name=VirtualBox OSE
+ GenericName=Virtual Machine
+ Type=Application
+ Exec=VirtualBox
+ TryExec=VirtualBox
+-DocPath=file://$VBOX_DOC_PATH/UserManual.pdf
+ Icon=VBox
+-Categories=Emulator;System;X-MandrivaLinux-System;
++Categories=Emulator;System;
+ Comment=Run several virtual systems on a single host computer
+ Comment[de]=Windows und andere Betriebssysteme unter Linux ausführen
+ Comment[sv]=Kör flera virtuella system på en enda värddator

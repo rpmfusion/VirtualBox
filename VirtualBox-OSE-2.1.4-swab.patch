@@ -1,0 +1,15 @@
+Since 2.6.29, kernel ships swab.h which conflicts with us.
+
+Lubomir Rintel <lkundrak@v3.sk>
+
+diff -up VirtualBox-2.1.4_OSE/src/VBox/Devices/Storage/DrvHostDVD.cpp.swab VirtualBox-2.1.4_OSE/src/VBox/Devices/Storage/DrvHostDVD.cpp
+--- VirtualBox-2.1.4_OSE/src/VBox/Devices/Storage/DrvHostDVD.cpp.swab	2009-03-30 14:07:28.804132649 +0200
++++ VirtualBox-2.1.4_OSE/src/VBox/Devices/Storage/DrvHostDVD.cpp	2009-03-30 14:07:30.369131589 +0200
+@@ -49,6 +49,7 @@
+ /* This is another hack for not bothering with C++ unfriendly byteswap macros. */
+ # define _LINUX_BYTEORDER_SWAB_H
+ # define _LINUX_BYTEORDER_SWABB_H
++# define _LINUX_SWAB_H
+ /* Those macros that are needed are defined in the header below */
+ # include "swab.h"
+ # include <linux/cdrom.h>
