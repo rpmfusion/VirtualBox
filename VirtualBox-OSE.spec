@@ -46,11 +46,12 @@ BuildRequires:  qt-devel < 1:4
 %endif
 
 # Plague-specific weirdness
-%ifarch %{ix86}
-ExclusiveArch:  %{_target_cpu}
+%if 0%{?fedora} > 10
+ExclusiveArch:  i586 x86_64
 %else
-ExclusiveArch:  x86_64
+ExclusiveArch:  i386 x86_64
 %endif
+
 Requires:       %{name}-kmod = %{version}
 Provides:       %{name}-kmod-common = %{version}
 
