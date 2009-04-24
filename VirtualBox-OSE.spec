@@ -8,7 +8,7 @@
 
 Name:           VirtualBox-OSE
 Version:        2.1.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -45,7 +45,12 @@ BuildRequires:  qt4-devel
 BuildRequires:  qt-devel < 1:4
 %endif
 
-ExclusiveArch:  %{ix86} x86_64
+# Plague-specific weirdness
+%ifarch %{ix86}
+ExclusiveArch:  %{_target_cpu}
+%else
+ExclusiveArch:  x86_64
+%endif
 Requires:       %{name}-kmod = %{version}
 Provides:       %{name}-kmod-common = %{version}
 
@@ -345,6 +350,9 @@ getent group %{groupname} >/dev/null || groupadd -r %{groupname}
 
 
 %changelog
+* Fri Apr 24 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.1.4-4
+- Adjust architecture list for plague
+
 * Sun Apr 12 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.1.4-3
 - Fix SDK permissions
 - Fix SDK requires
