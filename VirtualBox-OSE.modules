@@ -1,3 +1,8 @@
 #!/bin/sh
-/sbin/modprobe vboxdrv &>/dev/null
-/sbin/modprobe vboxnetflt &>/dev/null
+
+# User is advised to run this on upgrades
+/sbin/rmmod vboxnetflt &>/dev/null ||:
+/sbin/rmmod vboxdrv &>/dev/null ||:
+
+/sbin/modprobe vboxdrv
+/sbin/modprobe vboxnetflt

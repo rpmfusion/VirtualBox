@@ -1,0 +1,105 @@
+Replace some strings which ones that (sometimes) make more sense.
+
+Lubomir Rintel <lkundrak@v3.sk>
+
+diff -up VirtualBox-2.2.2_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp.strings VirtualBox-2.2.2_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp
+--- VirtualBox-2.2.2_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp.strings	2009-04-27 19:57:04.000000000 +0200
++++ VirtualBox-2.2.2_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp	2009-05-03 15:57:41.000000000 +0200
+@@ -73,22 +73,22 @@ QString g_QStrHintLinuxNoMemory = QAppli
+   );
+ 
+ QString g_QStrHintLinuxNoDriver = QApplication::tr(
+-  "The VirtualBox Linux kernel driver (vboxdrv) is either not loaded or "
+-  "there is a permission problem with /dev/vboxdrv. Re-setup the kernel "
+-  "module by executing<br/><br/>"
+-  "  <font color=blue>'/etc/init.d/vboxdrv setup'</font><br/><br/>"
+-  "as root. Users of Ubuntu, Fedora or Mandriva should install the DKMS "
+-  "package first. This package keeps track of Linux kernel changes and "
+-  "recompiles the vboxdrv kernel module if necessary."
++  "The VirtualBox Linux kernel driver (vboxdrv) is probably not "
++  "loaded.<br/><br/>"
++  "If you installed or VirtualBox OSE package recently you need to restart "
++  "the computer for the driver to load.<br/><br/>"
++  "Alternatively, you may attempt to load the driver by issuing the "
++  "following command with system administrator (root) privileges:<br/><br/>"
++  "  <font color=blue>'/etc/sysconfig/modules/VirtualBox-OSE.modules'</font><br/><br/>"
+   );
+ 
+ QString g_QStrHintOtherNoDriver = QApplication::tr(
+   "Make sure the kernel module has been loaded successfully."
+   );
+ 
+-/* I hope this isn't (C), (TM) or (R) Microsoft support ;-) */
++/* We're gonna try to give a helping hand. */
+ QString g_QStrHintReinstall = QApplication::tr(
+-  "It may help to reinstall VirtualBox."
++  "Please report the problem to the RPM Fusion Bugzilla."
+   );
+ 
+ #if defined(DEBUG) && defined(Q_WS_X11) && defined(RT_OS_LINUX)
+diff -up VirtualBox-2.2.2_OSE/src/VBox/Installer/linux/VBox.sh.strings VirtualBox-2.2.2_OSE/src/VBox/Installer/linux/VBox.sh
+--- VirtualBox-2.2.2_OSE/src/VBox/Installer/linux/VBox.sh.strings	2009-04-27 19:57:13.000000000 +0200
++++ VirtualBox-2.2.2_OSE/src/VBox/Installer/linux/VBox.sh	2009-05-03 15:57:41.000000000 +0200
+@@ -36,19 +36,20 @@ elif ! lsmod|grep -q vboxdrv; then
+     cat << EOF
+ WARNING: The vboxdrv kernel module is not loaded. Either there is no module
+          available for the current kernel (`uname -r`) or it failed to
+-         load. Please recompile the kernel module and install it by
++         load. Reboot the computer, or insert the kernel module by executing
+ 
+-           sudo /etc/init.d/vboxdrv setup
++           '/etc/sysconfig/modules/VirtualBox-OSE.modules' (as root)
+ 
+          You will not be able to start VMs until this problem is fixed.
+ EOF
+ elif [ ! -c /dev/vboxdrv ]; then
+     cat << EOF
+-WARNING: The character device /dev/vboxdrv does not exist. Try
++WARNING: The character device /dev/vboxdrv does not exist. Try running
+ 
+-           sudo /etc/init.d/vboxdrv restart
++           '/sbin/udevtrigger' (as root)
+ 
+-         and if that is not successful, try to re-install the package.
++         and if that is not successful, then you're in situation that
++         can not possibly happen and there's nothing you can do about it.
+ 
+ 	 You will not be able to start VMs until this problem is fixed.
+ EOF
+diff -up VirtualBox-2.2.2_OSE/src/VBox/Installer/linux/VirtualBox.desktop.strings VirtualBox-2.2.2_OSE/src/VBox/Installer/linux/VirtualBox.desktop
+--- VirtualBox-2.2.2_OSE/src/VBox/Installer/linux/VirtualBox.desktop.strings	2009-04-27 19:57:14.000000000 +0200
++++ VirtualBox-2.2.2_OSE/src/VBox/Installer/linux/VirtualBox.desktop	2009-05-03 15:57:41.000000000 +0200
+@@ -1,7 +1,7 @@
+ [Desktop Entry]
+ Encoding=UTF-8
+ Version=1.0
+-Name=Sun VirtualBox
++Name=VirtualBox OSE
+ GenericName=Virtual Machine
+ Type=Application
+ Exec=VirtualBox
+diff -up VirtualBox-2.2.2_OSE/src/VBox/VMM/VM.cpp.strings VirtualBox-2.2.2_OSE/src/VBox/VMM/VM.cpp
+--- VirtualBox-2.2.2_OSE/src/VBox/VMM/VM.cpp.strings	2009-04-27 19:57:32.000000000 +0200
++++ VirtualBox-2.2.2_OSE/src/VBox/VMM/VM.cpp	2009-05-03 15:57:41.000000000 +0200
+@@ -304,8 +304,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCP
+ #ifdef RT_OS_LINUX
+                     pszError = N_("VirtualBox kernel driver not loaded. The vboxdrv kernel module "
+                                   "was either not loaded or /dev/vboxdrv is not set up properly. "
+-                                  "Re-setup the kernel module by executing "
+-                                  "'/etc/init.d/vboxdrv setup' as root");
++                                  "Reboot the computer, or insert the kernel module by executing "
++                                  "'/etc/sysconfig/modules/VirtualBox-OSE.modules' as root");
+ #else
+                     pszError = N_("VirtualBox kernel driver not loaded");
+ #endif
+@@ -346,8 +346,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCP
+ #ifdef RT_OS_LINUX
+                     pszError = N_("VirtualBox kernel driver not installed. The vboxdrv kernel module "
+                                   "was either not loaded or /dev/vboxdrv was not created for some "
+-                                  "reason. Re-setup the kernel module by executing "
+-                                  "'/etc/init.d/vboxdrv setup' as root");
++                                  "reason. Insert the kernel module by executing "
++                                  "'/etc/sysconfig/modules/VirtualBox-OSE.modules' as root");
+ #else
+                     pszError = N_("VirtualBox kernel driver not installed");
+ #endif

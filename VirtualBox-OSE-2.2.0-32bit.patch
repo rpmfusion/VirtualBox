@@ -3,9 +3,22 @@ This disables the check for 32bit toolchain and tests that need it (boo).
 
 Lubomir Rintel <lkundrak@v3.sk>
 
---- VirtualBox-2.1.0/src/VBox/Devices/testcase/Makefile.kmk.32bit	2008-12-15 18:25:25.000000000 +0100
-+++ VirtualBox-2.1.0/src/VBox/Devices/testcase/Makefile.kmk	2009-01-11 11:36:52.000000000 +0100
-@@ -33,22 +33,28 @@
+diff -up VirtualBox-2.2.0_OSE/configure.32bit VirtualBox-2.2.0_OSE/configure
+--- VirtualBox-2.2.0_OSE/configure.32bit	2009-03-27 20:13:58.000000000 +0100
++++ VirtualBox-2.2.0_OSE/configure	2009-04-25 06:58:14.816362844 +0200
+@@ -2160,7 +2160,7 @@ if [ "$OS" = "linux" ]; then
+   fi
+   check_libcap
+   check_compiler_h
+-  [ "$BUILD_MACHINE" = "amd64" ] && check_32bit
++  #[ "$BUILD_MACHINE" = "amd64" ] && check_32bit
+ fi
+ 
+ [ -n "$SETUP_WINE" ] && setup_wine
+diff -up VirtualBox-2.2.0_OSE/src/VBox/Devices/testcase/Makefile.kmk.32bit VirtualBox-2.2.0_OSE/src/VBox/Devices/testcase/Makefile.kmk
+--- VirtualBox-2.2.0_OSE/src/VBox/Devices/testcase/Makefile.kmk.32bit	2009-03-13 11:38:48.000000000 +0100
++++ VirtualBox-2.2.0_OSE/src/VBox/Devices/testcase/Makefile.kmk	2009-04-25 06:58:14.807362039 +0200
+@@ -33,22 +33,28 @@ BLDDIRS += $(VBOX_DEVICES_TEST_OUT_DIR)
  # We setup one 'other' target for executing the structure & alignment
  # validation testcases. Perhaps a bit hackish, but extremely useful.
  #
@@ -34,7 +47,7 @@ Lubomir Rintel <lkundrak@v3.sk>
  tstDeviceStructSizeGC_TEMPLATE  = VBOXGCEXE
  tstDeviceStructSizeGC_DEFS      =
  ifdef VBOX_WITH_USB
-@@ -78,7 +84,9 @@
+@@ -81,7 +87,9 @@ tstDeviceStructSizeGC_INCS      = \
  #
  # The testcase it self.
  #
@@ -44,9 +57,10 @@ Lubomir Rintel <lkundrak@v3.sk>
  tstDeviceStructSize_TEMPLATE = VBOXR3AUTOTST
  tstDeviceStructSize_DEFS     =
  ifdef VBOX_WITH_USB
---- VirtualBox-2.1.0/src/VBox/VMM/testcase/Makefile.kmk.32bit	2008-12-13 22:59:41.000000000 +0100
-+++ VirtualBox-2.1.0/src/VBox/VMM/testcase/Makefile.kmk	2009-01-11 12:29:14.000000000 +0100
-@@ -25,7 +25,10 @@
+diff -up VirtualBox-2.2.0_OSE/src/VBox/VMM/testcase/Makefile.kmk.32bit VirtualBox-2.2.0_OSE/src/VBox/VMM/testcase/Makefile.kmk
+--- VirtualBox-2.2.0_OSE/src/VBox/VMM/testcase/Makefile.kmk.32bit	2009-04-07 21:32:47.000000000 +0200
++++ VirtualBox-2.2.0_OSE/src/VBox/VMM/testcase/Makefile.kmk	2009-04-25 07:00:54.512363102 +0200
+@@ -25,7 +25,10 @@ include	$(KBUILD_PATH)/subheader.kmk
  #
  # Target lists.
  #
@@ -58,18 +72,15 @@ Lubomir Rintel <lkundrak@v3.sk>
  ifneq ($(KBUILD_TARGET),win)
  PROGRAMS   += tstVMMFork
  endif
-@@ -51,17 +54,23 @@
+@@ -51,16 +54,21 @@ BLDDIRS += $(VBOX_VMM_TESTCASE_OUT_DIR)
  #
  ifeq ($(KBUILD_TARGET),$(KBUILD_HOST))
   ifeq ($(filter-out x86.x86 amd64.amd64 x86.amd64, $(KBUILD_TARGET_ARCH).$(KBUILD_HOST_ARCH)),)
 +  ifneq ($(KBUILD_HOST_ARCH),amd64)
    OTHERS += \
  	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstAsmStructs.run \
--	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstVMStructSize.run \
-+	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstVMStructSize.run
+ 	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstVMStructSize.run
 +  endif
-+  OTHERS += \
- 	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstInstrEmul.run
   endif
  endif
  
@@ -84,14 +95,3 @@ Lubomir Rintel <lkundrak@v3.sk>
          $(VBOX_VMM_TESTCASE_OUT_DIR)/tstInstrEmul.run
  
  OTHER_CLEAN += \
---- VirtualBox-2.1.0/configure.32bit	2008-12-17 10:49:00.000000000 +0100
-+++ VirtualBox-2.1.0/configure	2009-01-11 11:36:52.000000000 +0100
-@@ -2092,7 +2092,7 @@
-   fi
-   check_libcap
-   check_compiler_h
--  [ "$BUILD_MACHINE" = "amd64" ] && check_32bit
-+  #[ "$BUILD_MACHINE" = "amd64" ] && check_32bit
- fi
- 
- [ -n "$SETUP_WINE" ] && setup_wine

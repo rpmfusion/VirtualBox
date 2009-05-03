@@ -4,29 +4,26 @@
 # TODO: Remove executable bit temporarily to prevent stripping
 %define debug_package %{nil}
 
-%define groupname vboxusers
+# Lots of useless checks
+# This will be enabled by default once RPM is built with caps enabled
+%bcond_without hardening
 
 Name:           VirtualBox-OSE
-Version:        2.1.4
-Release:        4%{?dist}
+Version:        2.2.2
+Release:        1%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
 License:        GPLv2 or (GPLv2 and CDDL)
 URL:            http://www.virtualbox.org/wiki/VirtualBox
-Source0:        http://download.virtualbox.org/virtualbox/%{version}/VirtualBox-%{version}-3-OSE.tar.bz2
+Source0:        http://dlc.sun.com/virtualbox/%{version}/VirtualBox-%{version}-OSE.tar.bz2
 Source1:        http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
-Source3:        %{name}.desktop
-Source4:        %{name}-90-vboxdrv.rules
-Source5:        %{name}.modules
-Source6:        %{name}-guest.modules
-Patch6:         %{name}-1.6.4-desktop.patch
-Patch7:         %{name}-2.0.2-setup.patch
-Patch9:         %{name}-2.1.0-icons.patch
-Patch10:        %{name}-2.1.0-32bit.patch
-Patch11:        %{name}-2.1.2-gcc44.patch
-Patch12:        %{name}-2.1.4-swab.patch
-Patch13:        %{name}-2.1.4-libcap.patch
+Source4:        VirtualBox-OSE-90-vboxdrv.rules
+Source5:        VirtualBox-OSE.modules
+Source6:        VirtualBox-OSE-guest.modules
+Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
+Patch2:         VirtualBox-OSE-2.2.2-strings.patch
+Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -39,11 +36,7 @@ BuildRequires:  libXmu-devel
 BuildRequires:  python-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
-%if 0%{?fedora} > 6
 BuildRequires:  qt4-devel
-%else
-BuildRequires:  qt-devel < 1:4
-%endif
 
 # Plague-specific weirdness
 %if 0%{?fedora} > 10
@@ -54,8 +47,6 @@ ExclusiveArch:  i386 x86_64
 
 Requires:       %{name}-kmod = %{version}
 Provides:       %{name}-kmod-common = %{version}
-
-Requires(pre):  shadow-utils
 
 %description
 A general-purpose full virtualizer and emulator for 32-bit and
@@ -107,16 +98,9 @@ X.org X11 %{name} video and mouse driver.
 %setup -q -n VirtualBox-%{version}_OSE
 cp %{SOURCE1} . # PDF User Guide
 
-%patch6 -p1 -b .desktop
-%patch7 -p1 -b .setup
-%patch9 -p1 -b .icons
+%patch1 -p1 -b .noupdates
+%patch2 -p1 -b .strings
 %patch10 -p1 -b .32bit
-%patch11 -p1 -b .gcc44
-%patch12 -p1 -b .swab
-%patch13 -p1 -b .libcap
-
-# Copy icons forgotten from distribution, see patch9
-cp src/VBox/Frontends/VirtualBox4/images/os_*.png src/VBox/Frontends/VirtualBox/images
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -127,12 +111,8 @@ sed -i 's/\r//' COPYING
 
 
 %build
-./configure --disable-kmods \
-%if 0%{?fedora} > 6
-        --disable-qt3
-%else
-        --disable-qt4
-%endif
+./configure --disable-kmods --enable-webservice \
+        %{?_without_hardening:--disable-hardening}
 
 . ./env.sh
 
@@ -145,7 +125,8 @@ sed -i 's/\r//' COPYING
 # FIXME: Utilize optflags. This will probably involve patching of makefiles
 # Setting VBOX_GCC_OPT to optflags doesn't use the flags for large part of
 # the tree, while preventing required symbols to be generated in .r0 files
-kmk KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm VBOX_WITH_REGISTRATION_REQUEST= PATH_INS="$PWD/obj"
+kmk KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm VBOX_WITH_REGISTRATION_REQUEST= PATH_INS="$PWD/obj" \
+        KMK_REVISION=3000 KBUILD_KMK_REVISION=3000
 
 
 %install
@@ -159,11 +140,7 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 install -d $RPM_BUILD_ROOT%{_libdir}
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/components
-%if 0%{?fedora} > 6
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls
-%else
-install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls3
-%endif
 install -d $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk
 install -d $RPM_BUILD_ROOT%{_datadir}/pixmaps
 install -d $RPM_BUILD_ROOT%{_prefix}/src/%{name}-kmod-%{version}
@@ -174,9 +151,6 @@ ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxHeadless
 ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxManage
 ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxSDL
 ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VirtualBox
-%if 0%{?fedora} <= 6
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VirtualBox3
-%endif
 
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
         obj/bin/VBoxTunctl      \
@@ -188,72 +162,34 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/components \
 
 # Lib
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-        obj/bin/VBoxDD2.so      \
-        obj/bin/VBoxDD.so       \
-        obj/bin/VBoxDDU.so      \
-        obj/bin/VBoxGuestPropSvc.so \
-        obj/bin/VBoxHeadless.so \
-        obj/bin/VBoxPython.so   \
-        obj/bin/VBoxREM.so      \
-%ifnarch x86_64
-        obj/bin/VBoxREM32.so    \
-        obj/bin/VBoxREM64.so    \
-%endif
-        obj/bin/VBoxRT.so       \
-        obj/bin/VBoxSDL.so      \
-        obj/bin/VBoxSettings.so \
-        obj/bin/VBoxSharedClipboard.so \
-        obj/bin/VBoxSharedFolders.so \
-        obj/bin/VBoxVMM.so      \
-        obj/bin/VBoxXPCOM.so    \
-        obj/bin/VBoxBFE.so      \
-%if 0%{?fedora} > 6
-        obj/bin/VBoxKeyboard.so \
-        obj/bin/VirtualBox.so   \
-%else
-        obj/bin/VBoxKeyboard3.so \
-        obj/bin/VirtualBox3.so  \
-%endif
+        obj/bin/*.so            \
         obj/bin/V*.gc           \
         obj/bin/V*.r0
-
-# For some reason this is needed since 2.1.4.
-# Upstream binary distribution doesn't do that
-pushd $RPM_BUILD_ROOT%{_libdir}/virtualbox/components
-ln -sf ../*.so .
-popd
 
 # SetUID root binaries
 install -p -m 4755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
         obj/bin/VBoxHeadless    \
         obj/bin/VBoxSDL         \
-%if 0%{?fedora} > 6
+        obj/bin/VBoxNetDHCP     \
+        obj/bin/VBoxNetAdpCtl   \
         obj/bin/VirtualBox
-%else
-        obj/bin/VirtualBox3
-%endif
+
 
 # Other binaries
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
         obj/bin/VBoxManage      \
         obj/bin/VBoxSVC         \
-        obj/bin/VBoxXPCOMIPCD
+        obj/bin/VBoxXPCOMIPCD   \
+        obj/bin/VBoxSysInfo.sh
 
 # Language files
-%if 0%{?fedora} > 6
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
         obj/bin/nls/*
-%else
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls3 \
-        obj/bin/nls3/*
-%endif
 
 # SDK
 cp -rp obj/bin/sdk/. $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk
 
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_datadir}/virtualbox \
-        obj/bin/VBoxSysInfo.sh
-
+# Icon
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
         obj/bin/VBox.png
 
@@ -289,16 +225,47 @@ tar --use-compress-program lzma -cf $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{ve
         %{name}-kmod-%{version}
 
 # Menu entry
-desktop-file-install --dir=${RPM_BUILD_ROOT}%{_datadir}/applications \
+desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
+        --remove-key=DocPath --remove-category=X-MandrivaLinux-System \
         --vendor='' src/VBox/Installer/linux/VirtualBox.desktop
+
+
+%check
+# Dear contributor,
+#
+# If you forget a file when updating to a later version, it's
+# not you fault; as you can see, install section is far from
+# ideal. This section is meant to make it easier for you to spot
+# files you've forgotten to include. Feel free to blacklist
+# uninteresting files here.
+#
+# Not sure if a file is "uninteresting"? See if closed version
+# contains it? No? Remove it. Application doesn't run without
+# it? Bring it back.
+
+set +o posix
+diff <((find obj/bin/additions/* -maxdepth 0 -type f    \
+                -not -name 'VBoxOGL*.so'                \
+                -not -name 'autorun.sh'                 \
+                -not -name '*_drv*'                     \
+                -exec basename '{}' \;
+        find obj/bin/* -maxdepth 0 -type f              \
+                -not -name 'tst*'                       \
+                -not -name 'SUP*'                       \
+                -not -name 'VBox.sh'                    \
+                -not -name 'xpidl'                      \
+                -not -name 'vboxkeyboard.tar.gz'        \
+                -exec basename '{}' \;) |sort) \
+        <(find $RPM_BUILD_ROOT%{_libdir}/virtualbox/*   \
+                $RPM_BUILD_ROOT%{_bindir}/*             \
+                $RPM_BUILD_ROOT%{_datadir}/{pixmaps,applications}/* \
+                -maxdepth 0 -type f                     \
+                -not -name VBox -exec basename '{}' \; |sort)
+set -o posix
 
 
 %clean
 rm -rf $RPM_BUILD_ROOT
-
-
-%pre
-getent group %{groupname} >/dev/null || groupadd -r %{groupname}
 
 
 %files
@@ -310,13 +277,8 @@ getent group %{groupname} >/dev/null || groupadd -r %{groupname}
 %{_bindir}/VBoxSDL
 %{_bindir}/VBoxTunctl
 %{_bindir}/VirtualBox
-%if 0%{?fedora} <= 6
-%{_bindir}/VirtualBox3
-%endif
 %{_libdir}/virtualbox
 %{_datadir}/pixmaps/*
-%dir %{_datadir}/virtualbox
-%{_datadir}/virtualbox/VBoxSysInfo.sh
 %{_datadir}/applications/*.desktop
 %config %{_sysconfdir}/vbox/vbox.cfg
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
@@ -326,7 +288,7 @@ getent group %{groupname} >/dev/null || groupadd -r %{groupname}
 
 %files devel
 %defattr(0644,root,root,-)
-%{_datadir}/virtualbox/sdk
+%{_datadir}/virtualbox
 %doc COPYING
 
 
@@ -351,6 +313,17 @@ getent group %{groupname} >/dev/null || groupadd -r %{groupname}
 
 
 %changelog
+* Sun May 03 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.2-1
+- Damnit, another new upstream release! :)
+- Improved packaging checks
+- Upstream fixed libcap detection, drop patch
+- Drop gcc44 patch, upstream supports it now
+
+* Sat Apr 25 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.0-1
+- New upstream release
+- Allow for disabling of hardening to allow group-based vboxdrv control
+- Disable automatic updates
+
 * Fri Apr 24 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.1.4-4
 - Adjust architecture list for plague
 
