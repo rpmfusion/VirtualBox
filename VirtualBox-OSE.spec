@@ -9,7 +9,7 @@
 %bcond_without hardening
 
 Name:           VirtualBox-OSE
-Version:        2.2.2
+Version:        2.2.4
 Release:        1%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
@@ -313,6 +313,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun May 31 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.4-1
+- New upstream release
+
 * Sun May 03 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.2-1
 - Damnit, another new upstream release! :)
 - Improved packaging checks
