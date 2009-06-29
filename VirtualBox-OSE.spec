@@ -10,7 +10,7 @@
 
 Name:           VirtualBox-OSE
 Version:        2.2.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -68,30 +68,25 @@ Summary:        %{name} Guest Additions
 Group:          System Environment/Base
 Requires:       %{name}-kmod = %{version}
 Provides:       %{name}-kmod-common = %{version}
+Requires:       hal
+Requires:       xorg-x11-server-Xorg
+Requires:       xorg-x11-xinit
+Provides:       xorg-x11-drv-VirtualBox = %{version}-%{release}
+Obsoletes:      xorg-x11-drv-VirtualBox < %{version}-%{release}
 
 %description guest
 Tools that utilize kernel modules for supporting integration
 with the Host, including file sharing and tracking of mouse pointer
-movement.
+movement and X.org X11 video and mouse driver.
 
 
 %package kmodsrc
 Summary:        %{name} kernel module source code
 Group:          System Environment/Kernel
-Requires:       xorg-x11-server-Xorg
 
 %description kmodsrc
 Source tree used for building kernel module packages (%{name}-kmod)
 which is generated during the build of main package.
-
-
-%package -n xorg-x11-drv-%{name}
-Summary:        X.org X11 %{name} video and mouse driver
-Group:          User Interface/X Hardware Support
-Requires:       xorg-x11-server-Xorg
-
-%description -n xorg-x11-drv-%{name}
-X.org X11 %{name} video and mouse driver.
 
 
 %prep
@@ -193,18 +188,36 @@ cp -rp obj/bin/sdk/. $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
         obj/bin/VBox.png
 
-# X.Org drivers
-install -m 0755 -D obj/bin/additions/vboxmouse_drv_71.so \
+# Guest X.Org drivers
+%if 0%{?fedora} >= 10
+%global x11_api 16
+%endif
+
+install -m 0755 -D obj/bin/additions/vboxmouse_drv_%{x11_api}.so \
         $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxmouse_drv.so
-install -m 0755 -D obj/bin/additions/vboxvideo_drv_71.so \
+install -m 0755 -D obj/bin/additions/vboxvideo_drv_%{x11_api}.so \
         $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
-# Guest Additions
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
+install -m 0755 -D src/VBox/Additions/linux/installer/90-vboxguest.fdi \
+	$RPM_BUILD_ROOT%{_datadir}/hal/fdi/information/20thirdparty/90-vboxguest.fdi
+
+# Guest tools
+install -m 0755 -t $RPM_BUILD_ROOT%{_bindir} 	\
         obj/bin/additions/mountvboxsf           \
         obj/bin/additions/vboxadd-timesync      \
         obj/bin/additions/VBoxClient            \
         obj/bin/additions/VBoxControl
+
+install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
+	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
+
+install -m 0755 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
+	$RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+
+# Guest libraries
+install -m 0755 -t $RPM_BUILD_ROOT%{_libdir} 	\
+        obj/bin/additions/VBoxOGL*.so
 
 # Installation root configuration
 install -d $RPM_BUILD_ROOT/%{_sysconfdir}/vbox
@@ -244,8 +257,7 @@ desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
 # it? Bring it back.
 
 set +o posix
-diff <((find obj/bin/additions/* -maxdepth 0 -type f    \
-                -not -name 'VBoxOGL*.so'                \
+diff -u <((find obj/bin/additions/* -maxdepth 0 -type f    \
                 -not -name 'autorun.sh'                 \
                 -not -name '*_drv*'                     \
                 -exec basename '{}' \;
@@ -258,6 +270,7 @@ diff <((find obj/bin/additions/* -maxdepth 0 -type f    \
                 -exec basename '{}' \;) |sort) \
         <(find $RPM_BUILD_ROOT%{_libdir}/virtualbox/*   \
                 $RPM_BUILD_ROOT%{_bindir}/*             \
+                $RPM_BUILD_ROOT%{_libdir}/*OGL*.so      \
                 $RPM_BUILD_ROOT%{_datadir}/{pixmaps,applications}/* \
                 -maxdepth 0 -type f                     \
                 -not -name VBox -exec basename '{}' \; |sort)
@@ -266,6 +279,11 @@ set -o posix
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+
+
+# Guest additions install the OGL libraries
+%post guest -p /sbin/ldconfig
+%postun guest -p /sbin/ldconfig
 
 
 %files
@@ -298,6 +316,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/vboxadd-timesync
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
+%{_libdir}/xorg/modules/drivers/*
+%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
+%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+%{_libdir}/VBoxOGL*.so
+%{_datadir}/hal/fdi/information/20thirdparty/90-vboxguest.fdi
 %config %{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
 %doc COPYING
 
@@ -307,12 +330,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}-kmod-%{version}
 
 
-%files -n xorg-x11-drv-%{name}
-%defattr(-,root,root,-)
-%{_libdir}/xorg/modules/drivers/*
-
-
 %changelog
+* Mon Jun 29 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.4-2
+- They left for beer too early, dicks, so we fix up wbox now
+- Make guest additions just work
+- Merge xorg stuff with rest of guest additions
+
 * Sun May 31 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.4-1
 - New upstream release
 
