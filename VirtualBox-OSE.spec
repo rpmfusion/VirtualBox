@@ -10,7 +10,7 @@
 
 Name:           VirtualBox-OSE
 Version:        2.2.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -158,8 +158,10 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/components \
         obj/bin/components/*
 
 # Lib
+install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
+        obj/bin/*.so
+
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-        obj/bin/*.so            \
         obj/bin/V*.gc           \
         obj/bin/V*.r0
 
@@ -341,6 +343,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Jul 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.4-4
+- Libs need to be executable for the dep generator (#698)
+
 * Thu Jul 02 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.4-3
 - Enable resize for the login window
 - Add the guest udev rules
