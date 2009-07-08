@@ -10,7 +10,7 @@
 
 Name:           VirtualBox-OSE
 Version:        2.2.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -19,8 +19,10 @@ URL:            http://www.virtualbox.org/wiki/VirtualBox
 Source0:        http://dlc.sun.com/virtualbox/%{version}/VirtualBox-%{version}-OSE.tar.bz2
 Source1:        http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
 Source4:        VirtualBox-OSE-90-vboxdrv.rules
-Source5:        VirtualBox-OSE.modules
-Source6:        VirtualBox-OSE-guest.modules
+Source5:        VirtualBox-OSE-60-vboxadd.rules
+Source6:        VirtualBox-OSE.modules
+Source7:        VirtualBox-OSE-guest.modules
+Source8:        VirtualBox-OSE-vboxresize.desktop
 Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
 Patch2:         VirtualBox-OSE-2.2.2-strings.patch
 Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
@@ -213,7 +215,12 @@ install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
 	$RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+
+install -m 0755 -D %{SOURCE8} \
+	$RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
+
 desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 # Guest libraries
 install -m 0755 -t $RPM_BUILD_ROOT%{_libdir} 	\
@@ -223,12 +230,13 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_libdir} 	\
 install -d $RPM_BUILD_ROOT/%{_sysconfdir}/vbox
 echo 'INSTALL_DIR="%{_libdir}/virtualbox"' > $RPM_BUILD_ROOT/%{_sysconfdir}/vbox/vbox.cfg
 
-# Install udev rule
+# Install udev rules
 install -p -m 0644 -D %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
+install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-vboxadd.rules
 
 # Install modules load script
-install -p -m 0755 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}.modules
-install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
+install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}.modules
+install -p -m 0755 -D %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
@@ -301,7 +309,7 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/vbox/vbox.cfg
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
-%doc COPYING
+%doc COPYING UserManual.pdf
 
 
 %files devel
@@ -319,8 +327,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/xorg/modules/drivers/*
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
+%{_datadir}/gdm/autostart/LoginWindow
 %{_libdir}/VBoxOGL*.so
 %{_datadir}/hal/fdi/information/20thirdparty/90-vboxguest.fdi
+%config %{_sysconfdir}/udev/rules.d/60-vboxadd.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
 %doc COPYING
 
@@ -331,6 +341,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Jul 02 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.4-3
+- Enable resize for the login window
+- Add the guest udev rules
+- Actually install documentation
+
 * Mon Jun 29 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.4-2
 - They left for beer too early, dicks, so we fix up wbox now
 - Make guest additions just work
