@@ -9,8 +9,8 @@
 %bcond_without hardening
 
 Name:           VirtualBox-OSE
-Version:        2.2.4
-Release:        4%{?dist}
+Version:        3.0.0
+Release:        2%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -24,13 +24,16 @@ Source6:        VirtualBox-OSE.modules
 Source7:        VirtualBox-OSE-guest.modules
 Source8:        VirtualBox-OSE-vboxresize.desktop
 Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
-Patch2:         VirtualBox-OSE-2.2.2-strings.patch
+Patch2:         VirtualBox-OSE-3.0.0-strings.patch
 Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  kBuild >= 0.1.5-1
-BuildRequires:  SDL-devel xalan-c-devel hal-devel
+BuildRequires:  SDL-devel xalan-c-devel
+BuildRequires:  hal-devel
+BuildRequires:  openssl-devel
+BuildRequires:  libcurl-devel
 BuildRequires:  dev86 iasl libxslt-devel xerces-c-devel libXcursor-devel libIDL-devel
 BuildRequires:  yasm
 BuildRequires:  pulseaudio-libs-devel
@@ -173,13 +176,14 @@ install -p -m 4755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
         obj/bin/VBoxNetAdpCtl   \
         obj/bin/VirtualBox
 
-
 # Other binaries
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
         obj/bin/VBoxManage      \
         obj/bin/VBoxSVC         \
         obj/bin/VBoxXPCOMIPCD   \
-        obj/bin/VBoxSysInfo.sh
+        obj/bin/VBoxSysInfo.sh  \
+        obj/bin/vboxshell.py    \
+        obj/bin/VBoxTestOGL
 
 # Language files
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
@@ -208,7 +212,7 @@ install -m 0755 -D src/VBox/Additions/linux/installer/90-vboxguest.fdi \
 # Guest tools
 install -m 0755 -t $RPM_BUILD_ROOT%{_bindir} 	\
         obj/bin/additions/mountvboxsf           \
-        obj/bin/additions/vboxadd-timesync      \
+        obj/bin/additions/VBoxService           \
         obj/bin/additions/VBoxClient            \
         obj/bin/additions/VBoxControl
 
@@ -323,9 +327,9 @@ rm -rf $RPM_BUILD_ROOT
 %files guest
 %defattr(-,root,root,-)
 %{_bindir}/mountvboxsf
-%{_bindir}/vboxadd-timesync
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
+%{_bindir}/VBoxService
 %{_libdir}/xorg/modules/drivers/*
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
@@ -343,8 +347,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Wed Jul 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.4-4
+* Wed Jul 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.0-2
+- Tidy up the filelist check
 - Libs need to be executable for the dep generator (#698)
+
+* Fri Jul 03 2009 Jonathan Dieter <jdieter@gmail.com> - 3.0.0-1
+- New upstream release
 
 * Thu Jul 02 2009 Lubomir Rintel <lkundrak@v3.sk> - 2.2.4-3
 - Enable resize for the login window
