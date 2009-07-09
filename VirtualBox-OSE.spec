@@ -287,6 +287,7 @@ diff -u <((find obj/bin/additions/* -maxdepth 0 -type f    \
                 $RPM_BUILD_ROOT%{_libdir}/*OGL*.so      \
                 $RPM_BUILD_ROOT%{_datadir}/{pixmaps,applications}/* \
                 -maxdepth 0 -type f                     \
+                -not -name '*.py[co]'                   \
                 -not -name VBox -exec basename '{}' \; |sort)
 set -o posix
 
