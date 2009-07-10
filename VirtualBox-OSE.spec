@@ -10,7 +10,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -25,6 +25,7 @@ Source7:        VirtualBox-OSE-guest.modules
 Source8:        VirtualBox-OSE-vboxresize.desktop
 Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
 Patch2:         VirtualBox-OSE-3.0.0-strings.patch
+Patch3:         VirtualBox-OSE-3.0.0-netfreeze.patch
 Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -100,6 +101,7 @@ cp %{SOURCE1} . # PDF User Guide
 
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
+%patch3 -p1 -b .netfreeze
 %patch10 -p1 -b .32bit
 
 # Remove prebuilt binary tools
@@ -348,6 +350,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jul 10 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.0-3
+- Fix freeze of guests on network load (upstream ticket/4343)
+
 * Wed Jul 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.0-2
 - Tidy up the filelist check
 - Libs need to be executable for the dep generator (#698)
