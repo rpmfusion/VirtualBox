@@ -10,7 +10,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.0.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -76,8 +76,8 @@ Provides:       %{name}-kmod-common = %{version}
 Requires:       hal
 Requires:       xorg-x11-server-Xorg
 Requires:       xorg-x11-xinit
-Provides:       xorg-x11-drv-VirtualBox = %{version}-%{release}
-Obsoletes:      xorg-x11-drv-VirtualBox < %{version}-%{release}
+Provides:       xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
+Obsoletes:      xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
 
 %description guest
 Tools that utilize kernel modules for supporting integration
@@ -348,6 +348,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Jul 20 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.2-2
+- Properly replace the xorg driver package
+
 * Sun Jul 12 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.2-1
 - New upstream release
 - Dropping the upstreamed netfreeze patch
