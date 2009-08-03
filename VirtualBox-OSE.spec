@@ -10,7 +10,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.0.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -348,6 +348,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Aug 04 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.2-3
+- Add netadp bmodule (Vlastimil Holer, #744)
+
 * Mon Jul 20 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.2-2
 - Properly replace the xorg driver package
 

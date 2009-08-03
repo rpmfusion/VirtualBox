@@ -3,6 +3,8 @@
 # User is advised to run this on upgrades
 /sbin/rmmod vboxnetflt &>/dev/null ||:
 /sbin/rmmod vboxdrv &>/dev/null ||:
+/sbin/rmmod vboxnetadp &>/dev/null ||:
 
 /sbin/modprobe vboxdrv
 /sbin/modprobe vboxnetflt
+/sbin/modprobe vboxnetadp
