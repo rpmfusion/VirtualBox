@@ -1,0 +1,442 @@
+Build drivers for XOrg 1.7 ABI.
+And only them.
+
+Lubomir Rintel <lkundrak@v3.sk>
+
+diff -urp VirtualBox-3.0.2_OSE.orig/src/VBox/Additions/x11/vboxmouse/Makefile.kmk VirtualBox-3.0.2_OSE/src/VBox/Additions/x11/vboxmouse/Makefile.kmk
+--- VirtualBox-3.0.2_OSE.orig/src/VBox/Additions/x11/vboxmouse/Makefile.kmk	2009-07-10 11:40:23.000000000 -0400
++++ VirtualBox-3.0.2_OSE/src/VBox/Additions/x11/vboxmouse/Makefile.kmk	2009-08-04 15:19:27.878921289 -0400
+@@ -61,7 +61,7 @@ endif
+ #
+ # vboxmouse_drv_70
+ #
+-DLLS += vboxmouse_drv_70
++#DLLS += vboxmouse_drv_70
+ vboxmouse_drv_70_TEMPLATE = VBOXGUESTR3XORGMOD
+ vboxmouse_drv_70_DEFS = \
+ 	XFree86Server IN_MODULE XFree86Module XFree86LOADER XINPUT XORG_7X
+@@ -82,7 +82,7 @@ vboxmouse_drv_70_SOURCES = \
+ #
+ # vboxmouse_drv_71
+ #
+-DLLS += vboxmouse_drv_71
++#DLLS += vboxmouse_drv_71
+ vboxmouse_drv_71_TEMPLATE = VBOXGUESTR3XORGMOD
+ vboxmouse_drv_71_DEFS := $(vboxmouse_drv_70_DEFS)
+ vboxmouse_drv_71_INCS := \
+@@ -99,7 +99,7 @@ vboxmouse_drv_71_SOURCES = \
+ #
+ # vboxmouse_drv_14
+ #
+-DLLS += vboxmouse_drv_14
++#DLLS += vboxmouse_drv_14
+ vboxmouse_drv_14_TEMPLATE = VBOXGUESTR3XORGMOD
+ vboxmouse_drv_14_DEFS := $(vboxmouse_drv_70_DEFS) NO_ANSIC
+ vboxmouse_drv_14_INCS := \
+@@ -116,7 +116,7 @@ vboxmouse_drv_14_SOURCES = \
+ #
+ # vboxmouse_drv_15
+ #
+-DLLS += vboxmouse_drv_15
++#DLLS += vboxmouse_drv_15
+ vboxmouse_drv_15_TEMPLATE = VBOXGUESTR3XORGMOD
+ vboxmouse_drv_15_DEFS := $(vboxmouse_drv_70_DEFS) NO_ANSIC
+ vboxmouse_drv_15_INCS := \
+@@ -129,9 +129,9 @@ vboxmouse_drv_15_SOURCES = \
+ 
+ 
+ #
+-# vboxmouse_drv_16
++# vboxmouse_drv_16 \
+ #
+-DLLS += vboxmouse_drv_16
++#DLLS += vboxmouse_drv_16
+ vboxmouse_drv_16_TEMPLATE = VBOXGUESTR3XORGMOD
+ vboxmouse_drv_16_DEFS := $(vboxmouse_drv_70_DEFS) NO_ANSIC
+ vboxmouse_drv_16_INCS := \
+@@ -143,64 +143,90 @@ vboxmouse_drv_16_INCS := \
+ vboxmouse_drv_16_SOURCES = \
+ 	vboxmouse_15.c
+ 
+-# Check the undefined symbols in the X.Org modules against lists of allowed
+-# symbols.  Not very elegant, but it will catch problems early.
+-ifdef VBOX_WITH_TESTCASES
+-# ifndef VBOX_ONLY_ADDITIONS
+-  if1of ($(KBUILD_TARGET),linux solaris)
+-   ifeq ($(KBUILD_HOST_ARCH),$(KBUILD_TARGET_ARCH))
+-    ifndef VBOX_ONLY_SDK
+-     OUR_PATH_VBOXMOUSE=$(PATH_ROOT)/src/VBox/Additions/x11/vboxmouse
+-
+-    ifeq ($(KBUILD_TARGET),linux)
+-      TESTING  += $(PATH_vboxmouse_drv)/tstvboxmouse68.run
+-      OTHERS += $(PATH_vboxmouse_drv)/tstvboxmouse68.run
+-$$(PATH_vboxmouse_drv)/tstvboxmouse68.run: $$(INSTARGET_vboxmouse_drv)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET) \
+-	    "$(INSTARGET_vboxmouse_drv)" "$(OUR_PATH_VBOXMOUSE)/undefined_68" --static
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-    endif
+-
+-     TESTING  += $(PATH_vboxmouse_drv_70)/tstvboxmouse70.run
+-     OTHERS += $(PATH_vboxmouse_drv_70)/tstvboxmouse70.run
+-$$(PATH_vboxmouse_drv_70)/tstvboxmouse70.run: $$(INSTARGET_vboxmouse_drv_70)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh  $(KBUILD_TARGET) \
+-	    $(INSTARGET_vboxmouse_drv_70) $(OUR_PATH_VBOXMOUSE)/undefined_70
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-
+-     TESTING  += $(PATH_vboxmouse_drv_71)/tstvboxmouse71.run
+-     OTHERS += $(PATH_vboxmouse_drv_71)/tstvboxmouse71.run
+-$$(PATH_vboxmouse_drv_71)/tstvboxmouse71.run: $$(INSTARGET_vboxmouse_drv_71)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
+-	    $(INSTARGET_vboxmouse_drv_71) $(OUR_PATH_VBOXMOUSE)/undefined_71
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-
+-     TESTING  += $(PATH_vboxmouse_drv_14)/tstvboxmouse14.run
+-     OTHERS += $(PATH_vboxmouse_drv_14)/tstvboxmouse14.run
+-$$(PATH_vboxmouse_drv_14)/tstvboxmouse14.run: $$(INSTARGET_vboxmouse_drv_14)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET) \
+-	    $(INSTARGET_vboxmouse_drv_14) $(OUR_PATH_VBOXMOUSE)/undefined_14
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-
+-     TESTING  += $(PATH_vboxmouse_drv_15)/tstvboxmouse15.run
+-     OTHERS += $(PATH_vboxmouse_drv_15)/tstvboxmouse15.run
+-$$(PATH_vboxmouse_drv_15)/tstvboxmouse15.run: $$(INSTARGET_vboxmouse_drv_15)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
+-	    $(INSTARGET_vboxmouse_drv_15) $(OUR_PATH_VBOXMOUSE)/undefined_15
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-
+-     TESTING  += $(PATH_vboxmouse_drv_16)/tstvboxmouse16.run
+-     OTHERS += $(PATH_vboxmouse_drv_16)/tstvboxmouse16.run
+-$$(PATH_vboxmouse_drv_16)/tstvboxmouse16.run: $$(INSTARGET_vboxmouse_drv_16)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
+-	    $(INSTARGET_vboxmouse_drv_16) $(OUR_PATH_VBOXMOUSE)/undefined_16
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-
+-    endif # ! VBOX_ONLY_SDK
+-   endif # eq ($(KBUILD_HOST_ARCH),$(KBUILD_TARGET_ARCH))
+-  endif # eq ($(KBUILD_TARGET),linux)
+-# endif # ! VBOX_ONLY_ADDITIONS
+-endif # VBOX_WITH_TESTCASES
++DLLS += vboxmouse_drv_17
++vboxmouse_drv_17_TEMPLATE = VBOXGUESTR3XORGMOD
++vboxmouse_drv_17_DEFS := $(vboxmouse_drv_70_DEFS) NO_ANSIC
++vboxmouse_drv_17_INCS := \
++	/usr/include/pixman-1 \
++	/usr/share/xorg-x11-server-source/hw/xfree86/common \
++	/usr/share/xorg-x11-server-source/hw/xfree86/os-support/bus \
++	/usr/share/xorg-x11-server-source/include \
++	/usr/share/xorg-x11-server-source/mi \
++	/usr/share/xorg-x11-server-source/Xext \
++	$(PATH_SUB_CURRENT)
++vboxmouse_drv_17_SOURCES = \
++	vboxmouse_15.c
++
++#	$(VBOX_PATH_X11_XORG_1_6) \
++#	$(VBOX_PATH_X11_XORG_1_6)/X11 \
++#	$(VBOX_PATH_X11_ROOT)/xorg-server-1.6.0 \
++#	$(VBOX_PATH_X11_ROOT)/xorg-server-1.6.0-local \
++
++## Check the undefined symbols in the X.Org modules against lists of allowed
++## symbols.  Not very elegant, but it will catch problems early.
++#ifdef VBOX_WITH_TESTCASES
++## ifndef VBOX_ONLY_ADDITIONS
++#  if1of ($(KBUILD_TARGET),linux solaris)
++#   ifeq ($(KBUILD_HOST_ARCH),$(KBUILD_TARGET_ARCH))
++#    ifndef VBOX_ONLY_SDK
++#     OUR_PATH_VBOXMOUSE=$(PATH_ROOT)/src/VBox/Additions/x11/vboxmouse
++#
++#    ifeq ($(KBUILD_TARGET),linux)
++#      TESTING  += $(PATH_vboxmouse_drv)/tstvboxmouse68.run
++#      OTHERS += $(PATH_vboxmouse_drv)/tstvboxmouse68.run
++#$$(PATH_vboxmouse_drv)/tstvboxmouse68.run: $$(INSTARGET_vboxmouse_drv)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET) \
++#	    "$(INSTARGET_vboxmouse_drv)" "$(OUR_PATH_VBOXMOUSE)/undefined_68" --static
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#    endif
++#
++#     TESTING  += $(PATH_vboxmouse_drv_70)/tstvboxmouse70.run
++#     OTHERS += $(PATH_vboxmouse_drv_70)/tstvboxmouse70.run
++#$$(PATH_vboxmouse_drv_70)/tstvboxmouse70.run: $$(INSTARGET_vboxmouse_drv_70)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh  $(KBUILD_TARGET) \
++#	    $(INSTARGET_vboxmouse_drv_70) $(OUR_PATH_VBOXMOUSE)/undefined_70
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#
++#     TESTING  += $(PATH_vboxmouse_drv_71)/tstvboxmouse71.run
++#     OTHERS += $(PATH_vboxmouse_drv_71)/tstvboxmouse71.run
++#$$(PATH_vboxmouse_drv_71)/tstvboxmouse71.run: $$(INSTARGET_vboxmouse_drv_71)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++#	    $(INSTARGET_vboxmouse_drv_71) $(OUR_PATH_VBOXMOUSE)/undefined_71
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#
++#     TESTING  += $(PATH_vboxmouse_drv_14)/tstvboxmouse14.run
++#     OTHERS += $(PATH_vboxmouse_drv_14)/tstvboxmouse14.run
++#$$(PATH_vboxmouse_drv_14)/tstvboxmouse14.run: $$(INSTARGET_vboxmouse_drv_14)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET) \
++#	    $(INSTARGET_vboxmouse_drv_14) $(OUR_PATH_VBOXMOUSE)/undefined_14
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#
++#     TESTING  += $(PATH_vboxmouse_drv_15)/tstvboxmouse15.run
++#     OTHERS += $(PATH_vboxmouse_drv_15)/tstvboxmouse15.run
++#$$(PATH_vboxmouse_drv_15)/tstvboxmouse15.run: $$(INSTARGET_vboxmouse_drv_15)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++#	    $(INSTARGET_vboxmouse_drv_15) $(OUR_PATH_VBOXMOUSE)/undefined_15
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#
++#     TESTING  += $(PATH_vboxmouse_drv_16)/tstvboxmouse16.run
++#     OTHERS += $(PATH_vboxmouse_drv_16)/tstvboxmouse16.run
++#$$(PATH_vboxmouse_drv_16)/tstvboxmouse16.run: $$(INSTARGET_vboxmouse_drv_16)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++#	    $(INSTARGET_vboxmouse_drv_16) $(OUR_PATH_VBOXMOUSE)/undefined_16
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#
++##     TESTING  += $(PATH_vboxmouse_drv_17)/tstvboxmouse17.run
++##     OTHERS += $(PATH_vboxmouse_drv_17)/tstvboxmouse17.run
++##$$(PATH_vboxmouse_drv_17)/tstvboxmouse17.run: $$(INSTARGET_vboxmouse_drv_17)
++##	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++##	    $(INSTARGET_vboxmouse_drv_17) $(OUR_PATH_VBOXMOUSE)/undefined_17
++###	$(QUIET)$(APPEND) -t "$@" "done"
++#
++#    endif # ! VBOX_ONLY_SDK
++#   endif # eq ($(KBUILD_HOST_ARCH),$(KBUILD_TARGET_ARCH))
++#  endif # eq ($(KBUILD_TARGET),linux)
++## endif # ! VBOX_ONLY_ADDITIONS
++#endif # VBOX_WITH_TESTCASES
+ 
+ include	$(KBUILD_PATH)/subfooter.kmk
+ 
+diff -urp VirtualBox-3.0.2_OSE.orig/src/VBox/Additions/x11/vboxvideo/Makefile.kmk VirtualBox-3.0.2_OSE/src/VBox/Additions/x11/vboxvideo/Makefile.kmk
+--- VirtualBox-3.0.2_OSE.orig/src/VBox/Additions/x11/vboxvideo/Makefile.kmk	2009-07-10 11:40:23.000000000 -0400
++++ VirtualBox-3.0.2_OSE/src/VBox/Additions/x11/vboxvideo/Makefile.kmk	2009-08-04 15:20:09.279925752 -0400
+@@ -113,7 +113,7 @@ endif   # target linux
+ #         base keywords instead of using .solaris or .linux.
+ #         Also it is *important* to use := and not = when deriving a properity.
+ #
+-DLLS += vboxvideo_drv_70
++#DLLS += vboxvideo_drv_70
+ vboxvideo_drv_70_TEMPLATE = VBOXGUESTR3XORGMOD
+ if1of ($(KBUILD_TARGET), linux)
+  vboxvideo_drv_70_CFLAGS += \
+@@ -139,7 +139,7 @@ vboxvideo_drv_70_SOURCES  = \
+ #
+ # vboxvideo_drv_71
+ #
+-DLLS += vboxvideo_drv_71
++#DLLS += vboxvideo_drv_71
+ vboxvideo_drv_71_TEMPLATE = VBOXGUESTR3XORGMOD
+ vboxvideo_drv_71_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
+ vboxvideo_drv_71_DEFS := $(vboxvideo_drv_70_DEFS)
+@@ -158,7 +158,7 @@ vboxvideo_drv_71_SOURCES  = \
+ #
+ # vboxvideo_drv_13
+ #
+-DLLS += vboxvideo_drv_13
++#DLLS += vboxvideo_drv_13
+ vboxvideo_drv_13_TEMPLATE = VBOXGUESTR3XORGMOD
+ vboxvideo_drv_13_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
+ vboxvideo_drv_13_DEFS := $(vboxvideo_drv_70_DEFS)
+@@ -180,7 +180,7 @@ vboxvideo_drv_13_SOURCES = \
+ # This uses the same code (vboxvideo_13.c) as 1.3, but is built
+ # for 1.4 as well in case there should be any relevant header changes.
+ #
+-DLLS += vboxvideo_drv_14
++#DLLS += vboxvideo_drv_14
+ vboxvideo_drv_14_TEMPLATE = VBOXGUESTR3XORGMOD
+ vboxvideo_drv_14_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
+ vboxvideo_drv_14_DEFS := $(vboxvideo_drv_70_DEFS)
+@@ -199,7 +199,7 @@ vboxvideo_drv_14_SOURCES  = \
+ #
+ # vboxvideo_drv_15
+ #
+-DLLS += vboxvideo_drv_15
++#DLLS += vboxvideo_drv_15
+ vboxvideo_drv_15_TEMPLATE = VBOXGUESTR3XORGMOD
+ vboxvideo_drv_15_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
+ vboxvideo_drv_15_DEFS := $(vboxvideo_drv_70_DEFS) NO_ANSIC PCIACCESS \
+@@ -220,7 +220,7 @@ vboxvideo_drv_15_SOURCES  = \
+ #
+ # vboxvideo_drv_16
+ #
+-DLLS += vboxvideo_drv_16
++#DLLS += vboxvideo_drv_16
+ vboxvideo_drv_16_TEMPLATE = VBOXGUESTR3XORGMOD
+ vboxvideo_drv_16_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
+ vboxvideo_drv_16_DEFS := $(vboxvideo_drv_15_DEFS)
+@@ -237,71 +237,114 @@ vboxvideo_drv_16_SOURCES  = \
+ 	vboxutils.c \
+ 	vboxvideo_dri.c
+ 
+-# Check the undefined symbols in the X.Org modules against lists of allowed
+-# symbols.  Not very elegant, but it will catch problems early.
+-ifdef VBOX_WITH_TESTCASES
+-# ifndef VBOX_ONLY_ADDITIONS
+-  if1of ($(KBUILD_TARGET),linux solaris)
+-   ifeq ($(KBUILD_HOST_ARCH),$(KBUILD_TARGET_ARCH))
+-    ifndef VBOX_ONLY_SDK
+-     OUR_PATH_VBOXVIDEO=$(PATH_ROOT)/src/VBox/Additions/x11/vboxvideo
+-
+-     ifeq ($(KBUILD_TARGET),linux)
+-     TESTING  += $(PATH_vboxvideo_drv)/tstvboxvideo68.run
+-     OTHERS += $(PATH_vboxvideo_drv)/tstvboxvideo68.run
+-$$(PATH_vboxvideo_drv)/tstvboxvideo68.run: $$(INSTARGET_vboxvideo_drv)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
+-	    $(INSTARGET_vboxvideo_drv) $(OUR_PATH_VBOXVIDEO)/undefined_68 --static
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-     endif
+-
+-     TESTING  += $(PATH_vboxvideo_drv_70)/tstvboxvideo70.run
+-     OTHERS += $(PATH_vboxvideo_drv_70)/tstvboxvideo70.run
+-$$(PATH_vboxvideo_drv_70)/tstvboxvideo70.run: $$(INSTARGET_vboxvideo_drv_70)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
+-	    $(INSTARGET_vboxvideo_drv_70) $(OUR_PATH_VBOXVIDEO)/undefined_70
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-
+-     TESTING  += $(PATH_vboxvideo_drv_71)/tstvboxvideo71.run
+-     OTHERS += $(PATH_vboxvideo_drv_71)/tstvboxvideo71.run
+-$$(PATH_vboxvideo_drv_71)/tstvboxvideo71.run: $$(INSTARGET_vboxvideo_drv_71)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
+-	    $(INSTARGET_vboxvideo_drv_71) $(OUR_PATH_VBOXVIDEO)/undefined_71
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-
+-     TESTING  += $(PATH_vboxvideo_drv_13)/tstvboxvideo13.run
+-     OTHERS += $(PATH_vboxvideo_drv_13)/tstvboxvideo13.run
+-$$(PATH_vboxvideo_drv_13)/tstvboxvideo13.run: $$(INSTARGET_vboxvideo_drv_13)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
+-	    $(INSTARGET_vboxvideo_drv_13) $(OUR_PATH_VBOXVIDEO)/undefined_13
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-
+-     TESTING  += $(PATH_vboxvideo_drv_14)/tstvboxvideo14.run
+-     OTHERS += $(PATH_vboxvideo_drv_14)/tstvboxvideo14.run
+-$$(PATH_vboxvideo_drv_14)/tstvboxvideo14.run: $$(INSTARGET_vboxvideo_drv_14)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
+-	    $(INSTARGET_vboxvideo_drv_14) $(OUR_PATH_VBOXVIDEO)/undefined_14
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-
+-     TESTING  += $(PATH_vboxvideo_drv_15)/tstvboxvideo15.run
+-     OTHERS += $(PATH_vboxvideo_drv_15)/tstvboxvideo15.run
+-$$(PATH_vboxvideo_drv_15)/tstvboxvideo15.run: $$(INSTARGET_vboxvideo_drv_15)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
+-	    $(INSTARGET_vboxvideo_drv_15) $(OUR_PATH_VBOXVIDEO)/undefined_15
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-
+-     TESTING  += $(PATH_vboxvideo_drv_16)/tstvboxvideo16.run
+-     OTHERS += $(PATH_vboxvideo_drv_16)/tstvboxvideo16.run
+-$$(PATH_vboxvideo_drv_16)/tstvboxvideo16.run: $$(INSTARGET_vboxvideo_drv_16)
+-	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
+-	    $(INSTARGET_vboxvideo_drv_16) $(OUR_PATH_VBOXVIDEO)/undefined_16
+-	$(QUIET)$(APPEND) -t "$@" "done"
+-
+-    endif # ! VBOX_ONLY_SDK
+-   endif # eq ($(KBUILD_HOST_ARCH),$(KBUILD_TARGET_ARCH))
+-  endif # eq ($(KBUILD_TARGET),linux)
+-# endif # ! VBOX_ONLY_ADDITIONS
+-endif # VBOX_WITH_TESTCASES
++DLLS += vboxvideo_drv_17
++vboxvideo_drv_17_TEMPLATE = VBOXGUESTR3XORGMOD
++vboxvideo_drv_17_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
++vboxvideo_drv_17_DEFS := $(vboxvideo_drv_15_DEFS)
++vboxvideo_drv_17_INCS = \
++	/usr/include/drm \
++	/usr/include/X11/dri \
++	/usr/include/pixman-1 \
++	/usr/share/xorg-x11-server-source \
++	/usr/share/xorg-x11-server-source/fb \
++	/usr/share/xorg-x11-server-source/hw/xfree86/common \
++	/usr/share/xorg-x11-server-source/hw/xfree86/ddc \
++	/usr/share/xorg-x11-server-source/hw/xfree86/dixmods/extmod \
++	/usr/share/xorg-x11-server-source/hw/xfree86/dri \
++	/usr/share/xorg-x11-server-source/hw/xfree86/i2c \
++	/usr/share/xorg-x11-server-source/hw/xfree86/int10 \
++	/usr/share/xorg-x11-server-source/hw/xfree86/modes \
++	/usr/share/xorg-x11-server-source/hw/xfree86/os-support \
++	/usr/share/xorg-x11-server-source/hw/xfree86/os-support/bus \
++	/usr/share/xorg-x11-server-source/hw/xfree86/ramdac \
++	/usr/share/xorg-x11-server-source/hw/xfree86/shadowfb \
++	/usr/share/xorg-x11-server-source/hw/xfree86/vbe \
++	/usr/share/xorg-x11-server-source/hw/xfree86/vgahw \
++	/usr/share/xorg-x11-server-source/hw/xquartz/xpr \
++	/usr/share/xorg-x11-server-source/include \
++	/usr/share/xorg-x11-server-source/mi \
++	/usr/share/xorg-x11-server-source/miext/damage \
++	/usr/share/xorg-x11-server-source/randr \
++	/usr/share/xorg-x11-server-source/Xext \
++	/usr/share/xorg-x11-server-source/render \
++	/usr/share/xorg-x11-server-source/hw/xfree86/parser
++vboxvideo_drv_17_SOURCES  = \
++	vboxvideo_15.c \
++	vboxutils.c \
++	vboxvideo_dri.c
++
++## Check the undefined symbols in the X.Org modules against lists of allowed
++## symbols.  Not very elegant, but it will catch problems early.
++#ifdef VBOX_WITH_TESTCASES
++## ifndef VBOX_ONLY_ADDITIONS
++#  if1of ($(KBUILD_TARGET),linux solaris)
++#   ifeq ($(KBUILD_HOST_ARCH),$(KBUILD_TARGET_ARCH))
++#    ifndef VBOX_ONLY_SDK
++#     OUR_PATH_VBOXVIDEO=$(PATH_ROOT)/src/VBox/Additions/x11/vboxvideo
++#
++#     ifeq ($(KBUILD_TARGET),linux)
++#     TESTING  += $(PATH_vboxvideo_drv)/tstvboxvideo68.run
++#     OTHERS += $(PATH_vboxvideo_drv)/tstvboxvideo68.run
++#$$(PATH_vboxvideo_drv)/tstvboxvideo68.run: $$(INSTARGET_vboxvideo_drv)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++#	    $(INSTARGET_vboxvideo_drv) $(OUR_PATH_VBOXVIDEO)/undefined_68 --static
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#     endif
++#
++#     TESTING  += $(PATH_vboxvideo_drv_70)/tstvboxvideo70.run
++#     OTHERS += $(PATH_vboxvideo_drv_70)/tstvboxvideo70.run
++#$$(PATH_vboxvideo_drv_70)/tstvboxvideo70.run: $$(INSTARGET_vboxvideo_drv_70)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++#	    $(INSTARGET_vboxvideo_drv_70) $(OUR_PATH_VBOXVIDEO)/undefined_70
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#
++#     TESTING  += $(PATH_vboxvideo_drv_71)/tstvboxvideo71.run
++#     OTHERS += $(PATH_vboxvideo_drv_71)/tstvboxvideo71.run
++#$$(PATH_vboxvideo_drv_71)/tstvboxvideo71.run: $$(INSTARGET_vboxvideo_drv_71)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++#	    $(INSTARGET_vboxvideo_drv_71) $(OUR_PATH_VBOXVIDEO)/undefined_71
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#
++#     TESTING  += $(PATH_vboxvideo_drv_13)/tstvboxvideo13.run
++#     OTHERS += $(PATH_vboxvideo_drv_13)/tstvboxvideo13.run
++#$$(PATH_vboxvideo_drv_13)/tstvboxvideo13.run: $$(INSTARGET_vboxvideo_drv_13)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++#	    $(INSTARGET_vboxvideo_drv_13) $(OUR_PATH_VBOXVIDEO)/undefined_13
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#
++#     TESTING  += $(PATH_vboxvideo_drv_14)/tstvboxvideo14.run
++#     OTHERS += $(PATH_vboxvideo_drv_14)/tstvboxvideo14.run
++#$$(PATH_vboxvideo_drv_14)/tstvboxvideo14.run: $$(INSTARGET_vboxvideo_drv_14)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++#	    $(INSTARGET_vboxvideo_drv_14) $(OUR_PATH_VBOXVIDEO)/undefined_14
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#
++#     TESTING  += $(PATH_vboxvideo_drv_15)/tstvboxvideo15.run
++#     OTHERS += $(PATH_vboxvideo_drv_15)/tstvboxvideo15.run
++#$$(PATH_vboxvideo_drv_15)/tstvboxvideo15.run: $$(INSTARGET_vboxvideo_drv_15)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++#	    $(INSTARGET_vboxvideo_drv_15) $(OUR_PATH_VBOXVIDEO)/undefined_15
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#
++#     TESTING  += $(PATH_vboxvideo_drv_16)/tstvboxvideo16.run
++#     OTHERS += $(PATH_vboxvideo_drv_16)/tstvboxvideo16.run
++#$$(PATH_vboxvideo_drv_16)/tstvboxvideo16.run: $$(INSTARGET_vboxvideo_drv_16)
++#	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++#	    $(INSTARGET_vboxvideo_drv_16) $(OUR_PATH_VBOXVIDEO)/undefined_16
++#	$(QUIET)$(APPEND) -t "$@" "done"
++#
++##     TESTING  += $(PATH_vboxvideo_drv_17)/tstvboxvideo17.run
++##     OTHERS += $(PATH_vboxvideo_drv_17)/tstvboxvideo17.run
++##$$(PATH_vboxvideo_drv_17)/tstvboxvideo17.run: $$(INSTARGET_vboxvideo_drv_17)
++##	$(QUIET)/bin/sh $(PATH_ROOT)/src/bldprogs/checkUndefined.sh $(KBUILD_TARGET)  \
++##	    $(INSTARGET_vboxvideo_drv_17) $(OUR_PATH_VBOXVIDEO)/undefined_17
++##	$(QUIET)$(APPEND) -t "$@" "done"
++#
++#    endif # ! VBOX_ONLY_SDK
++#   endif # eq ($(KBUILD_HOST_ARCH),$(KBUILD_TARGET_ARCH))
++#  endif # eq ($(KBUILD_TARGET),linux)
++## endif # ! VBOX_ONLY_ADDITIONS
++#endif # VBOX_WITH_TESTCASES
+ 
+ include	$(KBUILD_PATH)/subfooter.kmk
+ 

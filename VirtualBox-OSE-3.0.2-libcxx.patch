@@ -1,0 +1,45 @@
+Do not include statically linked libstdc++. Not a good idea if we don't need
+to be binary-compatible across exotic distribution. Doesn't work with trunk
+glibc heading towards 2.11 anyways. Static linking is not really supported
+anyways.
+
+Lubomir Rintel <lkundrak@v3.sk>
+
+diff -urp VirtualBox-3.0.2_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk VirtualBox-3.0.2_OSE.fixed/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
+--- VirtualBox-3.0.2_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk	2009-07-10 11:40:22.000000000 -0400
++++ VirtualBox-3.0.2_OSE.fixed/src/VBox/Additions/x11/VBoxClient/Makefile.kmk	2009-08-04 13:54:09.707926383 -0400
+@@ -62,20 +62,20 @@ ifdef VBOX_X11_SEAMLESS_GUEST
+ 	Xext Xmu
+ endif
+ 
+-#
+-# Link aginst libstdc++.a. (http://www.trilithium.com/johan/2005/06/static-libstdc/).
+-# (It would've been preferred to avoid features depending on libstdc++, of course...)
+-#
+-# Actually, this is darn annoying and will *NOT* be tolerated for any new code!
+-#
+-VBoxClient_LIBPATH  += $(PATH_VBoxClient)
+-VBoxClient_ORDERDEPS = $(PATH_VBoxClient)/libstdc++.a
+-VBoxClient_CLEAN     = $(PATH_VBoxClient)/libstdc++.a
+-$$(PATH_VBoxClient)/libstdc++.a:
+-	$(call MSG_L1,Forcing static libstdc++)
+-	$(QUIET)$(MKDIR) -p $(@D)
+-	$(QUIET)$(LN_EXT) -sf `$(TOOL_$(VBOX_GCC_TOOL)_CXX) $(TEMPLATE_VBOXGUESTR3CPPEXE_CXXFLAGS.$(KBUILD_TARGET_ARCH)) -print-file-name=libstdc++.a` $@ \
+-	     || $(CP_EXT) -f  `$(TOOL_$(VBOX_GCC_TOOL)_CXX) $(TEMPLATE_VBOXGUESTR3CPPEXE_CXXFLAGS.$(KBUILD_TARGET_ARCH)) -print-file-name=libstdc++.a` $@
++##
++## Link aginst libstdc++.a. (http://www.trilithium.com/johan/2005/06/static-libstdc/).
++## (It would've been preferred to avoid features depending on libstdc++, of course...)
++##
++## Actually, this is darn annoying and will *NOT* be tolerated for any new code!
++##
++#VBoxClient_LIBPATH  += $(PATH_VBoxClient)
++#VBoxClient_ORDERDEPS = $(PATH_VBoxClient)/libstdc++.a
++#VBoxClient_CLEAN     = $(PATH_VBoxClient)/libstdc++.a
++#$$(PATH_VBoxClient)/libstdc++.a:
++#	$(call MSG_L1,Forcing static libstdc++)
++#	$(QUIET)$(MKDIR) -p $(@D)
++#	$(QUIET)$(LN_EXT) -sf `$(TOOL_$(VBOX_GCC_TOOL)_CXX) $(TEMPLATE_VBOXGUESTR3CPPEXE_CXXFLAGS.$(KBUILD_TARGET_ARCH)) -print-file-name=libstdc++.a` $@ \
++#	     || $(CP_EXT) -f  `$(TOOL_$(VBOX_GCC_TOOL)_CXX) $(TEMPLATE_VBOXGUESTR3CPPEXE_CXXFLAGS.$(KBUILD_TARGET_ARCH)) -print-file-name=libstdc++.a` $@
+ 
+ ifdef VBOX_X11_SEAMLESS_GUEST
+  if defined(VBOX_WITH_TESTCASES) && !defined(VBOX_ONLY_ADDITIONS) && !defined(VBOX_ONLY_SDK)

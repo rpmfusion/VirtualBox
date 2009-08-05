@@ -10,7 +10,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.0.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -25,6 +25,12 @@ Source7:        VirtualBox-OSE-guest.modules
 Source8:        VirtualBox-OSE-vboxresize.desktop
 Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
 Patch2:         VirtualBox-OSE-3.0.0-strings.patch
+Patch3:         VirtualBox-OSE-3.0.2-libcxx.patch
+Patch4:         VirtualBox-OSE-3.0.2-pulse12.patch
+Patch5:         VirtualBox-OSE-3.0.2-xinput2.patch
+Patch6:         VirtualBox-OSE-3.0.2-xorg17.patch
+Patch7:         VirtualBox-OSE-3.0.2-video17.patch
+Patch8:         VirtualBox-OSE-3.0.2-dri.patch
 Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -43,8 +49,18 @@ BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
 BuildRequires:  qt4-devel
 
+# For the X11 module
+BuildRequires:  libdrm-devel
+BuildRequires:  libpciaccess-devel
+BuildRequires:  mesa-libGL-devel
+BuildRequires:  pixman-devel
+BuildRequires:  xorg-x11-proto-devel
+BuildRequires:  xorg-x11-server-source
+
 # Plague-specific weirdness
-%if 0%{?fedora} > 10
+%if 0%{?fedora} > 11
+ExclusiveArch:  i686 x86_64
+%else %if 0%{?fedora} > 10
 ExclusiveArch:  i586 x86_64
 %else
 ExclusiveArch:  i386 x86_64
@@ -100,6 +116,12 @@ cp %{SOURCE1} . # PDF User Guide
 
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
+%patch3 -p1 -b .libcxx
+%patch4 -p1 -b .pulse12
+%patch5 -p1 -b .xinput2
+%patch6 -p1 -b .xorg17
+%patch7 -p1 -b .video17
+%patch8 -p1 -b .dri
 %patch10 -p1 -b .32bit
 
 # Remove prebuilt binary tools
@@ -197,9 +219,10 @@ install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
         obj/bin/VBox.png
 
 # Guest X.Org drivers
-%if 0%{?fedora} >= 10
-%global x11_api 16
-%endif
+# With the xorg17 patch, the _17 driver builds against what's
+# actually available for the system, so would probably be a 1.6
+# driver when compiled on Fedora 10, despite its name
+%global x11_api 17
 
 install -m 0755 -D obj/bin/additions/vboxmouse_drv_%{x11_api}.so \
         $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxmouse_drv.so
@@ -348,6 +371,14 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Aug 04 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.2-4
+- Build for i686
+- Fix build with newer PulseAudio
+- Don't bundle static libc++, fix build with newer one
+- Build Xorg 1.7 drivers, and only them
+- Adjust Mouse driver for XInput 2
+- Temporarily disable DRI
+
 * Tue Aug 04 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.2-3
 - Add netadp bmodule (Vlastimil Holer, #744)
 
