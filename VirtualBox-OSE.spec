@@ -27,9 +27,9 @@ Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
 Patch2:         VirtualBox-OSE-3.0.0-strings.patch
 Patch3:         VirtualBox-OSE-3.0.2-libcxx.patch
 Patch4:         VirtualBox-OSE-3.0.2-pulse12.patch
-Patch5:         VirtualBox-OSE-3.0.2-xinput2.patch
-Patch6:         VirtualBox-OSE-3.0.2-xorg17.patch
-Patch7:         VirtualBox-OSE-3.0.2-video17.patch
+Patch5:         VirtualBox-OSE-3.0.2-xorg17.patch
+Patch6:         VirtualBox-OSE-3.0.2-xinput2.patch
+Patch7:         VirtualBox-OSE-3.0.2-videodrv6.patch
 Patch8:         VirtualBox-OSE-3.0.2-dri.patch
 Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
 
@@ -118,9 +118,9 @@ cp %{SOURCE1} . # PDF User Guide
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .libcxx
 %patch4 -p1 -b .pulse12
-%patch5 -p1 -b .xinput2
-%patch6 -p1 -b .xorg17
-%patch7 -p1 -b .video17
+%patch5 -p1 -b .xorg17
+%patch6 -p1 -b .xinput2
+%patch7 -p1 -b .videodrv6
 %patch8 -p1 -b .dri
 %patch10 -p1 -b .32bit
 
