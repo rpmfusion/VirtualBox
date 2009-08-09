@@ -24,6 +24,7 @@ Source4:        VirtualBox-OSE-90-vboxdrv.rules
 Source5:        VirtualBox-OSE-60-vboxadd.rules
 Source6:        VirtualBox-OSE.modules
 Source7:        VirtualBox-OSE-guest.modules
+Source8:        VirtualBox-OSE-vboxresize.desktop
 Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
 Patch2:         VirtualBox-OSE-3.0.0-strings.patch
 Patch3:         VirtualBox-OSE-3.0.2-libcxx.patch
@@ -246,10 +247,10 @@ install -m 0755 -D obj/bin/additions/vboxvideo_drv_%{x11_api}.so \
         $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
 install -m 0755 -D src/VBox/Additions/linux/installer/90-vboxguest.fdi \
-	$RPM_BUILD_ROOT%{_datadir}/hal/fdi/information/20thirdparty/90-vboxguest.fdi
+        $RPM_BUILD_ROOT%{_datadir}/hal/fdi/policy/20thirdparty/90-vboxguest.fdi
 
 # Guest tools
-install -m 0755 -t $RPM_BUILD_ROOT%{_bindir} 	\
+install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}    \
         obj/bin/additions/mountvboxsf           \
         obj/bin/additions/VBoxService           \
         obj/bin/additions/VBoxClient            \
@@ -259,15 +260,19 @@ install -m 0755 src/VBox/Additions/x11/Installer/VBoxRandR.sh \
         $RPM_BUILD_ROOT%{_bindir}/VBoxRandR
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
-	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
+        $RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
-	$RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+        $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+
+install -m 0755 -D %{SOURCE8} \
+        $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 # Guest libraries
-install -m 0755 -t $RPM_BUILD_ROOT%{_libdir} 	\
+install -m 0755 -t $RPM_BUILD_ROOT%{_libdir}    \
         obj/bin/additions/VBoxOGL*.so
 ln -sf ../VBoxOGL.so $RPM_BUILD_ROOT%{_libdir}/dri/vboxvideo_dri.so
 
@@ -328,6 +333,7 @@ diff -u <((find obj/bin/additions/* -maxdepth 0 -type f    \
                 $RPM_BUILD_ROOT%{_datadir}/{pixmaps,applications}/* \
                 -maxdepth 0 -type f                     \
                 -not -name '*.py[co]'                   \
+                -not -name VBoxRandR                    \
                 -not -name VBox -exec basename '{}' \; |sort)
 set -o posix
 
@@ -388,7 +394,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %{_libdir}/VBoxOGL*.so
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
-%{_datadir}/hal/fdi/information/20thirdparty/90-vboxguest.fdi
+# %{_datadir}/gdm/autostart/LoginWindow
+%exclude %{_datadir}/gdm
+%{_datadir}/hal/fdi/policy/20thirdparty/90-vboxguest.fdi
 %config %{_sysconfdir}/udev/rules.d/60-vboxadd.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
 %doc COPYING
@@ -404,6 +412,7 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 - Include VBoxRandR
 - Add dri module to guest
 - Resize attempts in GDM make SELinux unhappy
+- Fix HAL policy file location
 
 * Sun Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-2
 - Don't quote INSTALL_DIR in vbox.cfg so that we don't confuse vboxgtk
