@@ -12,7 +12,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.0.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -24,7 +24,6 @@ Source4:        VirtualBox-OSE-90-vboxdrv.rules
 Source5:        VirtualBox-OSE-60-vboxadd.rules
 Source6:        VirtualBox-OSE.modules
 Source7:        VirtualBox-OSE-guest.modules
-Source8:        VirtualBox-OSE-vboxresize.desktop
 Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
 Patch2:         VirtualBox-OSE-3.0.0-strings.patch
 Patch3:         VirtualBox-OSE-3.0.2-libcxx.patch
@@ -174,6 +173,7 @@ install -d $RPM_BUILD_ROOT%{_libdir}
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/components
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls
+install -d $RPM_BUILD_ROOT%{_libdir}/dri
 install -d $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk
 install -d $RPM_BUILD_ROOT%{_datadir}/pixmaps
 install -d $RPM_BUILD_ROOT%{_prefix}/src/%{name}-kmod-%{version}
@@ -255,21 +255,22 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_bindir} 	\
         obj/bin/additions/VBoxClient            \
         obj/bin/additions/VBoxControl
 
+install -m 0755 src/VBox/Additions/x11/Installer/VBoxRandR.sh \
+        $RPM_BUILD_ROOT%{_bindir}/VBoxRandR
+
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
 	$RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
-install -m 0755 -D %{SOURCE8} \
-	$RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
-
 desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
-desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 # Guest libraries
 install -m 0755 -t $RPM_BUILD_ROOT%{_libdir} 	\
         obj/bin/additions/VBoxOGL*.so
+ln -sf ../VBoxOGL.so $RPM_BUILD_ROOT%{_libdir}/dri/vboxvideo_dri.so
+
 
 # Installation root configuration
 install -d $RPM_BUILD_ROOT/%{_sysconfdir}/vbox
@@ -381,11 +382,12 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
 %{_bindir}/VBoxService
+%{_bindir}/VBoxRandR
 %{_libdir}/xorg/modules/drivers/*
+%{_libdir}/dri/*
+%{_libdir}/VBoxOGL*.so
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
-%{_datadir}/gdm/autostart/LoginWindow
-%{_libdir}/VBoxOGL*.so
 %{_datadir}/hal/fdi/information/20thirdparty/90-vboxguest.fdi
 %config %{_sysconfdir}/udev/rules.d/60-vboxadd.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
@@ -398,6 +400,11 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Sun Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-3
+- Include VBoxRandR
+- Add dri module to guest
+- Resize attempts in GDM make SELinux unhappy
+
 * Sun Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-2
 - Don't quote INSTALL_DIR in vbox.cfg so that we don't confuse vboxgtk
 - Add python- subpackage
