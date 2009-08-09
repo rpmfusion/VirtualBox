@@ -1,8 +1,10 @@
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+
 # This is to prevent certain object files from being stripped.
 # FIXME: We would not probably get useful information
 # without utilizing optflags (see below)
 # TODO: Remove executable bit temporarily to prevent stripping
-%define debug_package %{nil}
+%global debug_package %{nil}
 
 # Lots of useless checks
 # This will be enabled by default once RPM is built with caps enabled
@@ -10,7 +12,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.0.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -77,11 +79,20 @@ A general-purpose full virtualizer and emulator for 32-bit and
 %package devel
 Summary:        %{name} SDK
 Group:          Development/Libraries
-Requires:       pyxpcom
 Requires:       VirtualBox-OSE = %{version}-%{release}
+Requires:       python-VirtualBox-OSE = %{version}-%{release}
 
 %description devel
 %{name} Software Development Kit.
+
+
+%package -n python-%{name}
+Summary:        Python bindings for %{name}
+Group:          Development/Libraries
+Requires:       VirtualBox-OSE = %{version}-%{release}
+
+%description -n python-%{name}
+Python XPCOM bindings to %{name}.
 
 
 %package guest
@@ -166,6 +177,7 @@ install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls
 install -d $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk
 install -d $RPM_BUILD_ROOT%{_datadir}/pixmaps
 install -d $RPM_BUILD_ROOT%{_prefix}/src/%{name}-kmod-%{version}
+install -d $RPM_BUILD_ROOT%{python_sitelib}/virtualbox
 
 # Binaries and Wrapper with Launchers
 install -p -m 0755 obj/bin/VBox.sh $RPM_BUILD_ROOT%{_bindir}/VBox
@@ -213,6 +225,10 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
 
 # SDK
 cp -rp obj/bin/sdk/. $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk
+mv $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom \
+        $RPM_BUILD_ROOT%{python_sitelib}/virtualbox
+ln -sf ../../../../../../..%{python_sitelib}/virtualbox/xpcom \
+        $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 # Icon
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
@@ -257,7 +273,7 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_libdir} 	\
 
 # Installation root configuration
 install -d $RPM_BUILD_ROOT/%{_sysconfdir}/vbox
-echo 'INSTALL_DIR="%{_libdir}/virtualbox"' > $RPM_BUILD_ROOT/%{_sysconfdir}/vbox/vbox.cfg
+echo 'INSTALL_DIR=%{_libdir}/virtualbox' > $RPM_BUILD_ROOT/%{_sysconfdir}/vbox/vbox.cfg
 
 # Install udev rules
 install -p -m 0644 -D %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
@@ -319,6 +335,13 @@ set -o posix
 rm -rf $RPM_BUILD_ROOT
 
 
+%pre devel
+# This changed to a symlink from directory, which would cause
+# the new package's CPIO payload to fail to unpack unless removed
+PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
+[ -d "$PYXP" ] && rm -rf "$PYXP"
+
+
 # Guest additions install the OGL libraries
 %post guest -p /sbin/ldconfig
 %postun guest -p /sbin/ldconfig
@@ -343,9 +366,13 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %files devel
-%defattr(0644,root,root,-)
+%defattr(0644,root,root,0755)
 %{_datadir}/virtualbox
-%doc COPYING
+
+
+%files -n python-%{name}
+%defattr(0644,root,root,0755)
+%{python_sitelib}/virtualbox
 
 
 %files guest
@@ -371,6 +398,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-2
+- Don't quote INSTALL_DIR in vbox.cfg so that we don't confuse vboxgtk
+- Add python- subpackage
+- Correct permissions on SDK directories (#754)
+
 * Sun Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-1
 - Update to later upstream release
 - Re-enable DRI again, fix drm_release crash
