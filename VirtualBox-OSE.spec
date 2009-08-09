@@ -9,8 +9,8 @@
 %bcond_without hardening
 
 Name:           VirtualBox-OSE
-Version:        3.0.2
-Release:        4%{?dist}
+Version:        3.0.4
+Release:        1%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -26,11 +26,11 @@ Source8:        VirtualBox-OSE-vboxresize.desktop
 Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
 Patch2:         VirtualBox-OSE-3.0.0-strings.patch
 Patch3:         VirtualBox-OSE-3.0.2-libcxx.patch
-Patch4:         VirtualBox-OSE-3.0.2-pulse12.patch
+Patch4:         VirtualBox-OSE-3.0.4-pulse0916.patch
 Patch5:         VirtualBox-OSE-3.0.2-xorg17.patch
 Patch6:         VirtualBox-OSE-3.0.2-xinput2.patch
-Patch7:         VirtualBox-OSE-3.0.2-videodrv6.patch
-Patch8:         VirtualBox-OSE-3.0.2-dri.patch
+Patch7:         VirtualBox-OSE-3.0.4-videodrv6.patch
+Patch8:         VirtualBox-OSE-3.0.4-vblank.patch
 Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -117,11 +117,11 @@ cp %{SOURCE1} . # PDF User Guide
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .libcxx
-%patch4 -p1 -b .pulse12
+%patch4 -p1 -b .pulse0916
 %patch5 -p1 -b .xorg17
 %patch6 -p1 -b .xinput2
 %patch7 -p1 -b .videodrv6
-%patch8 -p1 -b .dri
+%patch8 -p1 -b .vblank
 %patch10 -p1 -b .32bit
 
 # Remove prebuilt binary tools
@@ -371,6 +371,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-1
+- Update to later upstream release
+- Re-enable DRI again, fix drm_release crash
+
 * Tue Aug 04 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.2-4
 - Build for i686
 - Fix build with newer PulseAudio

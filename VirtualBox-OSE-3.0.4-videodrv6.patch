@@ -1,0 +1,104 @@
+Update the vboxvideo driver for Fedora 12's X.Org snapshot ABI.
+
+Lubomir Rintel <lkundrak@v3.sk>
+
+diff -up VirtualBox-3.0.4_OSE/src/VBox/Additions/x11/vboxvideo/vboxvideo_15.c.videodrv6 VirtualBox-3.0.4_OSE/src/VBox/Additions/x11/vboxvideo/vboxvideo_15.c
+--- VirtualBox-3.0.4_OSE/src/VBox/Additions/x11/vboxvideo/vboxvideo_15.c.videodrv6	2009-08-04 19:17:01.000000000 +0200
++++ VirtualBox-3.0.4_OSE/src/VBox/Additions/x11/vboxvideo/vboxvideo_15.c	2009-08-09 15:33:40.007923255 +0200
+@@ -469,6 +469,7 @@ static const xf86OutputFuncsRec VBOXOutp
+     .destroy = vbox_output_stub
+ };
+ 
++#if GET_ABI_MAJOR(ABI_VIDEODRV_VERSION) < 6
+ /*
+  * List of symbols from other modules that this module references.  This
+  * list is used to tell the loader that it is OK for symbols here to be
+@@ -538,6 +539,7 @@ static const char *driSymbols[] = {
+     NULL
+ };
+ #endif
++#endif
+ 
+ #ifdef XFree86LOADER
+ /* Module loader interface */
+@@ -580,6 +582,7 @@ vboxSetup(pointer Module, pointer Option
+ #endif
+         xf86Msg(X_CONFIG, "Load address of symbol \"VBOXVIDEO\" is %p\n",
+                 (void *)&VBOXVIDEO);
++#if GET_ABI_MAJOR(ABI_VIDEODRV_VERSION) < 6
+         LoaderRefSymLists(fbSymbols,
+                           shadowfbSymbols,
+                           vbeSymbols,
+@@ -588,6 +591,7 @@ vboxSetup(pointer Module, pointer Option
+                           drmSymbols, driSymbols,
+ #endif
+                           NULL);
++#endif
+         return (pointer)TRUE;
+     }
+ 
+@@ -763,7 +767,9 @@ VBOXPreInit(ScrnInfoPtr pScrn, int flags
+        text mode, in order to keep our code simple. */
+     if (!xf86LoadSubModule(pScrn, "vbe"))
+         return (FALSE);
++#if GET_ABI_MAJOR(ABI_VIDEODRV_VERSION) < 6
+     xf86LoaderReqSymLists(vbeSymbols, NULL);
++#endif
+ 
+     if ((pVBox->pVbe = VBEExtendedInit(NULL, pVBox->pEnt->index,
+                                        SET_BIOS_SCRATCH
+@@ -783,16 +789,22 @@ VBOXPreInit(ScrnInfoPtr pScrn, int flags
+     /* The ramdac module is needed for the hardware cursor. */
+     if (!xf86LoadSubModule(pScrn, "ramdac"))
+         return FALSE;
++#if GET_ABI_MAJOR(ABI_VIDEODRV_VERSION) < 6
+     xf86LoaderReqSymLists(ramdacSymbols, NULL);
++#endif
+ 
+     /* The framebuffer module. */
+     if (xf86LoadSubModule(pScrn, "fb") == NULL)
+         return (FALSE);
++#if GET_ABI_MAJOR(ABI_VIDEODRV_VERSION) < 6
+     xf86LoaderReqSymLists(fbSymbols, NULL);
++#endif
+ 
+     if (!xf86LoadSubModule(pScrn, "shadowfb"))
+         return FALSE;
++#if GET_ABI_MAJOR(ABI_VIDEODRV_VERSION) < 6
+     xf86LoaderReqSymLists(shadowfbSymbols, NULL);
++#endif
+ 
+     /* Set up our ScrnInfoRec structure to describe our virtual
+        capabilities to X. */
+@@ -880,7 +892,7 @@ VBOXPreInit(ScrnInfoPtr pScrn, int flags
+     /* Framebuffer-related setup */
+     pScrn->bitmapBitOrder = BITMAP_BIT_ORDER;
+ 
+-#ifdef VBOX_DRI
++#if defined(VBOX_DRI) && GET_ABI_MAJOR(ABI_XINPUT_VERSION) < 7
+     /* Load the dri module. */
+     if (xf86LoadSubModule(pScrn, "dri")) {
+         xf86LoaderReqSymLists(driSymbols, drmSymbols, NULL);
+diff -up VirtualBox-3.0.4_OSE/src/VBox/Additions/x11/vboxvideo/vboxvideo.h.videodrv6 VirtualBox-3.0.4_OSE/src/VBox/Additions/x11/vboxvideo/vboxvideo.h
+--- VirtualBox-3.0.4_OSE/src/VBox/Additions/x11/vboxvideo/vboxvideo.h.videodrv6	2009-08-04 19:17:02.000000000 +0200
++++ VirtualBox-3.0.4_OSE/src/VBox/Additions/x11/vboxvideo/vboxvideo.h	2009-08-09 15:24:27.393923506 +0200
+@@ -97,7 +97,9 @@ do { \
+ /* All drivers should typically include these */
+ #include "xf86.h"
+ #include "xf86_OSproc.h"
++#if GET_ABI_MAJOR(ABI_VIDEODRV_VERSION) < 6
+ #include "xf86Resources.h"
++#endif
+ 
+ #ifndef NO_ANSIC
+ /* All drivers need this */
+@@ -140,7 +142,9 @@ do { \
+ /* Dga definitions */
+ #include "dgaproc.h"
+ 
++#if GET_ABI_MAJOR(ABI_VIDEODRV_VERSION) < 6
+ #include "xf86RAC.h"
++#endif
+ 
+ #include "fb.h"
+ 

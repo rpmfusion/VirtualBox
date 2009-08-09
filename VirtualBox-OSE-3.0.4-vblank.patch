@@ -1,0 +1,23 @@
+Call drm_vblank_init() upon initialization, so that we initialize
+flip list and don't crash on NULL dereference upon drm_release().
+
+Lubomir Rintel <lkundrak@v3.sk>
+
+diff -up VirtualBox-3.0.4_OSE/src/VBox/Additions/linux/drm/vboxvideo_drm.c.vblank VirtualBox-3.0.4_OSE/src/VBox/Additions/linux/drm/vboxvideo_drm.c
+--- VirtualBox-3.0.4_OSE/src/VBox/Additions/linux/drm/vboxvideo_drm.c.vblank	2009-08-09 15:13:14.000000000 +0200
++++ VirtualBox-3.0.4_OSE/src/VBox/Additions/linux/drm/vboxvideo_drm.c	2009-08-09 15:13:20.000000000 +0200
+@@ -66,8 +66,14 @@ static struct pci_device_id pciidlist[] 
+ 	vboxvideo_PCI_IDS
+ };
+ 
++int vboxvideo_driver_load(struct drm_device * dev, unsigned long flags)
++{
++	return drm_vblank_init(dev, 1);
++}
++
+ static struct drm_driver driver = {
+ 	/* .driver_features = DRIVER_USE_MTRR, */
++	.load = vboxvideo_driver_load,
+ 	.reclaim_buffers = drm_core_reclaim_buffers,
+ 	.get_map_ofs = drm_core_get_map_ofs,
+ 	.get_reg_ofs = drm_core_get_reg_ofs,

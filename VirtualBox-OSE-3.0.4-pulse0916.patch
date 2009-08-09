@@ -1,4 +1,5 @@
 Adjust for newer PulseAudio API.
+We can not use PA_API_VERSION here, since it did not change (== 12).
 
 Lubomir Rintel <lkundrak@v3.sk>
 
@@ -9,7 +10,7 @@ diff -urp VirtualBox-3.0.2_OSE/src/VBox/Devices/Audio/pulse_stubs.c VirtualBox-3
  void function signature \
  { ( (void (*) signature) function ## _fn ) shortsig; }
  
-+#if PA_API_VERSION >= 12
++#if PA_PROTOCOL_VERSION >= 16
 +PROXY_STUB     (pa_stream_connect_playback, int,
 +                (pa_stream *s, const char *dev, const pa_buffer_attr *attr,
 +                 pa_stream_flags_t flags, const pa_cvolume *volume, pa_stream *sync_stream),
