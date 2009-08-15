@@ -8,11 +8,17 @@
 
 # Lots of useless checks
 # This will be enabled by default once RPM is built with caps enabled
-%bcond_without hardening
+%bcond_with hardening
+
+%if %with hardening
+%define priv_mode %%attr(4755,root,root)
+%else
+%define priv_mode %%caps(cap_net_raw+ep)
+%endif
 
 Name:           VirtualBox-OSE
 Version:        3.0.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -50,6 +56,7 @@ BuildRequires:  python-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
 BuildRequires:  qt4-devel
+BuildRequires:  gsoap-devel
 
 # For the X11 module
 BuildRequires:  libdrm-devel
@@ -145,7 +152,7 @@ sed -i 's/\r//' COPYING
 
 %build
 ./configure --disable-kmods --enable-webservice \
-        %{?_without_hardening:--disable-hardening}
+        %{!?with_hardening:--disable-hardening}
 
 . ./env.sh
 
@@ -203,16 +210,13 @@ install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
         obj/bin/V*.gc           \
         obj/bin/V*.r0
 
-# SetUID root binaries
-install -p -m 4755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
+# Executabes
+install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
         obj/bin/VBoxHeadless    \
         obj/bin/VBoxSDL         \
         obj/bin/VBoxNetDHCP     \
         obj/bin/VBoxNetAdpCtl   \
-        obj/bin/VirtualBox
-
-# Other binaries
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
+        obj/bin/VirtualBox      \
         obj/bin/VBoxManage      \
         obj/bin/VBoxSVC         \
         obj/bin/VBoxXPCOMIPCD   \
@@ -363,7 +367,19 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %{_bindir}/VBoxSDL
 %{_bindir}/VBoxTunctl
 %{_bindir}/VirtualBox
-%{_libdir}/virtualbox
+%dir %{_libdir}/virtualbox
+%{_libdir}/virtualbox/*.*
+%{_libdir}/virtualbox/components
+%{_libdir}/virtualbox/nls
+%{_libdir}/virtualbox/VBoxManage
+%{_libdir}/virtualbox/VBoxSVC
+%{_libdir}/virtualbox/VBoxTestOGL
+%{_libdir}/virtualbox/VBoxXPCOMIPCD
+%{priv_mode} %{_libdir}/virtualbox/VBoxHeadless
+%{priv_mode} %{_libdir}/virtualbox/VBoxSDL
+%{priv_mode} %{_libdir}/virtualbox/VBoxNetDHCP
+%{priv_mode} %{_libdir}/virtualbox/VBoxNetAdpCtl
+%{priv_mode} %{_libdir}/virtualbox/VirtualBox
 %{_datadir}/pixmaps/*
 %{_datadir}/applications/*.desktop
 %config %{_sysconfdir}/vbox/vbox.cfg
@@ -408,6 +424,10 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Sat Aug 15 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-4
+- Exchange hardening for filesystem capabilities
+- Enable web services
+
 * Sun Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-3
 - Include VBoxRandR
 - Add dri module to guest
