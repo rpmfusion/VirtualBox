@@ -1,7 +1,8 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 # VirtualBox-OSE takes care of reasonable warning very well
-%global optflags %(rpm --eval %%optflags |sed 's/-Wall//')
+# Also, we build 32bit code besided 64biton x86_64
+%global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//')
 
 # Hardening is basically a lot of seemingly useless checks that are here to
 # mitigate impact of eventual security issue in setuid root VBox. When we
@@ -169,9 +170,6 @@ sed -i 's/\r//' COPYING
 # the installation paths, but install the tree with the default
 # layout under 'obj' and shuffle files around in %%install.
 
-# FIXME: Utilize optflags. This will probably involve patching of makefiles
-# Setting VBOX_GCC_OPT to optflags doesn't use the flags for large part of
-# the tree, while preventing required symbols to be generated in .r0 files
 kmk KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_INS="$PWD/obj"              \
         VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=       \
         KMK_REVISION=3000 KBUILD_KMK_REVISION=3000                      \
