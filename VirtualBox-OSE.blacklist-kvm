@@ -1,0 +1,10 @@
+# Feel free to comment these out if you wish to use KVM hypervisor.
+#
+# Be warned that you won't be able to use VMX extensions in VirtualBox-OSE
+# as long as these modules are loaded (you'll still be able to launch the
+# virtual machines if you switch off use of hardware-supported
+# virtualization).
+
+blacklist kvm
+blacklist kvm_intel
+blacklist kvm_amd

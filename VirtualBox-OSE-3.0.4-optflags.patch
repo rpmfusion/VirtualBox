@@ -1,0 +1,14 @@
+diff -up VirtualBox-3.0.4_OSE/Config.kmk.optflags VirtualBox-3.0.4_OSE/Config.kmk
+--- VirtualBox-3.0.4_OSE/Config.kmk.optflags	2009-08-16 11:43:40.000000000 +0200
++++ VirtualBox-3.0.4_OSE/Config.kmk	2009-08-16 11:45:41.000000000 +0200
+@@ -3131,8 +3131,8 @@ ifdef VBOX_WITH_QTGUI
+ 
+   TEMPLATE_VBOXQT4GUIEXE_INCS += \
+  	$(LIB_SDL_INC)
+-  TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS = \
+- 	-g -pipe $(filter-out -Wno-unused,$(VBOX_GCC_WARN)) -frtti -fno-exceptions -Wno-non-virtual-dtor \
++  TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS = $(VBOX_GCC_OPT) \
++ 	$(filter-out -Wno-unused,$(VBOX_GCC_WARN)) -frtti -fno-exceptions -Wno-non-virtual-dtor \
+  	-Wno-long-long -fshort-wchar -fno-strict-aliasing \
+  	$(VBOX_GCC_fvisibility-hidden) $(VBOX_GCC_fvisibility-inlines-hidden)
+   TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS.x86 = -m32

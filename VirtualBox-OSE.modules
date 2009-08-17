@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # User is advised to run this on upgrades
-/sbin/rmmod vboxnetflt &>/dev/null ||:
-/sbin/rmmod vboxdrv &>/dev/null ||:
-/sbin/rmmod vboxnetadp &>/dev/null ||:
+/sbin/modprobe -r -b vboxnetflt &>/dev/null ||:
+/sbin/modprobe -r -b vboxdrv &>/dev/null ||:
+/sbin/modprobe -r -b vboxnetadp &>/dev/null ||:
 
-/sbin/modprobe vboxdrv
-/sbin/modprobe vboxnetflt
-/sbin/modprobe vboxnetadp
+/sbin/modprobe -b vboxdrv
+/sbin/modprobe -b vboxnetflt
+/sbin/modprobe -b vboxnetadp

@@ -1,14 +1,17 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-# This is to prevent certain object files from being stripped.
-# FIXME: We would not probably get useful information
-# without utilizing optflags (see below)
-# TODO: Remove executable bit temporarily to prevent stripping
-%global debug_package %{nil}
+# VirtualBox-OSE takes care of reasonable warning very well
+%global optflags %(rpm --eval %%optflags |sed 's/-Wall//')
 
-# Lots of useless checks
-# This will be enabled by default once RPM is built with caps enabled
+# Hardening is basically a lot of seemingly useless checks that are here to
+# mitigate impact of eventual security issue in setuid root VBox. When we
+# use the filesystem capabilities instead of running privileged, it can't
+# be used.
+%if 0%{?fedora} > 11
 %bcond_with hardening
+%else
+%bcond_without hardening
+%endif
 
 %if %with hardening
 %define priv_mode %%attr(4755,root,root)
@@ -18,7 +21,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.0.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -31,6 +34,7 @@ Source5:        VirtualBox-OSE-60-vboxadd.rules
 Source6:        VirtualBox-OSE.modules
 Source7:        VirtualBox-OSE-guest.modules
 Source8:        VirtualBox-OSE-vboxresize.desktop
+Source9:        VirtualBox-OSE.blacklist-kvm
 Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
 Patch2:         VirtualBox-OSE-3.0.0-strings.patch
 Patch3:         VirtualBox-OSE-3.0.2-libcxx.patch
@@ -39,6 +43,7 @@ Patch5:         VirtualBox-OSE-3.0.2-xorg17.patch
 Patch6:         VirtualBox-OSE-3.0.2-xinput2.patch
 Patch7:         VirtualBox-OSE-3.0.4-videodrv6.patch
 Patch8:         VirtualBox-OSE-3.0.4-vblank.patch
+Patch9:         VirtualBox-OSE-3.0.4-optflags.patch
 Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -57,6 +62,7 @@ BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
 BuildRequires:  qt4-devel
 BuildRequires:  gsoap-devel
+BuildRequires:  xz
 
 # For the X11 module
 BuildRequires:  libdrm-devel
@@ -140,6 +146,7 @@ cp %{SOURCE1} . # PDF User Guide
 %patch6 -p1 -b .xinput2
 %patch7 -p1 -b .videodrv6
 %patch8 -p1 -b .vblank
+%patch9 -p1 -b .optflags
 %patch10 -p1 -b .32bit
 
 # Remove prebuilt binary tools
@@ -165,8 +172,11 @@ sed -i 's/\r//' COPYING
 # FIXME: Utilize optflags. This will probably involve patching of makefiles
 # Setting VBOX_GCC_OPT to optflags doesn't use the flags for large part of
 # the tree, while preventing required symbols to be generated in .r0 files
-kmk KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm VBOX_WITH_REGISTRATION_REQUEST= PATH_INS="$PWD/obj" \
-        KMK_REVISION=3000 KBUILD_KMK_REVISION=3000
+kmk KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_INS="$PWD/obj"              \
+        VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=       \
+        KMK_REVISION=3000 KBUILD_KMK_REVISION=3000                      \
+        VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"        \
+        VBOX_GCC_R0_OPT="%{optflags}"
 
 
 %install
@@ -292,12 +302,13 @@ install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-v
 # Install modules load script
 install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}.modules
 install -p -m 0755 -D %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
+install -p -m 0644 -D %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modprobe.d/blacklist-kvm.conf
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
 cp -al obj/bin/src/vbox* obj/bin/additions/src/vbox* %{name}-kmod-%{version}
 install -d $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{version}
-tar --use-compress-program lzma -cf $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.lzma \
+tar --use-compress-program xz -cf $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.xz \
         %{name}-kmod-%{version}
 
 # Menu entry
@@ -385,6 +396,7 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %config %{_sysconfdir}/vbox/vbox.cfg
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
+%config(noreplace) %{_sysconfdir}/sysconfig/modprobe.d/*.conf
 %doc COPYING UserManual.pdf
 
 
@@ -424,6 +436,12 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Sun Aug 16 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-5
+- Enable debuginfo package
+- Correctly use compiler flags
+- Make it possible to blacklist our modules
+- Blacklist KVM
+
 * Sat Aug 15 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-4
 - Exchange hardening for filesystem capabilities
 - Enable web services
