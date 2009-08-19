@@ -1,1 +1,1 @@
-ACTION=="add", DEVPATH=="/class/misc/vboxdrv", OWNER="root", MODE="0600"
+ACTION=="add", DEVPATH=="/class/misc/vboxdrv", OWNER="root", MODE="0666"
