@@ -22,7 +22,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.0.4
-Release:        5%{?dist}
+Release:        5%{?dist}.x64
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -46,6 +46,7 @@ Patch7:         VirtualBox-OSE-3.0.4-videodrv6.patch
 Patch8:         VirtualBox-OSE-3.0.4-vblank.patch
 Patch9:         VirtualBox-OSE-3.0.4-optflags.patch
 Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
+Patch11:        VirtualBox-OSE-3.0.4-visibility.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -149,6 +150,7 @@ cp %{SOURCE1} . # PDF User Guide
 %patch8 -p1 -b .vblank
 %patch9 -p1 -b .optflags
 %patch10 -p1 -b .32bit
+%patch11 -p1 -b .visibility
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -170,6 +172,10 @@ sed -i 's/\r//' COPYING
 # the installation paths, but install the tree with the default
 # layout under 'obj' and shuffle files around in %%install.
 
+# FIXME: Utilize optflags. This will probably involve patching of makefiles
+# Setting VBOX_GCC_OPT to optflags doesn't use the flags for large part of
+# the tree, while preventing required symbols to be generated in .r0 files
+echo %{optflags}
 kmk KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_INS="$PWD/obj"              \
         VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=       \
         KMK_REVISION=3000 KBUILD_KMK_REVISION=3000                      \
@@ -230,7 +236,9 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
         obj/bin/VBoxXPCOMIPCD   \
         obj/bin/VBoxSysInfo.sh  \
         obj/bin/vboxshell.py    \
-        obj/bin/VBoxTestOGL
+        obj/bin/VBoxTestOGL     \
+        obj/bin/vboxwebsrv      \
+        obj/bin/webtest
 
 # Language files
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
@@ -384,6 +392,8 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %{_libdir}/virtualbox/VBoxSVC
 %{_libdir}/virtualbox/VBoxTestOGL
 %{_libdir}/virtualbox/VBoxXPCOMIPCD
+%{_libdir}/virtualbox/vboxwebsrv
+%{_libdir}/virtualbox/webtest
 %{priv_mode} %{_libdir}/virtualbox/VBoxHeadless
 %{priv_mode} %{_libdir}/virtualbox/VBoxSDL
 %{priv_mode} %{_libdir}/virtualbox/VBoxNetDHCP
