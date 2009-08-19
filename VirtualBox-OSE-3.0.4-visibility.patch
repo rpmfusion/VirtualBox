@@ -1,0 +1,36 @@
+Hack to fix up build of gsoap bindings on Rawhide.
+Still needs to be looked into.
+
+Lubomir Rintel <lkundrak@v3.sk>
+
+diff -up VirtualBox-3.0.4_OSE/Config.kmk.visibility VirtualBox-3.0.4_OSE/Config.kmk
+--- VirtualBox-3.0.4_OSE/Config.kmk.visibility	2009-08-19 07:26:08.353120473 +0200
++++ VirtualBox-3.0.4_OSE/Config.kmk	2009-08-19 07:28:35.203118058 +0200
+@@ -2436,7 +2436,7 @@ ifeq ($(KBUILD_TARGET),win)
+ 
+ else # the gcc guys
+ TEMPLATE_VBOXR3EXE_TOOL                = $(VBOX_GCC_TOOL)
+-TEMPLATE_VBOXR3EXE_CXXFLAGS            = -g -pipe $(VBOX_GCC_PEDANTIC) $(VBOX_GCC_Wno-variadic-macros) $(VBOX_GCC_OPT) $(VBOX_GCC_FP) -fno-strict-aliasing $(VBOX_GCC_fvisibility-inlines-hidden) $(VBOX_GCC_fvisibility-hidden)
++TEMPLATE_VBOXR3EXE_CXXFLAGS            = -g -pipe $(VBOX_GCC_PEDANTIC) $(VBOX_GCC_Wno-variadic-macros) $(VBOX_GCC_OPT) $(VBOX_GCC_FP) -fno-strict-aliasing $(VBOX_GCC_fvisibility-inlines-hidden)
+ TEMPLATE_VBOXR3EXE_CXXFLAGS.x86        = -m32
+ TEMPLATE_VBOXR3EXE_CXXFLAGS.amd64      = -m64
+ # L4 currently can't handle exception handling.
+diff -up VirtualBox-3.0.4_OSE/src/VBox/Main/webservice/websrv-nsmap.xsl.visibility VirtualBox-3.0.4_OSE/src/VBox/Main/webservice/websrv-nsmap.xsl
+--- VirtualBox-3.0.4_OSE/src/VBox/Main/webservice/websrv-nsmap.xsl.visibility	2009-08-04 19:18:47.000000000 +0200
++++ VirtualBox-3.0.4_OSE/src/VBox/Main/webservice/websrv-nsmap.xsl	2009-08-19 07:26:08.475118377 +0200
+@@ -49,6 +49,7 @@
+  * Generated from: src/VBox/Main/idl/VirtualBox.xidl (VirtualBox's interface definitions in XML)
+  * Generator: src/VBox/Main/webservice/websrv-nsmap.xsl */
+ 
++#pragma GCC visibility push(default)
+ #include "soapH.h"
+ SOAP_NMAC struct Namespace namespaces[] =
+ {
+@@ -64,6 +65,7 @@ SOAP_NMAC struct Namespace namespaces[] 
+   <xsl:text><![CDATA[
+     {NULL, NULL, NULL, NULL}
+ };
++#pragma GCC visibility pop
+ 
+ ]]></xsl:text>
+ </xsl:template>
