@@ -22,7 +22,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.0.4
-Release:        5%{?dist}
+Release:        5%{?dist}.x64
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
