@@ -1,8 +1,10 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-# VirtualBox-OSE takes care of reasonable warning very well
-# Also, we build 32bit code besided 64biton x86_64
-%global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//')
+# Standard compiler flags, without:
+# -Wall        -- VirtualBox-OSE takes care of reasonable warning very well
+# -m32, -m64   -- 32bit code is built besides 64bit on x86_64
+# -fexceptions -- R0 code doesn't link against C++ library, no __gxx_personality_v0
+%global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
 
 # Hardening is basically a lot of seemingly useless checks that are here to
 # mitigate impact of eventual security issue in setuid root VBox. When we
@@ -22,7 +24,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.0.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -444,6 +446,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Thu Aug 20 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-6
+- No exceptions in R0 code, should fix unresolved symbol problem
+
 * Sun Aug 16 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-5
 - Enable debuginfo package
 - Correctly use compiler flags
