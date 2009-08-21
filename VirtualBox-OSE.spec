@@ -24,7 +24,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.0.4
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -32,7 +32,8 @@ License:        GPLv2 or (GPLv2 and CDDL)
 URL:            http://www.virtualbox.org/wiki/VirtualBox
 Source0:        http://dlc.sun.com/virtualbox/%{version}/VirtualBox-%{version}-OSE.tar.bz2
 Source1:        http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
-Source4:        VirtualBox-OSE-90-vboxdrv.rules
+Source3:        VirtualBox-OSE-90-vboxdrv.rules
+Source4:        VirtualBox-OSE-90-vboxdrv.rules.hardening
 Source5:        VirtualBox-OSE-60-vboxadd.rules
 Source6:        VirtualBox-OSE.modules
 Source7:        VirtualBox-OSE-guest.modules
@@ -304,8 +305,8 @@ install -d $RPM_BUILD_ROOT/%{_sysconfdir}/vbox
 echo 'INSTALL_DIR=%{_libdir}/virtualbox' > $RPM_BUILD_ROOT/%{_sysconfdir}/vbox/vbox.cfg
 
 # Install udev rules
-install -p -m 0644 -D %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
-install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-vboxadd.rules
+%define vboxdrv_udev %{?with_hardening:%{SOURCE4}}%{?!with_hardening:%{SOURCE3}}
+install -p -m 0644 -D %{vboxdrv_udev} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-vboxadd.rules
 
 # Install modules load script
 install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}.modules
@@ -446,6 +447,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Sat Aug 22 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-7
+- Correct the path in udev rule and adjust for non-hardening
+
 * Thu Aug 20 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-6
 - No exceptions in R0 code, should fix unresolved symbol problem
 
