@@ -306,7 +306,7 @@ echo 'INSTALL_DIR=%{_libdir}/virtualbox' > $RPM_BUILD_ROOT/%{_sysconfdir}/vbox/v
 
 # Install udev rules
 %define vboxdrv_udev %{?with_hardening:%{SOURCE4}}%{?!with_hardening:%{SOURCE3}}
-install -p -m 0644 -D %{vboxdrv_udev} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/90-vboxadd.rules
+install -p -m 0644 -D %{vboxdrv_udev} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-vboxadd.rules
 
 # Install modules load script
 install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}.modules
