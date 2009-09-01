@@ -50,6 +50,7 @@ Patch8:         VirtualBox-OSE-3.0.4-vblank.patch
 Patch9:         VirtualBox-OSE-3.0.4-optflags.patch
 Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
 Patch11:        VirtualBox-OSE-3.0.4-visibility.patch
+Patch12:        VirtualBox-OSE-3.0.4-noansi.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -154,6 +155,7 @@ cp %{SOURCE1} . # PDF User Guide
 %patch9 -p1 -b .optflags
 %patch10 -p1 -b .32bit
 %patch11 -p1 -b .visibility
+%patch12 -p1 -b .noansi
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -450,6 +452,7 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %changelog
 * Sat Aug 22 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-7
 - Correct the path in udev rule and adjust for non-hardening
+- Fix build with recent x86_64 glibc
 
 * Thu Aug 20 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-6
 - No exceptions in R0 code, should fix unresolved symbol problem
