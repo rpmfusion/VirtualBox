@@ -2,11 +2,10 @@ Replace some strings which ones that (sometimes) make more sense.
 
 Lubomir Rintel <lkundrak@v3.sk>
 
-
-diff -urb VirtualBox-3.0.0_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp VirtualBox-3.0.0_OSEb/src/VBox/Frontends/VirtualBox/src/main.cpp
---- VirtualBox-3.0.0_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp	2009-06-24 16:38:16.000000000 +0300
-+++ VirtualBox-3.0.0_OSEb/src/VBox/Frontends/VirtualBox/src/main.cpp	2009-07-03 14:14:27.528519750 +0300
-@@ -72,13 +72,13 @@
+diff -up VirtualBox-3.0.6_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp.strings VirtualBox-3.0.6_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp
+--- VirtualBox-3.0.6_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp.strings	2009-09-09 20:09:15.000000000 +0200
++++ VirtualBox-3.0.6_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp	2009-09-10 22:09:50.000000000 +0200
+@@ -71,13 +71,13 @@ QString g_QStrHintLinuxNoMemory = QAppli
    );
  
  QString g_QStrHintLinuxNoDriver = QApplication::tr(
@@ -27,7 +26,7 @@ diff -urb VirtualBox-3.0.0_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp Virtua
    );
  
  QString g_QStrHintOtherWrongDriverVersion = QApplication::tr(
-@@ -101,9 +101,9 @@
+@@ -100,9 +100,9 @@ QString g_QStrHintOtherNoDriver = QAppli
    "Make sure the kernel module has been loaded successfully."
    );
  
@@ -39,10 +38,10 @@ diff -urb VirtualBox-3.0.0_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp Virtua
    );
  
  #if defined(DEBUG) && defined(Q_WS_X11) && defined(RT_OS_LINUX)
-diff -urb VirtualBox-3.0.0_OSE/src/VBox/Installer/linux/VBox.sh VirtualBox-3.0.0_OSEb/src/VBox/Installer/linux/VBox.sh
---- VirtualBox-3.0.0_OSE/src/VBox/Installer/linux/VBox.sh	2009-03-27 21:13:57.000000000 +0200
-+++ VirtualBox-3.0.0_OSEb/src/VBox/Installer/linux/VBox.sh	2009-07-03 14:12:02.490521356 +0300
-@@ -36,19 +36,20 @@
+diff -up VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/VBox.sh.strings VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/VBox.sh
+--- VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/VBox.sh.strings	2009-09-09 20:09:47.000000000 +0200
++++ VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/VBox.sh	2009-09-10 22:09:50.000000000 +0200
+@@ -36,19 +36,20 @@ elif ! lsmod|grep -q vboxdrv; then
      cat << EOF
  WARNING: The vboxdrv kernel module is not loaded. Either there is no module
           available for the current kernel (`uname -r`) or it failed to
@@ -68,9 +67,9 @@ diff -urb VirtualBox-3.0.0_OSE/src/VBox/Installer/linux/VBox.sh VirtualBox-3.0.0
  
  	 You will not be able to start VMs until this problem is fixed.
  EOF
-diff -urb VirtualBox-3.0.0_OSE/src/VBox/Installer/linux/VirtualBox.desktop VirtualBox-3.0.0_OSEb/src/VBox/Installer/linux/VirtualBox.desktop
---- VirtualBox-3.0.0_OSE/src/VBox/Installer/linux/VirtualBox.desktop	2009-06-12 15:34:41.000000000 +0300
-+++ VirtualBox-3.0.0_OSEb/src/VBox/Installer/linux/VirtualBox.desktop	2009-07-03 14:12:02.492525812 +0300
+diff -up VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/virtualbox.desktop.strings VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/virtualbox.desktop
+--- VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/virtualbox.desktop.strings	2009-09-09 20:09:48.000000000 +0200
++++ VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/virtualbox.desktop	2009-09-10 22:09:51.000000000 +0200
 @@ -1,7 +1,7 @@
  [Desktop Entry]
  Encoding=UTF-8
@@ -80,10 +79,10 @@ diff -urb VirtualBox-3.0.0_OSE/src/VBox/Installer/linux/VirtualBox.desktop Virtu
  GenericName=Virtual Machine
  Type=Application
  Exec=VirtualBox
-diff -urb VirtualBox-3.0.0_OSE/src/VBox/VMM/VM.cpp VirtualBox-3.0.0_OSEb/src/VBox/VMM/VM.cpp
---- VirtualBox-3.0.0_OSE/src/VBox/VMM/VM.cpp	2009-06-24 16:38:14.000000000 +0300
-+++ VirtualBox-3.0.0_OSEb/src/VBox/VMM/VM.cpp	2009-07-03 14:12:02.501771542 +0300
-@@ -314,8 +314,8 @@
+diff -up VirtualBox-3.0.6_OSE/src/VBox/VMM/VM.cpp.strings VirtualBox-3.0.6_OSE/src/VBox/VMM/VM.cpp
+--- VirtualBox-3.0.6_OSE/src/VBox/VMM/VM.cpp.strings	2009-09-09 20:10:03.000000000 +0200
++++ VirtualBox-3.0.6_OSE/src/VBox/VMM/VM.cpp	2009-09-10 22:09:51.000000000 +0200
+@@ -334,8 +334,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCP
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not loaded. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv is not set up properly. "
@@ -94,7 +93,7 @@ diff -urb VirtualBox-3.0.0_OSE/src/VBox/VMM/VM.cpp VirtualBox-3.0.0_OSEb/src/VBo
  #else
                      pszError = N_("VirtualBox kernel driver not loaded");
  #endif
-@@ -356,8 +356,8 @@
+@@ -376,8 +376,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCP
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not installed. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv was not created for some "
