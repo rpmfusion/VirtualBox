@@ -6,15 +6,8 @@
 # -fexceptions -- R0 code doesn't link against C++ library, no __gxx_personality_v0
 %global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
 
-# Hardening is basically a lot of seemingly useless checks that are here to
-# mitigate impact of eventual security issue in setuid root VBox. When we
-# use the filesystem capabilities instead of running privileged, it can't
-# be used.
-%if 0%{?fedora} > 11
-%bcond_with hardening
-%else
+# Do not disable hardening for anything but debugging!
 %bcond_without hardening
-%endif
 
 %if %with hardening
 %define priv_mode %%attr(4755,root,root)
@@ -23,8 +16,8 @@
 %endif
 
 Name:           VirtualBox-OSE
-Version:        3.0.4
-Release:        7%{?dist}
+Version:        3.0.6
+Release:        1%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -40,13 +33,9 @@ Source7:        VirtualBox-OSE-guest.modules
 Source8:        VirtualBox-OSE-vboxresize.desktop
 Source9:        VirtualBox-OSE.blacklist-kvm
 Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
-Patch2:         VirtualBox-OSE-3.0.0-strings.patch
+Patch2:         VirtualBox-OSE-3.0.6-strings.patch
 Patch3:         VirtualBox-OSE-3.0.2-libcxx.patch
-Patch4:         VirtualBox-OSE-3.0.4-pulse0916.patch
-Patch5:         VirtualBox-OSE-3.0.2-xorg17.patch
-Patch6:         VirtualBox-OSE-3.0.2-xinput2.patch
-Patch7:         VirtualBox-OSE-3.0.4-videodrv6.patch
-Patch8:         VirtualBox-OSE-3.0.4-vblank.patch
+Patch5:         VirtualBox-OSE-3.0.6-xorg17.patch
 Patch9:         VirtualBox-OSE-3.0.4-optflags.patch
 Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
 Patch11:        VirtualBox-OSE-3.0.4-visibility.patch
@@ -147,11 +136,7 @@ cp %{SOURCE1} . # PDF User Guide
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .libcxx
-%patch4 -p1 -b .pulse0916
 %patch5 -p1 -b .xorg17
-%patch6 -p1 -b .xinput2
-%patch7 -p1 -b .videodrv6
-%patch8 -p1 -b .vblank
 %patch9 -p1 -b .optflags
 %patch10 -p1 -b .32bit
 %patch11 -p1 -b .visibility
@@ -326,7 +311,7 @@ tar --use-compress-program xz -cf $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{vers
 # Menu entry
 desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
         --remove-key=DocPath --remove-category=X-MandrivaLinux-System \
-        --vendor='' src/VBox/Installer/linux/VirtualBox.desktop
+        --vendor='' src/VBox/Installer/linux/virtualbox.desktop
 
 
 %check
@@ -450,6 +435,11 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Thu Sep 10 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.6-1
+- Bring hardening back, stupid Lubomir
+- Update to recent upstream release
+- Drop upstreamed patches for Fedora 12 Alpha support
+
 * Sat Aug 22 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-7
 - Correct the path in udev rule and adjust for non-hardening
 - Fix build with recent x86_64 glibc
