@@ -16,7 +16,7 @@
 %endif
 
 Name:           VirtualBox-OSE
-Version:        3.0.6
+Version:        3.0.8
 Release:        1%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
@@ -435,6 +435,10 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Wed Oct 07 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.8-1
+- Update to newer upstream
+- Fixes SunSolve #268188 security issue
+
 * Thu Sep 10 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.6-1
 - Bring hardening back, stupid Lubomir
 - Update to recent upstream release
