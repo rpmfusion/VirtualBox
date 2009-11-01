@@ -16,7 +16,7 @@
 %endif
 
 Name:           VirtualBox-OSE
-Version:        3.0.8
+Version:        3.0.10
 Release:        1%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
@@ -299,7 +299,7 @@ install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-v
 # Install modules load script
 install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}.modules
 install -p -m 0755 -D %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
-install -p -m 0644 -D %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modprobe.d/blacklist-kvm.conf
+install -p -m 0644 -D %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modprobe.d/blacklist-kvm.conf
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
@@ -435,6 +435,10 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Sun Nov 01 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.10-1
+- Update to newer upstream release
+- Fix mixed up source files (Tony Nelson, #881)
+
 * Wed Oct 07 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.8-1
 - Update to newer upstream
 - Fixes SunSolve #268188 security issue
