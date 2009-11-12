@@ -27,7 +27,7 @@ Source0:        http://download.virtualbox.org/virtualbox/%{version}_BETA1/Virtu
 Source1:        http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
 Source3:        VirtualBox-OSE-90-vboxdrv.rules
 Source4:        VirtualBox-OSE-90-vboxdrv.rules.hardening
-Source5:        VirtualBox-OSE-60-vboxadd.rules
+Source5:        VirtualBox-OSE-60-vboxguest.rules
 Source6:        VirtualBox-OSE.modules
 Source7:        VirtualBox-OSE-guest.modules
 Source8:        VirtualBox-OSE-vboxresize.desktop
@@ -292,7 +292,7 @@ echo 'INSTALL_DIR=%{_libdir}/virtualbox' > $RPM_BUILD_ROOT/%{_sysconfdir}/vbox/v
 # Install udev rules
 %define vboxdrv_udev %{?with_hardening:%{SOURCE4}}%{?!with_hardening:%{SOURCE3}}
 install -p -m 0644 -D %{vboxdrv_udev} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
-install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-vboxadd.rules
+install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-vboxguest.rules
 
 # Install modules load script
 install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}.modules
@@ -423,7 +423,7 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 # %{_datadir}/gdm/autostart/LoginWindow
 %exclude %{_datadir}/gdm
 %{_datadir}/hal/fdi/policy/20thirdparty/90-vboxguest.fdi
-%config %{_sysconfdir}/udev/rules.d/60-vboxadd.rules
+%config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
 %doc COPYING
 
