@@ -16,14 +16,14 @@
 %endif
 
 Name:           VirtualBox-OSE
-Version:        3.0.10
-Release:        1%{?dist}
+Version:        3.1.0
+Release:        0.1.beta1%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
 License:        GPLv2 or (GPLv2 and CDDL)
 URL:            http://www.virtualbox.org/wiki/VirtualBox
-Source0:        http://dlc.sun.com/virtualbox/%{version}/VirtualBox-%{version}-OSE.tar.bz2
+Source0:        http://download.virtualbox.org/virtualbox/%{version}_BETA1/VirtualBox-%{version}_BETA1_OSE.tar.bz2
 Source1:        http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
 Source3:        VirtualBox-OSE-90-vboxdrv.rules
 Source4:        VirtualBox-OSE-90-vboxdrv.rules.hardening
@@ -32,10 +32,10 @@ Source6:        VirtualBox-OSE.modules
 Source7:        VirtualBox-OSE-guest.modules
 Source8:        VirtualBox-OSE-vboxresize.desktop
 Source9:        VirtualBox-OSE.blacklist-kvm
-Patch1:         VirtualBox-OSE-2.2.0-noupdate.patch
-Patch2:         VirtualBox-OSE-3.0.6-strings.patch
-Patch3:         VirtualBox-OSE-3.0.2-libcxx.patch
-Patch5:         VirtualBox-OSE-3.0.6-xorg17.patch
+Patch1:         VirtualBox-OSE-3.1.0-noupdate.patch
+Patch2:         VirtualBox-OSE-3.1.0-strings.patch
+Patch3:         VirtualBox-OSE-3.1.0-libcxx.patch
+Patch5:         VirtualBox-OSE-3.1.0-xorg17.patch
 Patch9:         VirtualBox-OSE-3.0.4-optflags.patch
 Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
 Patch11:        VirtualBox-OSE-3.0.4-visibility.patch
@@ -162,9 +162,6 @@ sed -i 's/\r//' COPYING
 # the installation paths, but install the tree with the default
 # layout under 'obj' and shuffle files around in %%install.
 
-# FIXME: Utilize optflags. This will probably involve patching of makefiles
-# Setting VBOX_GCC_OPT to optflags doesn't use the flags for large part of
-# the tree, while preventing required symbols to be generated in .r0 files
 echo %{optflags}
 kmk KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_INS="$PWD/obj"              \
         VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=       \
@@ -216,6 +213,7 @@ install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
 
 # Executabes
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
+        obj/bin/EfiThunk        \
         obj/bin/VBoxHeadless    \
         obj/bin/VBoxSDL         \
         obj/bin/VBoxNetDHCP     \
@@ -261,7 +259,7 @@ install -m 0755 -D src/VBox/Additions/linux/installer/90-vboxguest.fdi \
 
 # Guest tools
 install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}    \
-        obj/bin/additions/mountvboxsf           \
+        obj/bin/additions/mount.vboxsf          \
         obj/bin/additions/VBoxService           \
         obj/bin/additions/VBoxClient            \
         obj/bin/additions/VBoxControl
@@ -385,6 +383,7 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %{_libdir}/virtualbox/VBoxXPCOMIPCD
 %{_libdir}/virtualbox/vboxwebsrv
 %{_libdir}/virtualbox/webtest
+%{_libdir}/virtualbox/EfiThunk
 %{priv_mode} %{_libdir}/virtualbox/VBoxHeadless
 %{priv_mode} %{_libdir}/virtualbox/VBoxSDL
 %{priv_mode} %{_libdir}/virtualbox/VBoxNetDHCP
@@ -411,7 +410,7 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 %files guest
 %defattr(-,root,root,-)
-%{_bindir}/mountvboxsf
+%{_bindir}/mount.vboxsf
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
 %{_bindir}/VBoxService
@@ -435,6 +434,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Thu Nov 12 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.1.0-0.1.beta1
+- Upstream beta release
+
 * Sun Nov 01 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.10-1
 - Update to newer upstream release
 - Fix mixed up source files (Tony Nelson, #881)
