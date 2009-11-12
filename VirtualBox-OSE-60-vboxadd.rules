@@ -1,2 +1,0 @@
-ACTION=="add", KERNEL=="vboxadd", SUBSYSTEM=="misc", OWNER="root", MODE="0600"
-ACTION=="add", KERNEL=="vboxuser", SUBSYSTEM=="misc", OWNER="root", MODE="0666"
