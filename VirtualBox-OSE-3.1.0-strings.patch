@@ -2,10 +2,10 @@ Replace some strings which ones that (sometimes) make more sense.
 
 Lubomir Rintel <lkundrak@v3.sk>
 
-diff -up VirtualBox-3.0.6_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp.strings VirtualBox-3.0.6_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp
---- VirtualBox-3.0.6_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp.strings	2009-09-09 20:09:15.000000000 +0200
-+++ VirtualBox-3.0.6_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp	2009-09-10 22:09:50.000000000 +0200
-@@ -71,13 +71,13 @@ QString g_QStrHintLinuxNoMemory = QAppli
+diff -up VirtualBox-3.1.0_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp.strings VirtualBox-3.1.0_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp
+--- VirtualBox-3.1.0_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp.strings	2009-11-05 17:53:04.000000000 +0100
++++ VirtualBox-3.1.0_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp	2009-11-12 15:34:13.000000000 +0100
+@@ -72,13 +72,13 @@ QString g_QStrHintLinuxNoMemory = QAppli
    );
  
  QString g_QStrHintLinuxNoDriver = QApplication::tr(
@@ -26,7 +26,7 @@ diff -up VirtualBox-3.0.6_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp.strings
    );
  
  QString g_QStrHintOtherWrongDriverVersion = QApplication::tr(
-@@ -100,9 +100,9 @@ QString g_QStrHintOtherNoDriver = QAppli
+@@ -101,9 +101,9 @@ QString g_QStrHintOtherNoDriver = QAppli
    "Make sure the kernel module has been loaded successfully."
    );
  
@@ -38,9 +38,9 @@ diff -up VirtualBox-3.0.6_OSE/src/VBox/Frontends/VirtualBox/src/main.cpp.strings
    );
  
  #if defined(DEBUG) && defined(Q_WS_X11) && defined(RT_OS_LINUX)
-diff -up VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/VBox.sh.strings VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/VBox.sh
---- VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/VBox.sh.strings	2009-09-09 20:09:47.000000000 +0200
-+++ VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/VBox.sh	2009-09-10 22:09:50.000000000 +0200
+diff -up VirtualBox-3.1.0_OSE/src/VBox/Installer/linux/VBox.sh.strings VirtualBox-3.1.0_OSE/src/VBox/Installer/linux/VBox.sh
+--- VirtualBox-3.1.0_OSE/src/VBox/Installer/linux/VBox.sh.strings	2009-11-05 17:54:06.000000000 +0100
++++ VirtualBox-3.1.0_OSE/src/VBox/Installer/linux/VBox.sh	2009-11-12 15:34:13.000000000 +0100
 @@ -36,19 +36,20 @@ elif ! lsmod|grep -q vboxdrv; then
      cat << EOF
  WARNING: The vboxdrv kernel module is not loaded. Either there is no module
@@ -65,11 +65,11 @@ diff -up VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/VBox.sh.strings VirtualBo
 +         and if that is not successful, then you're in situation that
 +         can not possibly happen and there's nothing you can do about it.
  
- 	 You will not be able to start VMs until this problem is fixed.
+          You will not be able to start VMs until this problem is fixed.
  EOF
-diff -up VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/virtualbox.desktop.strings VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/virtualbox.desktop
---- VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/virtualbox.desktop.strings	2009-09-09 20:09:48.000000000 +0200
-+++ VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/virtualbox.desktop	2009-09-10 22:09:51.000000000 +0200
+diff -up VirtualBox-3.1.0_OSE/src/VBox/Installer/linux/virtualbox.desktop.strings VirtualBox-3.1.0_OSE/src/VBox/Installer/linux/virtualbox.desktop
+--- VirtualBox-3.1.0_OSE/src/VBox/Installer/linux/virtualbox.desktop.strings	2009-09-01 13:22:55.000000000 +0200
++++ VirtualBox-3.1.0_OSE/src/VBox/Installer/linux/virtualbox.desktop	2009-11-12 15:34:13.000000000 +0100
 @@ -1,7 +1,7 @@
  [Desktop Entry]
  Encoding=UTF-8
@@ -79,10 +79,10 @@ diff -up VirtualBox-3.0.6_OSE/src/VBox/Installer/linux/virtualbox.desktop.string
  GenericName=Virtual Machine
  Type=Application
  Exec=VirtualBox
-diff -up VirtualBox-3.0.6_OSE/src/VBox/VMM/VM.cpp.strings VirtualBox-3.0.6_OSE/src/VBox/VMM/VM.cpp
---- VirtualBox-3.0.6_OSE/src/VBox/VMM/VM.cpp.strings	2009-09-09 20:10:03.000000000 +0200
-+++ VirtualBox-3.0.6_OSE/src/VBox/VMM/VM.cpp	2009-09-10 22:09:51.000000000 +0200
-@@ -334,8 +334,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCP
+diff -up VirtualBox-3.1.0_OSE/src/VBox/VMM/VM.cpp.strings VirtualBox-3.1.0_OSE/src/VBox/VMM/VM.cpp
+--- VirtualBox-3.1.0_OSE/src/VBox/VMM/VM.cpp.strings	2009-11-10 16:47:29.000000000 +0100
++++ VirtualBox-3.1.0_OSE/src/VBox/VMM/VM.cpp	2009-11-12 15:34:13.000000000 +0100
+@@ -336,8 +336,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not loaded. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv is not set up properly. "
@@ -93,7 +93,7 @@ diff -up VirtualBox-3.0.6_OSE/src/VBox/VMM/VM.cpp.strings VirtualBox-3.0.6_OSE/s
  #else
                      pszError = N_("VirtualBox kernel driver not loaded");
  #endif
-@@ -376,8 +376,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCP
+@@ -378,8 +378,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not installed. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv was not created for some "

@@ -5,13 +5,13 @@ anyways.
 
 Lubomir Rintel <lkundrak@v3.sk>
 
-diff -urp VirtualBox-3.0.2_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk VirtualBox-3.0.2_OSE.fixed/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
---- VirtualBox-3.0.2_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk	2009-07-10 11:40:22.000000000 -0400
-+++ VirtualBox-3.0.2_OSE.fixed/src/VBox/Additions/x11/VBoxClient/Makefile.kmk	2009-08-04 13:54:09.707926383 -0400
-@@ -62,20 +62,20 @@ ifdef VBOX_X11_SEAMLESS_GUEST
- 	Xext Xmu
+diff -up VirtualBox-3.1.0_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk.libcxx VirtualBox-3.1.0_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
+--- VirtualBox-3.1.0_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk.libcxx	2009-11-05 17:54:28.000000000 +0100
++++ VirtualBox-3.1.0_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk	2009-11-12 15:37:07.000000000 +0100
+@@ -68,20 +68,20 @@ endif
+ ifdef VBOX_WITH_GUEST_PROPS
+  VBoxClient_DEFS += VBOX_WITH_GUEST_PROPS
  endif
- 
 -#
 -# Link aginst libstdc++.a. (http://www.trilithium.com/johan/2005/06/static-libstdc/).
 -# (It would've been preferred to avoid features depending on libstdc++, of course...)
