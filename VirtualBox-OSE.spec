@@ -17,7 +17,7 @@
 
 Name:           VirtualBox-OSE
 Version:        3.1.0
-Release:        0.1.beta1%{?dist}
+Release:        0.1.beta2%{?dist}
 Summary:        A general-purpose full virtualizer for PC hardware
 
 Group:          Development/Tools
@@ -161,7 +161,6 @@ sed -i 's/\r//' COPYING
 # really been installed to. Therefore we do not override any of
 # the installation paths, but install the tree with the default
 # layout under 'obj' and shuffle files around in %%install.
-
 echo %{optflags}
 kmk KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_INS="$PWD/obj"              \
         VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=       \
@@ -283,7 +282,6 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-
 install -m 0755 -t $RPM_BUILD_ROOT%{_libdir}    \
         obj/bin/additions/VBoxOGL*.so
 ln -sf ../VBoxOGL.so $RPM_BUILD_ROOT%{_libdir}/dri/vboxvideo_dri.so
-
 
 # Installation root configuration
 install -d $RPM_BUILD_ROOT/%{_sysconfdir}/vbox
@@ -420,7 +418,6 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %{_libdir}/VBoxOGL*.so
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
-# %{_datadir}/gdm/autostart/LoginWindow
 %exclude %{_datadir}/gdm
 %{_datadir}/hal/fdi/policy/20thirdparty/90-vboxguest.fdi
 %config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
@@ -434,6 +431,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Sat Nov 21 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.1.0-0.1.beta2
+- Another upstream beta
+
 * Thu Nov 12 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.1.0-0.1.beta1
 - Upstream beta release
 
