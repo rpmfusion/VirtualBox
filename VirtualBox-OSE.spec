@@ -23,7 +23,7 @@ Summary:        A general-purpose full virtualizer for PC hardware
 Group:          Development/Tools
 License:        GPLv2 or (GPLv2 and CDDL)
 URL:            http://www.virtualbox.org/wiki/VirtualBox
-Source0:        http://download.virtualbox.org/virtualbox/%{version}_BETA1/VirtualBox-%{version}_BETA1_OSE.tar.bz2
+Source0:        http://download.virtualbox.org/virtualbox/%{version}_BETA2/VirtualBox-%{version}_BETA2_OSE.tar.bz2
 Source1:        http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
 Source3:        VirtualBox-OSE-90-vboxdrv.rules
 Source4:        VirtualBox-OSE-90-vboxdrv.rules.hardening
