@@ -1,83 +1,82 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 # Standard compiler flags, without:
-# -Wall        -- VirtualBox-OSE takes care of reasonable warning very well
+# -Wall	       -- VirtualBox-OSE takes care of reasonable warning very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
 # -fexceptions -- R0 code doesn't link against C++ library, no __gxx_personality_v0
 %global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
 
 # Do not disable hardening for anything but debugging!
 %bcond_without hardening
-
 %if %with hardening
 %define priv_mode %%attr(4755,root,root)
 %else
 %define priv_mode %%caps(cap_net_raw+ep)
 %endif
 
-Name:           VirtualBox-OSE
-Version:        3.1.0
-Release:        0.1.beta2%{?dist}
-Summary:        A general-purpose full virtualizer for PC hardware
+Name:		VirtualBox-OSE
+Version:	3.1.0
+Release:	0.1.beta2%{?dist}
+Summary:	A general-purpose full virtualizer for PC hardware
 
-Group:          Development/Tools
-License:        GPLv2 or (GPLv2 and CDDL)
-URL:            http://www.virtualbox.org/wiki/VirtualBox
-Source0:        http://download.virtualbox.org/virtualbox/%{version}_BETA2/VirtualBox-%{version}_BETA2_OSE.tar.bz2
-Source1:        http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
-Source3:        VirtualBox-OSE-90-vboxdrv.rules
-Source4:        VirtualBox-OSE-90-vboxdrv.rules.hardening
-Source5:        VirtualBox-OSE-60-vboxguest.rules
-Source6:        VirtualBox-OSE.modules
-Source7:        VirtualBox-OSE-guest.modules
-Source8:        VirtualBox-OSE-vboxresize.desktop
-Source9:        VirtualBox-OSE.blacklist-kvm
-Patch1:         VirtualBox-OSE-3.1.0-noupdate.patch
-Patch2:         VirtualBox-OSE-3.1.0-strings.patch
-Patch3:         VirtualBox-OSE-3.1.0-libcxx.patch
-Patch5:         VirtualBox-OSE-3.1.0-xorg17.patch
-Patch9:         VirtualBox-OSE-3.0.4-optflags.patch
-Patch10:        VirtualBox-OSE-2.2.0-32bit.patch
-Patch11:        VirtualBox-OSE-3.0.4-visibility.patch
-Patch12:        VirtualBox-OSE-3.0.4-noansi.patch
+Group:		Development/Tools
+License:	GPLv2 or (GPLv2 and CDDL)
+URL:		http://www.virtualbox.org/wiki/VirtualBox
+Source0:	http://download.virtualbox.org/virtualbox/%{version}_BETA2/VirtualBox-%{version}_BETA2_OSE.tar.bz2
+Source1:	http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
+Source3:	VirtualBox-OSE-90-vboxdrv.rules
+Source4:	VirtualBox-OSE-90-vboxdrv.rules.hardening
+Source5:	VirtualBox-OSE-60-vboxguest.rules
+Source6:	VirtualBox-OSE.modules
+Source7:	VirtualBox-OSE-guest.modules
+Source8:	VirtualBox-OSE-vboxresize.desktop
+Source9:	VirtualBox-OSE.blacklist-kvm
+Patch1:		VirtualBox-OSE-3.1.0-noupdate.patch
+Patch2:		VirtualBox-OSE-3.1.0-strings.patch
+Patch3:		VirtualBox-OSE-3.1.0-libcxx.patch
+Patch5:		VirtualBox-OSE-3.1.0-xorg17.patch
+Patch9:		VirtualBox-OSE-3.0.4-optflags.patch
+Patch10:	VirtualBox-OSE-2.2.0-32bit.patch
+Patch11:	VirtualBox-OSE-3.0.4-visibility.patch
+Patch12:	VirtualBox-OSE-3.0.4-noansi.patch
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  kBuild >= 0.1.5-1
-BuildRequires:  SDL-devel xalan-c-devel
-BuildRequires:  hal-devel
-BuildRequires:  openssl-devel
-BuildRequires:  libcurl-devel
-BuildRequires:  dev86 iasl libxslt-devel xerces-c-devel libXcursor-devel libIDL-devel
-BuildRequires:  yasm
-BuildRequires:  pulseaudio-libs-devel
-BuildRequires:  libXmu-devel
-BuildRequires:  python-devel
-BuildRequires:  desktop-file-utils
-BuildRequires:  libcap-devel
-BuildRequires:  qt4-devel
-BuildRequires:  gsoap-devel
-BuildRequires:  xz
+BuildRequires:	kBuild >= 0.1.5-1
+BuildRequires:	SDL-devel xalan-c-devel
+BuildRequires:	hal-devel
+BuildRequires:	openssl-devel
+BuildRequires:	libcurl-devel
+BuildRequires:	dev86 iasl libxslt-devel xerces-c-devel libXcursor-devel libIDL-devel
+BuildRequires:	yasm
+BuildRequires:	pulseaudio-libs-devel
+BuildRequires:	libXmu-devel
+BuildRequires:	python-devel
+BuildRequires:	desktop-file-utils
+BuildRequires:	libcap-devel
+BuildRequires:	qt4-devel
+BuildRequires:	gsoap-devel
+BuildRequires:	xz
 
 # For the X11 module
-BuildRequires:  libdrm-devel
-BuildRequires:  libpciaccess-devel
-BuildRequires:  mesa-libGL-devel
-BuildRequires:  pixman-devel
-BuildRequires:  xorg-x11-proto-devel
-BuildRequires:  xorg-x11-server-source
+BuildRequires:	libdrm-devel
+BuildRequires:	libpciaccess-devel
+BuildRequires:	mesa-libGL-devel
+BuildRequires:	pixman-devel
+BuildRequires:	xorg-x11-proto-devel
+BuildRequires:	xorg-x11-server-source
 
 # Plague-specific weirdness
 %if 0%{?fedora} > 11
-ExclusiveArch:  i686 x86_64
+ExclusiveArch:	i686 x86_64
 %else %if 0%{?fedora} > 10
-ExclusiveArch:  i586 x86_64
+ExclusiveArch:	i586 x86_64
 %else
-ExclusiveArch:  i386 x86_64
+ExclusiveArch:	i386 x86_64
 %endif
 
-Requires:       %{name}-kmod = %{version}
-Provides:       %{name}-kmod-common = %{version}
+Requires:	%{name}-kmod = %{version}
+Provides:	%{name}-kmod-common = %{version}
 
 %description
 A general-purpose full virtualizer and emulator for 32-bit and
@@ -85,34 +84,34 @@ A general-purpose full virtualizer and emulator for 32-bit and
 
 
 %package devel
-Summary:        %{name} SDK
-Group:          Development/Libraries
-Requires:       VirtualBox-OSE = %{version}-%{release}
-Requires:       python-VirtualBox-OSE = %{version}-%{release}
+Summary:	%{name} SDK
+Group:		Development/Libraries
+Requires:	VirtualBox-OSE = %{version}-%{release}
+Requires:	python-VirtualBox-OSE = %{version}-%{release}
 
 %description devel
 %{name} Software Development Kit.
 
 
 %package -n python-%{name}
-Summary:        Python bindings for %{name}
-Group:          Development/Libraries
-Requires:       VirtualBox-OSE = %{version}-%{release}
+Summary:	Python bindings for %{name}
+Group:		Development/Libraries
+Requires:	VirtualBox-OSE = %{version}-%{release}
 
 %description -n python-%{name}
 Python XPCOM bindings to %{name}.
 
 
 %package guest
-Summary:        %{name} Guest Additions
-Group:          System Environment/Base
-Requires:       %{name}-kmod = %{version}
-Provides:       %{name}-kmod-common = %{version}
-Requires:       hal
-Requires:       xorg-x11-server-Xorg
-Requires:       xorg-x11-xinit
-Provides:       xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
-Obsoletes:      xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
+Summary:	%{name} Guest Additions
+Group:		System Environment/Base
+Requires:	%{name}-kmod = %{version}
+Provides:	%{name}-kmod-common = %{version}
+Requires:	hal
+Requires:	xorg-x11-server-Xorg
+Requires:	xorg-x11-xinit
+Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
+Obsoletes:	xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
 
 %description guest
 Tools that utilize kernel modules for supporting integration
@@ -121,8 +120,8 @@ movement and X.org X11 video and mouse driver.
 
 
 %package kmodsrc
-Summary:        %{name} kernel module source code
-Group:          System Environment/Kernel
+Summary:	%{name} kernel module source code
+Group:		System Environment/Kernel
 
 %description kmodsrc
 Source tree used for building kernel module packages (%{name}-kmod)
@@ -152,7 +151,7 @@ sed -i 's/\r//' COPYING
 
 %build
 ./configure --disable-kmods --enable-webservice \
-        %{!?with_hardening:--disable-hardening}
+	%{!?with_hardening:--disable-hardening}
 
 . ./env.sh
 
@@ -162,11 +161,11 @@ sed -i 's/\r//' COPYING
 # the installation paths, but install the tree with the default
 # layout under 'obj' and shuffle files around in %%install.
 echo %{optflags}
-kmk KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_INS="$PWD/obj"              \
-        VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=       \
-        KMK_REVISION=3000 KBUILD_KMK_REVISION=3000                      \
-        VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"        \
-        VBOX_GCC_R0_OPT="%{optflags}"
+kmk KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_INS="$PWD/obj"		\
+	VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=	\
+	KMK_REVISION=3000 KBUILD_KMK_REVISION=3000			\
+	VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"	\
+	VBOX_GCC_R0_OPT="%{optflags}"
 
 
 %install
@@ -195,52 +194,53 @@ ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxSDL
 ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VirtualBox
 
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
-        obj/bin/VBoxTunctl      \
-        obj/bin/VBoxBFE
+	obj/bin/VBoxTunctl	\
+	obj/bin/VBoxBFE
 
 # Components
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/components \
-        obj/bin/components/*
+	obj/bin/components/*
 
 # Lib
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-        obj/bin/*.so
+	obj/bin/*.so
 
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-        obj/bin/V*.gc           \
-        obj/bin/V*.r0
+	obj/bin/V*.gc		\
+	obj/bin/V*.r0		\
+	obj/bin/vboxefi.fv
 
 # Executabes
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-        obj/bin/EfiThunk        \
-        obj/bin/VBoxHeadless    \
-        obj/bin/VBoxSDL         \
-        obj/bin/VBoxNetDHCP     \
-        obj/bin/VBoxNetAdpCtl   \
-        obj/bin/VirtualBox      \
-        obj/bin/VBoxManage      \
-        obj/bin/VBoxSVC         \
-        obj/bin/VBoxXPCOMIPCD   \
-        obj/bin/VBoxSysInfo.sh  \
-        obj/bin/vboxshell.py    \
-        obj/bin/VBoxTestOGL     \
-        obj/bin/vboxwebsrv      \
-        obj/bin/webtest
+	obj/bin/EfiThunk	\
+	obj/bin/VBoxHeadless	\
+	obj/bin/VBoxSDL		\
+	obj/bin/VBoxNetDHCP	\
+	obj/bin/VBoxNetAdpCtl	\
+	obj/bin/VirtualBox	\
+	obj/bin/VBoxManage	\
+	obj/bin/VBoxSVC		\
+	obj/bin/VBoxXPCOMIPCD	\
+	obj/bin/VBoxSysInfo.sh	\
+	obj/bin/vboxshell.py	\
+	obj/bin/VBoxTestOGL	\
+	obj/bin/vboxwebsrv	\
+	obj/bin/webtest
 
 # Language files
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
-        obj/bin/nls/*
+	obj/bin/nls/*
 
 # SDK
 cp -rp obj/bin/sdk/. $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk
 mv $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom \
-        $RPM_BUILD_ROOT%{python_sitelib}/virtualbox
+	$RPM_BUILD_ROOT%{python_sitelib}/virtualbox
 ln -sf ../../../../../../..%{python_sitelib}/virtualbox/xpcom \
-        $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
+	$RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 # Icon
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
-        obj/bin/VBox.png
+	obj/bin/VBox.png
 
 # Guest X.Org drivers
 # With the xorg17 patch, the _17 driver builds against what's
@@ -249,38 +249,38 @@ install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
 %global x11_api 17
 
 install -m 0755 -D obj/bin/additions/vboxmouse_drv_%{x11_api}.so \
-        $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxmouse_drv.so
+	$RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxmouse_drv.so
 install -m 0755 -D obj/bin/additions/vboxvideo_drv_%{x11_api}.so \
-        $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
+	$RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
 install -m 0755 -D src/VBox/Additions/linux/installer/90-vboxguest.fdi \
-        $RPM_BUILD_ROOT%{_datadir}/hal/fdi/policy/20thirdparty/90-vboxguest.fdi
+	$RPM_BUILD_ROOT%{_datadir}/hal/fdi/policy/20thirdparty/90-vboxguest.fdi
 
 # Guest tools
-install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}    \
-        obj/bin/additions/mount.vboxsf          \
-        obj/bin/additions/VBoxService           \
-        obj/bin/additions/VBoxClient            \
-        obj/bin/additions/VBoxControl
+install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}	\
+	obj/bin/additions/mount.vboxsf		\
+	obj/bin/additions/VBoxService		\
+	obj/bin/additions/VBoxClient		\
+	obj/bin/additions/VBoxControl
 
 install -m 0755 src/VBox/Additions/x11/Installer/VBoxRandR.sh \
-        $RPM_BUILD_ROOT%{_bindir}/VBoxRandR
+	$RPM_BUILD_ROOT%{_bindir}/VBoxRandR
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
-        $RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
+	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
-        $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+	$RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
 install -m 0755 -D %{SOURCE8} \
-        $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
+	$RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 # Guest libraries
-install -m 0755 -t $RPM_BUILD_ROOT%{_libdir}    \
-        obj/bin/additions/VBoxOGL*.so
+install -m 0755 -t $RPM_BUILD_ROOT%{_libdir}	\
+	obj/bin/additions/VBoxOGL*.so
 ln -sf ../VBoxOGL.so $RPM_BUILD_ROOT%{_libdir}/dri/vboxvideo_dri.so
 
 # Installation root configuration
@@ -302,12 +302,12 @@ mkdir -p %{name}-kmod-%{version}
 cp -al obj/bin/src/vbox* obj/bin/additions/src/vbox* %{name}-kmod-%{version}
 install -d $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{version}
 tar --use-compress-program xz -cf $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.xz \
-        %{name}-kmod-%{version}
+	%{name}-kmod-%{version}
 
 # Menu entry
 desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
-        --remove-key=DocPath --remove-category=X-MandrivaLinux-System \
-        --vendor='' src/VBox/Installer/linux/virtualbox.desktop
+	--remove-key=DocPath --remove-category=X-MandrivaLinux-System \
+	--vendor='' src/VBox/Installer/linux/virtualbox.desktop
 
 
 %check
@@ -324,25 +324,25 @@ desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
 # it? Bring it back.
 
 set +o posix
-diff -u <((find obj/bin/additions/* -maxdepth 0 -type f    \
-                -not -name 'autorun.sh'                 \
-                -not -name '*_drv*'                     \
-                -exec basename '{}' \;
-        find obj/bin/* -maxdepth 0 -type f              \
-                -not -name 'tst*'                       \
-                -not -name 'SUP*'                       \
-                -not -name 'VBox.sh'                    \
-                -not -name 'xpidl'                      \
-                -not -name 'vboxkeyboard.tar.gz'        \
-                -exec basename '{}' \;) |sort) \
-        <(find $RPM_BUILD_ROOT%{_libdir}/virtualbox/*   \
-                $RPM_BUILD_ROOT%{_bindir}/*             \
-                $RPM_BUILD_ROOT%{_libdir}/*OGL*.so      \
-                $RPM_BUILD_ROOT%{_datadir}/{pixmaps,applications}/* \
-                -maxdepth 0 -type f                     \
-                -not -name '*.py[co]'                   \
-                -not -name VBoxRandR                    \
-                -not -name VBox -exec basename '{}' \; |sort)
+diff -u <((find obj/bin/additions/* -maxdepth 0 -type f	   \
+		-not -name 'autorun.sh'			\
+		-not -name '*_drv*'			\
+		-exec basename '{}' \;
+	find obj/bin/* -maxdepth 0 -type f		\
+		-not -name 'tst*'			\
+		-not -name 'SUP*'			\
+		-not -name 'VBox.sh'			\
+		-not -name 'xpidl'			\
+		-not -name 'vboxkeyboard.tar.gz'	\
+		-exec basename '{}' \;) |sort) \
+	<(find $RPM_BUILD_ROOT%{_libdir}/virtualbox/*	\
+		$RPM_BUILD_ROOT%{_bindir}/*		\
+		$RPM_BUILD_ROOT%{_libdir}/*OGL*.so	\
+		$RPM_BUILD_ROOT%{_datadir}/{pixmaps,applications}/* \
+		-maxdepth 0 -type f			\
+		-not -name '*.py[co]'			\
+		-not -name VBoxRandR			\
+		-not -name VBox -exec basename '{}' \; |sort)
 set -o posix
 
 
