@@ -6,26 +6,17 @@
 # -fexceptions -- R0 code doesn't link against C++ library, no __gxx_personality_v0
 %global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
 
-# Do not disable hardening for anything but debugging!
-%bcond_without hardening
-%if %with hardening
-%define priv_mode %%attr(4755,root,root)
-%else
-%define priv_mode %%caps(cap_net_raw+ep)
-%endif
-
 Name:		VirtualBox-OSE
 Version:	3.1.0
-Release:	0.1.beta2%{?dist}
+Release:	1%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
 License:	GPLv2 or (GPLv2 and CDDL)
 URL:		http://www.virtualbox.org/wiki/VirtualBox
-Source0:	http://download.virtualbox.org/virtualbox/%{version}_BETA2/VirtualBox-%{version}_BETA2_OSE.tar.bz2
+Source0:	http://download.virtualbox.org/virtualbox/%{version}/VirtualBox-%{version}-OSE.tar.bz2
 Source1:	http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
 Source3:	VirtualBox-OSE-90-vboxdrv.rules
-Source4:	VirtualBox-OSE-90-vboxdrv.rules.hardening
 Source5:	VirtualBox-OSE-60-vboxguest.rules
 Source6:	VirtualBox-OSE.modules
 Source7:	VirtualBox-OSE-guest.modules
@@ -37,7 +28,7 @@ Patch3:		VirtualBox-OSE-3.1.0-libcxx.patch
 Patch5:		VirtualBox-OSE-3.1.0-xorg17.patch
 Patch9:		VirtualBox-OSE-3.0.4-optflags.patch
 Patch10:	VirtualBox-OSE-2.2.0-32bit.patch
-Patch11:	VirtualBox-OSE-3.0.4-visibility.patch
+Patch11:	VirtualBox-OSE-3.1.0-visibility.patch
 Patch12:	VirtualBox-OSE-3.0.4-noansi.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -151,7 +142,6 @@ sed -i 's/\r//' COPYING
 
 %build
 ./configure --disable-kmods --enable-webservice \
-	%{!?with_hardening:--disable-hardening}
 
 . ./env.sh
 
@@ -288,8 +278,7 @@ install -d $RPM_BUILD_ROOT/%{_sysconfdir}/vbox
 echo 'INSTALL_DIR=%{_libdir}/virtualbox' > $RPM_BUILD_ROOT/%{_sysconfdir}/vbox/vbox.cfg
 
 # Install udev rules
-%define vboxdrv_udev %{?with_hardening:%{SOURCE4}}%{?!with_hardening:%{SOURCE3}}
-install -p -m 0644 -D %{vboxdrv_udev} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
+install -p -m 0644 -D %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-vboxguest.rules
 
 # Install modules load script
@@ -431,6 +420,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Mon Nov 30 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.1.0-1
+- Upstream release (they do that quite often, huh?)
+
 * Sat Nov 21 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.1.0-0.1.beta2
 - Another upstream beta
 
