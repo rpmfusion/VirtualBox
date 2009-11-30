@@ -197,8 +197,8 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
 
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
 	obj/bin/V*.gc		\
-	obj/bin/V*.r0		\
-	obj/bin/vboxefi.fv
+	obj/bin/V*.r0
+#	obj/bin/vboxefi.fv
 
 # Executabes
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
