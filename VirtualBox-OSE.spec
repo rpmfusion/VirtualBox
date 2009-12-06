@@ -371,11 +371,11 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %{_libdir}/virtualbox/vboxwebsrv
 %{_libdir}/virtualbox/webtest
 %{_libdir}/virtualbox/EfiThunk
-%{priv_mode} %{_libdir}/virtualbox/VBoxHeadless
-%{priv_mode} %{_libdir}/virtualbox/VBoxSDL
-%{priv_mode} %{_libdir}/virtualbox/VBoxNetDHCP
-%{priv_mode} %{_libdir}/virtualbox/VBoxNetAdpCtl
-%{priv_mode} %{_libdir}/virtualbox/VirtualBox
+%attr(4755,root,root) %{_libdir}/virtualbox/VBoxHeadless
+%attr(4755,root,root) %{_libdir}/virtualbox/VBoxSDL
+%attr(4755,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
+%attr(4755,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
+%attr(4755,root,root) %{_libdir}/virtualbox/VirtualBox
 %{_datadir}/pixmaps/*
 %{_datadir}/applications/*.desktop
 %config %{_sysconfdir}/vbox/vbox.cfg
