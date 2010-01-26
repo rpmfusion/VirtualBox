@@ -7,7 +7,7 @@
 %global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
 
 Name:		VirtualBox-OSE
-Version:	3.1.0
+Version:	3.1.2
 Release:	1%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
@@ -420,6 +420,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Tue Jan 26 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.1.2-1
+- New upstream release
+
 * Mon Nov 30 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.1.0-1
 - Upstream release (they do that quite often, huh?)
 
