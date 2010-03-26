@@ -1,13 +1,13 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 # Standard compiler flags, without:
-# -Wall	       -- VirtualBox-OSE takes care of reasonable warning very well
+# -Wall	       -- VirtualBox-OSE takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
 # -fexceptions -- R0 code doesn't link against C++ library, no __gxx_personality_v0
 %global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
 
 Name:		VirtualBox-OSE
-Version:	3.1.4
+Version:	3.1.6
 Release:	1%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
@@ -27,7 +27,7 @@ Patch2:		VirtualBox-OSE-3.1.0-strings.patch
 Patch3:		VirtualBox-OSE-3.1.0-libcxx.patch
 Patch5:		VirtualBox-OSE-3.1.0-xorg17.patch
 Patch9:		VirtualBox-OSE-3.0.4-optflags.patch
-Patch10:	VirtualBox-OSE-2.2.0-32bit.patch
+Patch10:	VirtualBox-OSE-3.1.6-32bit.patch
 Patch11:	VirtualBox-OSE-3.1.0-visibility.patch
 Patch12:	VirtualBox-OSE-3.0.4-noansi.patch
 
@@ -141,8 +141,7 @@ sed -i 's/\r//' COPYING
 
 
 %build
-./configure --disable-kmods --enable-webservice \
-
+./configure --disable-kmods --enable-webservice
 . ./env.sh
 
 # VirtualBox build system installs and builds in the same step,
@@ -151,11 +150,12 @@ sed -i 's/\r//' COPYING
 # the installation paths, but install the tree with the default
 # layout under 'obj' and shuffle files around in %%install.
 echo %{optflags}
-kmk KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_INS="$PWD/obj"		\
+kmk %{_smp_mflags} \
+	KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_INS="$PWD/obj"		\
 	VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=	\
 	KMK_REVISION=3000 KBUILD_KMK_REVISION=3000			\
 	VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"	\
-	VBOX_GCC_R0_OPT="%{optflags}"
+	VBOX_GCC_R0_OPT="%{optflags}" VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"
 
 
 %install
@@ -284,7 +284,7 @@ install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-v
 # Install modules load script
 install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}.modules
 install -p -m 0755 -D %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
-install -p -m 0644 -D %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modprobe.d/blacklist-kvm.conf
+install -p -m 0644 -D %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/modprobe.d/blacklist-kvm.conf
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
@@ -378,10 +378,11 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %attr(4755,root,root) %{_libdir}/virtualbox/VirtualBox
 %{_datadir}/pixmaps/*
 %{_datadir}/applications/*.desktop
+%dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
-%config(noreplace) %{_sysconfdir}/sysconfig/modprobe.d/*.conf
+%config(noreplace) %{_sysconfdir}/modprobe.d/*.conf
 %doc COPYING UserManual.pdf
 
 
@@ -420,6 +421,14 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Fri Mar 26 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.1.6-1
+- New upstream release
+- Workaround trouble linking with new linker
+- modprobe configuration files into right directory (LI Rui Bin)
+- Own /etc/vbox (LI Rui Bin)
+- Use parallel build
+- Attempt to address #1083 by insmodding instead of modprobe
+
 * Tue Feb 16 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.1.4-1
 - New upstream, new release :)
 
