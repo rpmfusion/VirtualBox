@@ -7,29 +7,35 @@
 %global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
 
 Name:		VirtualBox-OSE
-Version:	3.1.6
-Release:	1%{?dist}
+Version:	3.2.0
+Release:	0.1.beta1%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
 License:	GPLv2 or (GPLv2 and CDDL)
 URL:		http://www.virtualbox.org/wiki/VirtualBox
-Source0:	http://download.virtualbox.org/virtualbox/%{version}/VirtualBox-%{version}-OSE.tar.bz2
-Source1:	http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
+# You can download the binaries here:
+#  http://213.239.192.22/download/3.2.0_BETA1/
+# (don't worry about the IP address, this is a temporary Oracle server)
+# -- From: Frank Mehnert
+Source0:	http://213.239.192.22/download/%{version}_BETA1/VirtualBox-%{version}_BETA1-OSE.tar.bz2
+Source1:	http://213.239.192.22/download/%{version}_BETA1/UserManual.pdf
+#Source0:	http://download.virtualbox.org/virtualbox/%{version}/VirtualBox-%{version}-OSE.tar.bz2
+#Source1:	http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
 Source3:	VirtualBox-OSE-90-vboxdrv.rules
 Source5:	VirtualBox-OSE-60-vboxguest.rules
 Source6:	VirtualBox-OSE.modules
 Source7:	VirtualBox-OSE-guest.modules
 Source8:	VirtualBox-OSE-vboxresize.desktop
 Source9:	VirtualBox-OSE.blacklist-kvm
-Patch1:		VirtualBox-OSE-3.1.0-noupdate.patch
+Patch1:		VirtualBox-OSE-3.2.0-noupdate.patch
 Patch2:		VirtualBox-OSE-3.1.0-strings.patch
 Patch3:		VirtualBox-OSE-3.1.0-libcxx.patch
-Patch5:		VirtualBox-OSE-3.1.0-xorg17.patch
+Patch5:		VirtualBox-OSE-3.2.0-xorg17.patch
 Patch9:		VirtualBox-OSE-3.0.4-optflags.patch
-Patch10:	VirtualBox-OSE-3.1.6-32bit.patch
+Patch10:	VirtualBox-OSE-3.2.0-32bit.patch
 Patch11:	VirtualBox-OSE-3.1.0-visibility.patch
-Patch12:	VirtualBox-OSE-3.0.4-noansi.patch
+Patch12:	VirtualBox-OSE-3.2.0-noansi.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -48,17 +54,19 @@ BuildRequires:	libcap-devel
 BuildRequires:	qt4-devel
 BuildRequires:	gsoap-devel
 BuildRequires:	xz
+BuildRequires:	pam-devel
 
 # For the X11 module
 BuildRequires:	libdrm-devel
 BuildRequires:	libpciaccess-devel
 BuildRequires:	mesa-libGL-devel
+BuildRequires:	mesa-libOSMesa-devel
 BuildRequires:	pixman-devel
 BuildRequires:	xorg-x11-proto-devel
 BuildRequires:	xorg-x11-server-source
 
 # Plague-specific weirdness
-%if 0%{?fedora} > 11
+%if 0%{?fedora} > 11 || 0%{?rhel} > 5
 ExclusiveArch:	i686 x86_64
 %else %if 0%{?fedora} > 10
 ExclusiveArch:	i586 x86_64
@@ -165,6 +173,7 @@ rm -rf $RPM_BUILD_ROOT
 # the commercially supported version to minimize confusion
 
 # Directory structure
+install -d $RPM_BUILD_ROOT/%{_lib}/security
 install -d $RPM_BUILD_ROOT%{_bindir}
 install -d $RPM_BUILD_ROOT%{_libdir}
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox
@@ -253,9 +262,6 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}	\
 	obj/bin/additions/VBoxClient		\
 	obj/bin/additions/VBoxControl
 
-install -m 0755 src/VBox/Additions/x11/Installer/VBoxRandR.sh \
-	$RPM_BUILD_ROOT%{_bindir}/VBoxRandR
-
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
@@ -272,6 +278,9 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-
 install -m 0755 -t $RPM_BUILD_ROOT%{_libdir}	\
 	obj/bin/additions/VBoxOGL*.so
 ln -sf ../VBoxOGL.so $RPM_BUILD_ROOT%{_libdir}/dri/vboxvideo_dri.so
+
+install -m 0755 -t $RPM_BUILD_ROOT/%{_lib}/security \
+	obj/bin/additions/pam_vbox.so
 
 # Installation root configuration
 install -d $RPM_BUILD_ROOT/%{_sysconfdir}/vbox
@@ -316,12 +325,14 @@ set +o posix
 diff -u <((find obj/bin/additions/* -maxdepth 0 -type f	   \
 		-not -name 'autorun.sh'			\
 		-not -name '*_drv*'			\
+		-not -name 'pam_vbox.so'		\
 		-exec basename '{}' \;
 	find obj/bin/* -maxdepth 0 -type f		\
 		-not -name 'tst*'			\
 		-not -name 'SUP*'			\
 		-not -name 'VBox.sh'			\
 		-not -name 'xpidl'			\
+		-not -name 'scm'			\
 		-not -name 'vboxkeyboard.tar.gz'	\
 		-exec basename '{}' \;) |sort) \
 	<(find $RPM_BUILD_ROOT%{_libdir}/virtualbox/*	\
@@ -330,7 +341,6 @@ diff -u <((find obj/bin/additions/* -maxdepth 0 -type f	   \
 		$RPM_BUILD_ROOT%{_datadir}/{pixmaps,applications}/* \
 		-maxdepth 0 -type f			\
 		-not -name '*.py[co]'			\
-		-not -name VBoxRandR			\
 		-not -name VBox -exec basename '{}' \; |sort)
 set -o posix
 
@@ -398,11 +408,11 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 %files guest
 %defattr(-,root,root,-)
+/%{_lib}/security/pam_vbox.so
 %{_bindir}/mount.vboxsf
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
 %{_bindir}/VBoxService
-%{_bindir}/VBoxRandR
 %{_libdir}/xorg/modules/drivers/*
 %{_libdir}/dri/*
 %{_libdir}/VBoxOGL*.so
@@ -421,6 +431,10 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Wed Apr 28 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.0-0.1.beta1
+- 3.2.0 beta
+- Build i686 on el6
+
 * Fri Mar 26 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.1.6-1
 - New upstream release
 - Workaround trouble linking with new linker
