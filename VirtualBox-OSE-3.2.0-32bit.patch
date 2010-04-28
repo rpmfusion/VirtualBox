@@ -1,7 +1,7 @@
-From c54ef4d0f82d1aa7e0e3bf370265cdf569b1dc26 Mon Sep 17 00:00:00 2001
+From 6ea579d79b86cff1a80899b5dcc22f4aa5a47b2b Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Fri, 26 Mar 2010 04:44:55 +0100
-Subject: [PATCH] Build on x86_64 without 32bit toolchain.
+Subject: [PATCH 3/4] Build on x86_64 without 32bit toolchain.
 
 This disables the check for 32bit toolchain and tests that need it
 (boo).
@@ -12,23 +12,23 @@ This disables the check for 32bit toolchain and tests that need it
  3 files changed, 23 insertions(+), 4 deletions(-)
 
 diff --git a/configure b/configure
-index 2a29643..69bdc28 100755
+index 59f4e4c..5ef90de 100755
 --- a/configure
 +++ b/configure
-@@ -2345,7 +2345,7 @@ if [ "$OS" = "linux" ]; then
+@@ -2491,7 +2491,7 @@ if [ "$OS" = "linux" ]; then
    fi
    check_libcap
    check_compiler_h
--  [ "$BUILD_MACHINE" = "amd64" ] && check_32bit
-+  #[ "$BUILD_MACHINE" = "amd64" ] && check_32bit
+-  [ "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
++  #[ "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
  fi
  
  [ -n "$SETUP_WINE" ] && setup_wine
 diff --git a/src/VBox/Devices/testcase/Makefile.kmk b/src/VBox/Devices/testcase/Makefile.kmk
-index 2f3e157..cce43ae 100644
+index 5b46a7e..b2d34ff 100644
 --- a/src/VBox/Devices/testcase/Makefile.kmk
 +++ b/src/VBox/Devices/testcase/Makefile.kmk
-@@ -33,23 +33,29 @@ BLDDIRS += $(VBOX_DEVICES_TEST_OUT_DIR)
+@@ -29,23 +29,29 @@ BLDDIRS += $(VBOX_DEVICES_TEST_OUT_DIR)
  # We setup one 'other' target for executing the structure & alignment
  # validation testcases. Perhaps a bit hackish, but extremely useful.
  #
@@ -55,10 +55,10 @@ index 2f3e157..cce43ae 100644
 +ifneq ($(KBUILD_HOST_ARCH),amd64)
   PROGRAMS += tstDeviceStructSizeRC
 +endif
-  tstDeviceStructSizeRC_TEMPLATE  = VBOXGCEXE
+  tstDeviceStructSizeRC_TEMPLATE  = VBoxRcExe
   tstDeviceStructSizeRC_DEFS      = VBOX_WITH_RAW_MODE
   ifdef VBOX_WITH_USB
-@@ -92,7 +98,9 @@ endif # VBOX_WITH_RAW_MODE
+@@ -88,7 +94,9 @@ endif # VBOX_WITH_RAW_MODE
  #
  # The testcase it self.
  #
@@ -69,10 +69,10 @@ index 2f3e157..cce43ae 100644
  tstDeviceStructSize_DEFS     =
  ifdef VBOX_WITH_USB
 diff --git a/src/VBox/VMM/testcase/Makefile.kmk b/src/VBox/VMM/testcase/Makefile.kmk
-index 89b5203..9149ffe 100644
+index eb051ca..3b8beb8 100644
 --- a/src/VBox/VMM/testcase/Makefile.kmk
 +++ b/src/VBox/VMM/testcase/Makefile.kmk
-@@ -25,9 +25,15 @@ include	$(KBUILD_PATH)/subheader.kmk
+@@ -21,9 +21,15 @@ include	$(KBUILD_PATH)/subheader.kmk
  #
  # Target lists.
  #
@@ -90,7 +90,7 @@ index 89b5203..9149ffe 100644
   ifneq ($(KBUILD_TARGET),win)
    PROGRAMS += tstVMMFork
   endif
-@@ -65,16 +71,21 @@ BLDDIRS += $(VBOX_VMM_TESTCASE_OUT_DIR)
+@@ -61,16 +67,21 @@ BLDDIRS += $(VBOX_VMM_TESTCASE_OUT_DIR)
  #
  ifeq ($(KBUILD_TARGET),$(KBUILD_HOST))
   ifeq ($(filter-out x86.x86 amd64.amd64 x86.amd64, $(KBUILD_TARGET_ARCH).$(KBUILD_HOST_ARCH)),)
