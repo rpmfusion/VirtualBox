@@ -8,20 +8,14 @@
 
 Name:		VirtualBox-OSE
 Version:	3.2.0
-Release:	0.1.beta1%{?dist}
+Release:	0.2.beta2%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
 License:	GPLv2 or (GPLv2 and CDDL)
 URL:		http://www.virtualbox.org/wiki/VirtualBox
-# You can download the binaries here:
-#  http://213.239.192.22/download/3.2.0_BETA1/
-# (don't worry about the IP address, this is a temporary Oracle server)
-# -- From: Frank Mehnert
-Source0:	http://213.239.192.22/download/%{version}_BETA1/VirtualBox-%{version}_BETA1-OSE.tar.bz2
-Source1:	http://213.239.192.22/download/%{version}_BETA1/UserManual.pdf
-#Source0:	http://download.virtualbox.org/virtualbox/%{version}/VirtualBox-%{version}-OSE.tar.bz2
-#Source1:	http://download.virtualbox.org/virtualbox/%{version}/UserManual.pdf
+Source0:	http://download.virtualbox.org/download/%{version}_BETA2/VirtualBox-%{version}_BETA2-OSE.tar.bz2
+Source1:	http://download.virtualbox.org/download/%{version}_BETA2/UserManual.pdf
 Source3:	VirtualBox-OSE-90-vboxdrv.rules
 Source5:	VirtualBox-OSE-60-vboxguest.rules
 Source6:	VirtualBox-OSE.modules
@@ -209,7 +203,11 @@ install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
 	obj/bin/V*.r0           \
 	obj/bin/VBoxEFI*.fd
 
-# Executabes
+# Documentation
+install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
+	%{SOURCE1}
+
+# Executables
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
 	obj/bin/EfiThunk	\
 	obj/bin/VBoxHeadless	\
@@ -371,7 +369,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %{_bindir}/VBoxTunctl
 %{_bindir}/VirtualBox
 %dir %{_libdir}/virtualbox
-%{_libdir}/virtualbox/*.*
+%doc %{_libdir}/virtualbox/*.pdf
+%{_libdir}/virtualbox/*.[^p]*
+%{_libdir}/virtualbox/*.py*
 %{_libdir}/virtualbox/components
 %{_libdir}/virtualbox/nls
 %{_libdir}/virtualbox/VBoxManage
@@ -393,7 +393,7 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
 %config(noreplace) %{_sysconfdir}/modprobe.d/*.conf
-%doc COPYING UserManual.pdf
+%doc COPYING
 
 
 %files devel
@@ -431,6 +431,10 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Mon May 10 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.0-0.2.beta2
+- 3.2.0 beta2
+- Move pdf documentation to libdir, so that UI can find it
+
 * Wed Apr 28 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.0-0.1.beta1
 - 3.2.0 beta
 - Build i686 on el6
