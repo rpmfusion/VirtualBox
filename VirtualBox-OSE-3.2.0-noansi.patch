@@ -1,20 +1,19 @@
-From d1bc4c5b0e1dd57f798efaf04b0430e22ba27a73 Mon Sep 17 00:00:00 2001
+From 8bfe9d2a26b87a767cac64fd810247ca5125432e Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Wed, 28 Apr 2010 12:11:49 +0200
-Subject: [PATCH 4/4] Build as c99
+Subject: [PATCH] Build as c99
 
 On Rawhide as of 01 Sep 2009 x86_64 /usr/include/bits/mathinline.h
 contains a non-iso/ansi c inline assembly construct.
 ---
- Config.kmk                      |    4 ++--
- src/libs/xpcom18a4/Makefile.kmk |    2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ Config.kmk |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Config.kmk b/Config.kmk
-index 28c076c..f1d6651 100644
+index d15b6ac..fbd023e 100644
 --- a/Config.kmk
 +++ b/Config.kmk
-@@ -3791,7 +3791,7 @@ if1of ($(KBUILD_TARGET), dragonfly freebsd linux netbsd openbsd) # the gnu ld gu
+@@ -3805,7 +3805,7 @@ if1of ($(KBUILD_TARGET), dragonfly freebsd linux netbsd openbsd) # the gnu ld gu
   TEMPLATE_VBOXGUESTR3XF86MOD_LDFLAGS.x86     = -m elf_i386
   TEMPLATE_VBOXGUESTR3XF86MOD_LDFLAGS.amd64   = -m elf_x86_64
  endif
@@ -23,7 +22,7 @@ index 28c076c..f1d6651 100644
  TEMPLATE_VBOXGUESTR3XF86MOD_CXXFLAGS= $(TEMPLATE_VBOXGUESTR3EXE_CXXFLAGS) -fno-merge-constants
  TEMPLATE_VBOXGUESTR3XF86MOD_SYSSUFF = .o
  TEMPLATE_VBOXGUESTR3XF86MOD_LIBS  = \
-@@ -3807,7 +3807,7 @@ TEMPLATE_VBOXGUESTR3XORGMOD       = VBox X.org Guest Module
+@@ -3821,7 +3821,7 @@ TEMPLATE_VBOXGUESTR3XORGMOD       = VBox X.org Guest Module
  TEMPLATE_VBOXGUESTR3XORGMOD_EXTENDS = VBOXGUESTR3DLL
  TEMPLATE_VBOXGUESTR3XORGMOD_LIBS.$(KBUILD_TYPE)     = $(NO_SUCH_VARIABLE)
  TEMPLATE_VBOXGUESTR3XORGMOD_LIBS.$(KBUILD_TARGET)   = $(NO_SUCH_VARIABLE)
@@ -32,19 +31,6 @@ index 28c076c..f1d6651 100644
  TEMPLATE_VBOXGUESTR3XORGMOD_DEFS = $(TEMPLATE_VBOXGUESTR3DLL_DEFS) LOG_TO_BACKDOOR VBOX_GUESTR3XORGMOD RTMEM_NO_WRAP_TO_EF_APIS
  ifeq ($(KBUILD_TARGET_ARCH),amd64)
   TEMPLATE_VBOXGUESTR3XORGMOD_DEFS += _XSERVER64
-diff --git a/src/libs/xpcom18a4/Makefile.kmk b/src/libs/xpcom18a4/Makefile.kmk
-index 5f5b27e..7ad05c4 100644
---- a/src/libs/xpcom18a4/Makefile.kmk
-+++ b/src/libs/xpcom18a4/Makefile.kmk
-@@ -76,7 +76,7 @@ TEMPLATE_XPCOM_CFLAGS.release      = -O
- TEMPLATE_XPCOM_CFLAGS.profile      = -O
- TEMPLATE_XPCOM_CFLAGS.freebsd      = -pthread
- TEMPLATE_XPCOM_CFLAGS.l4           = -nostdinc
--TEMPLATE_XPCOM_CFLAGS.linux        = -pthread -ansi
-+TEMPLATE_XPCOM_CFLAGS.linux        = -pthread
- TEMPLATE_XPCOM_CFLAGS.solaris      = -fno-omit-frame-pointer # for now anyway.
- TEMPLATE_XPCOM_DEFS                = MOZILLA_CLIENT=1 NDEBUG=1 _IMPL_NS_COM \
-                                      XPCOM_DLL_BASE=\"$(basename $(notdir $(LIB_XPCOM)))\" \
 -- 
 1.7.0.1
 
