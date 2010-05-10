@@ -23,7 +23,7 @@ Source7:	VirtualBox-OSE-guest.modules
 Source8:	VirtualBox-OSE-vboxresize.desktop
 Source9:	VirtualBox-OSE.blacklist-kvm
 Patch1:		VirtualBox-OSE-3.2.0-noupdate.patch
-Patch2:		VirtualBox-OSE-3.1.0-strings.patch
+Patch2:		VirtualBox-OSE-3.2.0-strings.patch
 Patch3:		VirtualBox-OSE-3.1.0-libcxx.patch
 Patch5:		VirtualBox-OSE-3.2.0-xorg17.patch
 Patch9:		VirtualBox-OSE-3.0.4-optflags.patch
