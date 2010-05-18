@@ -1,0 +1,37 @@
+From 07af14581c31196975426b7c777616c502656afc Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Mon, 17 May 2010 20:34:30 +0200
+Subject: [PATCH 2/2] Disabling a cpuid testcase
+
+Triggers bug in register allocation for inline asm, disabling a test
+case seems to be a better solution than disabling inlining of
+ASMCpuId().
+
+Bugzilla reference: https://bugzilla.redhat.com/show_bug.cgi?id=593064
+---
+ src/VBox/Runtime/testcase/Makefile.kmk |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
+
+diff --git a/src/VBox/Runtime/testcase/Makefile.kmk b/src/VBox/Runtime/testcase/Makefile.kmk
+index 0bd3782..b2b96a9 100644
+--- a/src/VBox/Runtime/testcase/Makefile.kmk
++++ b/src/VBox/Runtime/testcase/Makefile.kmk
+@@ -65,7 +65,6 @@ PROGRAMS += \
+ 	tstHandleTable \
+ 	tstRTHeapOffset \
+ 	tstRTHeapSimple \
+-	tstInlineAsm \
+ 	tstLdr \
+ 	tstLdrLoad \
+ 	tstRTList \
+@@ -122,7 +121,6 @@ PROGRAMS.linux += \
+ 	tstRTProcWait \
+ 	tstRTProcIsRunningByName \
+ 	tstRTBitOperationsPIC3 \
+-	tstInlineAsmPIC \
+ 	tstInlineAsmPIC3
+ PROGRAMS.l4 += \
+ 	tstIoCtl
+-- 
+1.7.0.1
+

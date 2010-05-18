@@ -8,5 +8,5 @@ insert_module ()
 }
 
 insert_module vboxguest
-insert_module vboxvfs
+insert_module vboxsf
 
