@@ -6,16 +6,24 @@
 # -fexceptions -- R0 code doesn't link against C++ library, no __gxx_personality_v0
 %global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
 
+# In prerelease builds (such as betas), this package has the same
+# major version number, while the kernel module abi is not guarranteed
+# to be stable. This is so that we force the module update in sync with
+# userspace.
+#global prerel %{nil}
+%global prerel beta3
+%global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
+
 Name:		VirtualBox-OSE
 Version:	3.2.0
-Release:	0.2.beta2%{?dist}
+Release:	0.3%{?prerelease:.%{prerelease}%{?dist}}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
 License:	GPLv2 or (GPLv2 and CDDL)
 URL:		http://www.virtualbox.org/wiki/VirtualBox
-Source0:	http://download.virtualbox.org/download/%{version}_BETA2/VirtualBox-%{version}_BETA2-OSE.tar.bz2
-Source1:	http://download.virtualbox.org/download/%{version}_BETA2/UserManual.pdf
+Source0:	http://download.virtualbox.org/download/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}-OSE.tar.bz2
+Source1:	http://download.virtualbox.org/download/%{version}%{?prereltag}/UserManual.pdf
 Source3:	VirtualBox-OSE-90-vboxdrv.rules
 Source5:	VirtualBox-OSE-60-vboxguest.rules
 Source6:	VirtualBox-OSE.modules
@@ -26,10 +34,11 @@ Patch1:		VirtualBox-OSE-3.2.0-noupdate.patch
 Patch2:		VirtualBox-OSE-3.2.0-strings.patch
 Patch3:		VirtualBox-OSE-3.1.0-libcxx.patch
 Patch5:		VirtualBox-OSE-3.2.0-xorg17.patch
-Patch9:		VirtualBox-OSE-3.0.4-optflags.patch
+Patch9:		VirtualBox-OSE-3.2.0-optflags.patch
 Patch10:	VirtualBox-OSE-3.2.0-32bit.patch
-Patch11:	VirtualBox-OSE-3.1.0-visibility.patch
+Patch11:        VirtualBox-OSE-3.2.0-visibility.patch
 Patch12:	VirtualBox-OSE-3.2.0-noansi.patch
+Patch13:	VirtualBox-OSE-3.2.0-cpuid.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -68,8 +77,8 @@ ExclusiveArch:	i586 x86_64
 ExclusiveArch:	i386 x86_64
 %endif
 
-Requires:	%{name}-kmod = %{version}
-Provides:	%{name}-kmod-common = %{version}
+Requires:	%{name}-kmod = %{version}%{?prereltag}
+Provides:	%{name}-kmod-common = %{version}%{?prereltag}
 
 %description
 A general-purpose full virtualizer and emulator for 32-bit and
@@ -133,6 +142,7 @@ cp %{SOURCE1} . # PDF User Guide
 %patch10 -p1 -b .32bit
 %patch11 -p1 -b .visibility
 %patch12 -p1 -b .noansi
+%patch13 -p1 -b .cpuid
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -432,6 +442,10 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Fri May 14 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.0-0.2.beta3
+- Beta 3
+- Add a release satus tag into kernel abi dependency
+
 * Mon May 10 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.0-0.2.beta2
 - 3.2.0 beta2
 - Move pdf documentation to libdir, so that UI can find it

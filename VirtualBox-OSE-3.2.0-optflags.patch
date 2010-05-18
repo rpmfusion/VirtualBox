@@ -1,0 +1,26 @@
+From acefc7b1799fb4b342b39b38ecd392d2fe24fd58 Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Fri, 14 May 2010 12:26:33 +0200
+Subject: [PATCH] If anyone finds out why did I remove those I owe him a beer.
+
+Seems like this patch could be safely left out.
+---
+ Config.kmk |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Config.kmk b/Config.kmk
+index 823dbf4..83555a0 100644
+--- a/Config.kmk
++++ b/Config.kmk
+@@ -3499,7 +3499,7 @@ ifdef VBOX_WITH_QTGUI
+  	$(LIB_SDL_INC)
+   ## @todo Use VBOX_GCC_PEDANTIC_CXX?
+   TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS = \
+- 	-g -pipe $(filter-out -Wno-unused,$(VBOX_GCC_WARN)) -frtti -fno-exceptions -Wno-non-virtual-dtor \
++ 	$(filter-out -Wno-unused,$(VBOX_GCC_WARN)) -frtti -fno-exceptions -Wno-non-virtual-dtor \
+  	-Wno-long-long -fshort-wchar -fno-strict-aliasing \
+  	$(VBOX_GCC_fvisibility-hidden) $(VBOX_GCC_fvisibility-inlines-hidden)
+   TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS.x86 = -m32
+-- 
+1.7.0.1
+
