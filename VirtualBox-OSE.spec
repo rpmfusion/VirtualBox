@@ -10,13 +10,12 @@
 # major version number, while the kernel module abi is not guarranteed
 # to be stable. This is so that we force the module update in sync with
 # userspace.
-#global prerel %{nil}
-%global prerel beta3
+#global prerel beta3
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
 Version:	3.2.0
-Release:	0.3%{?prerelease:.%{prerelease}%{?dist}}
+Release:	1%{?prerel:.%{prerel}%{?dist}}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -77,8 +76,8 @@ ExclusiveArch:	i586 x86_64
 ExclusiveArch:	i386 x86_64
 %endif
 
-Requires:	%{name}-kmod = %{version}%{?prereltag}
-Provides:	%{name}-kmod-common = %{version}%{?prereltag}
+Requires:	%{name}-kmod = %{version}
+Provides:	%{name}-kmod-common = %{version}
 
 %description
 A general-purpose full virtualizer and emulator for 32-bit and
@@ -124,6 +123,7 @@ movement and X.org X11 video and mouse driver.
 %package kmodsrc
 Summary:	%{name} kernel module source code
 Group:		System Environment/Kernel
+Provides:       %{name}(kmodabi) = %{version}%{?prereltag}
 
 %description kmodsrc
 Source tree used for building kernel module packages (%{name}-kmod)
@@ -442,9 +442,12 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Wed May 19 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.0-1
+- Release
+
 * Fri May 14 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.0-0.2.beta3
 - Beta 3
-- Add a release satus tag into kernel abi dependency
+- Add a release status tag into kernel abi dependency
 
 * Mon May 10 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.0-0.2.beta2
 - 3.2.0 beta2
