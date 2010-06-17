@@ -14,7 +14,7 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	3.2.0
+Version:	3.2.4
 Release:	1%{?prerel:.%{prerel}%{?dist}}
 Summary:	A general-purpose full virtualizer for PC hardware
 
@@ -32,7 +32,7 @@ Patch1:		VirtualBox-OSE-3.2.0-noupdate.patch
 Patch2:		VirtualBox-OSE-3.2.0-strings.patch
 Patch3:		VirtualBox-OSE-3.1.0-libcxx.patch
 Patch5:		VirtualBox-OSE-3.2.0-xorg17.patch
-Patch9:		VirtualBox-OSE-3.2.0-optflags.patch
+Patch9:		VirtualBox-OSE-3.2.4-optflags.patch
 Patch10:	VirtualBox-OSE-3.2.0-32bit.patch
 Patch11:        VirtualBox-OSE-3.2.0-visibility.patch
 Patch12:	VirtualBox-OSE-3.2.0-noansi.patch
