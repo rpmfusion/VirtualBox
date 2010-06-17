@@ -28,7 +28,6 @@ Source5:	VirtualBox-OSE-60-vboxguest.rules
 Source6:	VirtualBox-OSE.modules
 Source7:	VirtualBox-OSE-guest.modules
 Source8:	VirtualBox-OSE-vboxresize.desktop
-Source9:	VirtualBox-OSE.blacklist-kvm
 Patch1:		VirtualBox-OSE-3.2.0-noupdate.patch
 Patch2:		VirtualBox-OSE-3.2.0-strings.patch
 Patch3:		VirtualBox-OSE-3.1.0-libcxx.patch
@@ -76,8 +75,9 @@ ExclusiveArch:	i586 x86_64
 ExclusiveArch:	i386 x86_64
 %endif
 
-Requires:	%{name}-kmod = %{version}
-Provides:	%{name}-kmod-common = %{version}
+Requires:	%{name}-kmod = %{version}%{?prereltag}
+Provides:	%{name}-kmod-common = %{version}%{?prereltag}
+Conflicts:	%{name}-guest <= %{version}-%{release}
 
 %description
 A general-purpose full virtualizer and emulator for 32-bit and
@@ -113,6 +113,7 @@ Requires:	xorg-x11-server-Xorg
 Requires:	xorg-x11-xinit
 Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
 Obsoletes:	xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
+Conflicts:	%{name} <= %{version}-%{release}
 
 %description guest
 Tools that utilize kernel modules for supporting integration
@@ -123,7 +124,6 @@ movement and X.org X11 video and mouse driver.
 %package kmodsrc
 Summary:	%{name} kernel module source code
 Group:		System Environment/Kernel
-Provides:       %{name}(kmodabi) = %{version}%{?prereltag}
 
 %description kmodsrc
 Source tree used for building kernel module packages (%{name}-kmod)
@@ -301,7 +301,6 @@ install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-v
 # Install modules load script
 install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}.modules
 install -p -m 0755 -D %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
-install -p -m 0644 -D %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/modprobe.d/blacklist-kvm.conf
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
@@ -403,7 +402,6 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %config %{_sysconfdir}/vbox/vbox.cfg
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
-%config(noreplace) %{_sysconfdir}/modprobe.d/*.conf
 %doc COPYING
 
 
@@ -442,6 +440,12 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Thu Jun 17 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.4-1
+- New release
+- Do not use /usr/bin/xargs in module script (Piergiorgio Sartor, #1256)
+- No longer blacklist KVM (Nicolas Chauvet, #1280)
+- Hypervisor conflicts with guest (Henrique Martins, #1239)
+
 * Wed May 19 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.0-1
 - Release
 

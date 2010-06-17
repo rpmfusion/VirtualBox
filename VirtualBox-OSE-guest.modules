@@ -4,7 +4,7 @@
 insert_module ()
 {
         grep -qR "^[ \t]*blacklist[ \t][ \t]*$1[ \t]*" /etc/modprobe.d && return
-        modinfo $1 |awk '/filename:/ {print $2}' |xargs -r insmod
+        modinfo $1 |awk '/filename:/ {print "insmod "$2}' |$SHELL
 }
 
 insert_module vboxguest
