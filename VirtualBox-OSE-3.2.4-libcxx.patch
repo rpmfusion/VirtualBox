@@ -1,14 +1,34 @@
-Do not include statically linked libstdc++. Not a good idea if we don't need
-to be binary-compatible across exotic distribution. Doesn't work with trunk
-glibc heading towards 2.11 anyways. Static linking is not really supported
-anyways.
+From b6d65ab182115fc4785e5d13ddbf72c188a78ac3 Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Fri, 18 Jun 2010 10:58:14 +0200
+Subject: [PATCH] Do not include statically linked libstdc++
 
-Lubomir Rintel <lkundrak@v3.sk>
+Not a good idea if we don't need to be binary-compatible across exotic
+distribution. Doesn't work with trunk glibc heading towards 2.11 anyways.
+Static linking is not really supported anyways.
+---
+ configure                                      |    2 +-
+ src/VBox/Additions/x11/VBoxClient/Makefile.kmk |   28 ++++++++++++------------
+ 2 files changed, 15 insertions(+), 15 deletions(-)
 
-diff -up VirtualBox-3.1.0_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk.libcxx VirtualBox-3.1.0_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
---- VirtualBox-3.1.0_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk.libcxx	2009-11-05 17:54:28.000000000 +0100
-+++ VirtualBox-3.1.0_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk	2009-11-12 15:37:07.000000000 +0100
-@@ -68,20 +68,20 @@ endif
+diff --git a/configure b/configure
+index ad35434..48d7a94 100755
+--- a/configure
++++ b/configure
+@@ -2445,7 +2445,7 @@ fi
+ if [ "$OS" = "linux" ]; then
+   # don't check for the static libstdc++ in the PUEL version as we build the
+   # additions at a dedicated box
+-  [ $OSE -ge 1 ] && check_staticlibstdcxx
++  #[ $OSE -ge 1 ] && check_staticlibstdcxx
+   if [ $WITH_KMODS -eq 1 ]; then
+     check_linux
+   else
+diff --git a/src/VBox/Additions/x11/VBoxClient/Makefile.kmk b/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
+index 015a847..469b314 100644
+--- a/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
++++ b/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
+@@ -69,20 +69,20 @@ endif
  ifdef VBOX_WITH_GUEST_PROPS
   VBoxClient_DEFS += VBOX_WITH_GUEST_PROPS
  endif
@@ -43,3 +63,6 @@ diff -up VirtualBox-3.1.0_OSE/src/VBox/Additions/x11/VBoxClient/Makefile.kmk.lib
  
  ifdef VBOX_X11_SEAMLESS_GUEST
   if defined(VBOX_WITH_TESTCASES) && !defined(VBOX_ONLY_ADDITIONS) && !defined(VBOX_ONLY_SDK)
+-- 
+1.7.0.1
+
