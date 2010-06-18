@@ -1,4 +1,4 @@
-From b6d65ab182115fc4785e5d13ddbf72c188a78ac3 Mon Sep 17 00:00:00 2001
+From 7bfae220df8bfa772480ab5f860c46b06dcdf9fb Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Fri, 18 Jun 2010 10:58:14 +0200
 Subject: [PATCH] Do not include statically linked libstdc++
@@ -7,10 +7,24 @@ Not a good idea if we don't need to be binary-compatible across exotic
 distribution. Doesn't work with trunk glibc heading towards 2.11 anyways.
 Static linking is not really supported anyways.
 ---
+ Config.kmk                                     |    2 +-
  configure                                      |    2 +-
- src/VBox/Additions/x11/VBoxClient/Makefile.kmk |   28 ++++++++++++------------
- 2 files changed, 15 insertions(+), 15 deletions(-)
+ src/VBox/Additions/x11/VBoxClient/Makefile.kmk |   33 +++++++++++-------------
+ 3 files changed, 17 insertions(+), 20 deletions(-)
 
+diff --git a/Config.kmk b/Config.kmk
+index 1dc7c3f..a58046e 100644
+--- a/Config.kmk
++++ b/Config.kmk
+@@ -2778,7 +2778,7 @@ TEMPLATE_VBOXR3EXE_LIBS                = pthread m rt dl
+ TEMPLATE_VBOXR3EXE_LIBS                = \
+ 	$(L4_LIBDIR)/libvboxserver.s.so \
+ 	$(L4_LIBDIR)/libuc++.0.s.so \
+-	supc++ gcc_eh gcc \
++	stdc++ \
+ 	$(L4_LIBDIR)/libdl.s.so \
+ 	$(L4_LIBDIR)/libuc.0.s.so
+  else ifeq ($(KBUILD_TARGET),os2)
 diff --git a/configure b/configure
 index ad35434..48d7a94 100755
 --- a/configure
@@ -25,10 +39,22 @@ index ad35434..48d7a94 100755
      check_linux
    else
 diff --git a/src/VBox/Additions/x11/VBoxClient/Makefile.kmk b/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
-index 015a847..469b314 100644
+index 015a847..627f659 100644
 --- a/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
 +++ b/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
-@@ -69,20 +69,20 @@ endif
+@@ -50,10 +50,7 @@ VBoxClient_LIBS = \
+ 	X11 \
+ 	Xrandr \
+ 	Xt
+-# These are static replacements for gcc-specific parts of libstdc++
+-VBoxClient_LIBS += \
+-	supc++ \
+-	gcc_eh
++VBoxClient_LIBS += stdc++
+ ifdef VBOX_X11_SEAMLESS_GUEST
+  VBoxClient_DEFS += SEAMLESS_GUEST DYNAMIC_RESIZE
+  VBoxClient_SOURCES += \
+@@ -69,20 +66,20 @@ endif
  ifdef VBOX_WITH_GUEST_PROPS
   VBoxClient_DEFS += VBOX_WITH_GUEST_PROPS
  endif
