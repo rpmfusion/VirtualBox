@@ -167,7 +167,8 @@ kmk %{_smp_mflags} \
 	VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=	\
 	KMK_REVISION=3000 KBUILD_KMK_REVISION=3000			\
 	VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"	\
-	VBOX_GCC_R0_OPT="%{optflags}" VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"
+	VBOX_GCC_R0_OPT="%{optflags}" VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL" \
+	VBOX_KEYBOARD_DEST_DIR="$PWD/obj/obj/VBoxKeyboard/install"
 
 
 %install
@@ -340,7 +341,7 @@ diff -u <((find obj/bin/additions/* -maxdepth 0 -type f	   \
 		-not -name 'VBox.sh'			\
 		-not -name 'xpidl'			\
 		-not -name 'scm'			\
-		-not -name 'vboxkeyboard.tar.gz'	\
+		-not -name 'vboxkeyboard.tar.*'		\
 		-exec basename '{}' \;) |sort) \
 	<(find $RPM_BUILD_ROOT%{_libdir}/virtualbox/*	\
 		$RPM_BUILD_ROOT%{_bindir}/*		\
