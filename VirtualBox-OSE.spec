@@ -14,7 +14,7 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	3.2.4
+Version:	3.2.6
 Release:	1%{?prerel:.%{prerel}%{?dist}}
 Summary:	A general-purpose full virtualizer for PC hardware
 
@@ -37,6 +37,7 @@ Patch10:	VirtualBox-OSE-3.2.0-32bit.patch
 Patch11:        VirtualBox-OSE-3.2.0-visibility.patch
 Patch12:	VirtualBox-OSE-3.2.0-noansi.patch
 Patch13:	VirtualBox-OSE-3.2.0-cpuid.patch
+Patch14:	VirtualBox-OSE-3.2.6-vboxkeyboard.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -143,6 +144,7 @@ cp %{SOURCE1} . # PDF User Guide
 %patch11 -p1 -b .visibility
 %patch12 -p1 -b .noansi
 %patch13 -p1 -b .cpuid
+%patch14 -p1 -b .vboxkeyboard
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -168,7 +170,6 @@ kmk %{_smp_mflags} \
 	KMK_REVISION=3000 KBUILD_KMK_REVISION=3000			\
 	VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"	\
 	VBOX_GCC_R0_OPT="%{optflags}" VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL" \
-	VBOX_KEYBOARD_DEST_DIR="$PWD/obj/obj/VBoxKeyboard/install"
 
 
 %install
@@ -441,6 +442,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Mon Jul 12 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.6-1
+- New release, fix build
+
 * Thu Jun 17 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.4-1
 - New release
 - Do not use /usr/bin/xargs in module script (Piergiorgio Sartor, #1256)
