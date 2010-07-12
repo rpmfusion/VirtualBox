@@ -39,6 +39,7 @@ Patch12:	VirtualBox-OSE-3.2.0-noansi.patch
 Patch13:	VirtualBox-OSE-3.2.0-cpuid.patch
 Patch14:	VirtualBox-OSE-3.2.6-vboxkeyboard.patch
 Patch15:	VirtualBox-OSE-3.2.6-gcc45.patch
+Patch16:	VirtualBox-OSE-3.2.6-acpi.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -147,6 +148,7 @@ cp %{SOURCE1} . # PDF User Guide
 %patch13 -p1 -b .cpuid
 %patch14 -p1 -b .vboxkeyboard
 %patch15 -p1 -b .gcc45
+%patch16 -p0 -b .acpi
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -447,6 +449,7 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 * Mon Jul 12 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.6-1
 - New release, fix build
 - Fix compile with GCC 4.5
+- Fix acpi compilation with newer iasl
 
 * Thu Jun 17 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.4-1
 - New release
