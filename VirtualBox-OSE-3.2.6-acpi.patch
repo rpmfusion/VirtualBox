@@ -1,0 +1,29 @@
+svn log -c30593 http://www.virtualbox.org/svn/vbox/trunk
+------------------------------------------------------------------------
+r30593 | vboxsync | 2010-07-04 07:10:31 -0400 (Sun, 04 Jul 2010) | 1 line
+
+vbox.dsl: Fix compilation with newer iasl versions (Contributed by Jung-uk Kim and Bernhard Froehlich)
+------------------------------------------------------------------------
+svn diff -c30593 http://www.virtualbox.org/svn/vbox/trunk
+Index: src/VBox/Devices/PC/vbox.dsl
+===================================================================
+--- src/VBox/Devices/PC/vbox.dsl	(revision 30592)
++++ src/VBox/Devices/PC/vbox.dsl	(revision 30593)
+@@ -986,7 +986,7 @@
+                              // (all of low memory space)
+                      ResourceProducer,        // bit 0 of general flags is 0
+                      PosDecode,               // positive Decode
+-                     MinFixed,                // Range is fixed
++                     MinNotFixed,             // Range is not fixed
+                      MaxFixed,                // Range is fixed
+                      Cacheable,
+                      ReadWrite,
+@@ -995,7 +995,7 @@
+ 
+                      0xffdfffff,              // Max = 4GB - 2MB
+                      0x00000000,              // Translation
+-                     0xdfdfffff,              // Range Length (calculated
++                     0x00000000,              // Range Length (calculated
+                                               // dynamically)
+                      ,                        // Optional field left blank
+                      ,                        // Optional field left blank
