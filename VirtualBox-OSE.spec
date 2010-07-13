@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	3.2.6
-Release:	2%{?prerel:.%{prerel}%{?dist}}
+Release:	2%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
