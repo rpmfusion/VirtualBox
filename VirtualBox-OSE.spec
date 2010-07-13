@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	3.2.6
-Release:	1%{?prerel:.%{prerel}%{?dist}}
+Release:	2%{?prerel:.%{prerel}%{?dist}}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -28,6 +28,7 @@ Source5:	VirtualBox-OSE-60-vboxguest.rules
 Source6:	VirtualBox-OSE.modules
 Source7:	VirtualBox-OSE-guest.modules
 Source8:	VirtualBox-OSE-vboxresize.desktop
+Source9:	VirtualBox-OSE-00-vboxvideo.conf
 Patch1:		VirtualBox-OSE-3.2.0-noupdate.patch
 Patch2:		VirtualBox-OSE-3.2.0-strings.patch
 Patch3:		VirtualBox-OSE-3.2.4-libcxx.patch
@@ -266,6 +267,7 @@ install -m 0755 -D obj/bin/additions/vboxmouse_drv_%{x11_api}.so \
 install -m 0755 -D obj/bin/additions/vboxvideo_drv_%{x11_api}.so \
 	$RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
+# This is no longer needed for a more recent Xorg, since evdev uses udev
 install -m 0755 -D src/VBox/Additions/linux/installer/90-vboxguest.fdi \
 	$RPM_BUILD_ROOT%{_datadir}/hal/fdi/policy/20thirdparty/90-vboxguest.fdi
 
@@ -275,6 +277,10 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}	\
 	obj/bin/additions/VBoxService		\
 	obj/bin/additions/VBoxClient		\
 	obj/bin/additions/VBoxControl
+
+# Ideally, Xorg should autodetect this, but for some reason it no longer does
+install -m 0755 -D %{SOURCE9} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
@@ -431,6 +437,7 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %{_libdir}/xorg/modules/drivers/*
 %{_libdir}/dri/*
 %{_libdir}/VBoxOGL*.so
+%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %exclude %{_datadir}/gdm
@@ -446,6 +453,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Tue Jul 13 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.6-2
+- Ship with Xorg configuration
+
 * Mon Jul 12 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.6-1
 - New release, fix build
 - Fix compile with GCC 4.5
