@@ -14,8 +14,8 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	3.2.6
-Release:	2%{?prerel:.%{prerel}}%{?dist}
+Version:	3.2.8
+Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -40,7 +40,6 @@ Patch12:	VirtualBox-OSE-3.2.0-noansi.patch
 Patch13:	VirtualBox-OSE-3.2.0-cpuid.patch
 Patch14:	VirtualBox-OSE-3.2.6-vboxkeyboard.patch
 Patch15:	VirtualBox-OSE-3.2.6-gcc45.patch
-Patch16:	VirtualBox-OSE-3.2.6-acpi.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -149,7 +148,6 @@ cp %{SOURCE1} . # PDF User Guide
 %patch13 -p1 -b .cpuid
 %patch14 -p1 -b .vboxkeyboard
 %patch15 -p1 -b .gcc45
-%patch16 -p0 -b .acpi
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -453,6 +451,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Sun Aug 8 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.8-1
+- New release
+
 * Tue Jul 13 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.6-2
 - Ship with Xorg configuration
 
