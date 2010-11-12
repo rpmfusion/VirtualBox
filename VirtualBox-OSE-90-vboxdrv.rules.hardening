@@ -1,2 +1,0 @@
-ACTION=="add", DEVPATH=="/devices/virtual/misc/vboxdrv", OWNER="root", MODE="0600"
-ACTION=="add", DEVPATH=="/devices/virtual/misc/vboxnetctl", OWNER="root", MODE="0600"

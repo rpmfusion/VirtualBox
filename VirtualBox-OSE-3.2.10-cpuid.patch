@@ -1,7 +1,7 @@
-From 07af14581c31196975426b7c777616c502656afc Mon Sep 17 00:00:00 2001
+From 0d94661041e17d3de686a66d2bca55428fd07f25 Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Mon, 17 May 2010 20:34:30 +0200
-Subject: [PATCH 2/2] Disabling a cpuid testcase
+Subject: [PATCH] Disabling a cpuid testcase
 
 Triggers bug in register allocation for inline asm, disabling a test
 case seems to be a better solution than disabling inlining of
@@ -13,7 +13,7 @@ Bugzilla reference: https://bugzilla.redhat.com/show_bug.cgi?id=593064
  1 files changed, 0 insertions(+), 2 deletions(-)
 
 diff --git a/src/VBox/Runtime/testcase/Makefile.kmk b/src/VBox/Runtime/testcase/Makefile.kmk
-index 0bd3782..b2b96a9 100644
+index 53038d4..09bfdb3 100644
 --- a/src/VBox/Runtime/testcase/Makefile.kmk
 +++ b/src/VBox/Runtime/testcase/Makefile.kmk
 @@ -65,7 +65,6 @@ PROGRAMS += \
@@ -30,8 +30,8 @@ index 0bd3782..b2b96a9 100644
  	tstRTBitOperationsPIC3 \
 -	tstInlineAsmPIC \
  	tstInlineAsmPIC3
- PROGRAMS.l4 += \
- 	tstIoCtl
+ PROGRAMS.solaris += \
+ 	tstRTCoreDump
 -- 
-1.7.0.1
+1.7.3.1
 
