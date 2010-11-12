@@ -14,7 +14,7 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	3.2.8
+Version:	3.2.10
 Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
@@ -32,12 +32,12 @@ Source9:	VirtualBox-OSE-00-vboxvideo.conf
 Patch1:		VirtualBox-OSE-3.2.0-noupdate.patch
 Patch2:		VirtualBox-OSE-3.2.0-strings.patch
 Patch3:		VirtualBox-OSE-3.2.4-libcxx.patch
-Patch5:		VirtualBox-OSE-3.2.0-xorg17.patch
+Patch5:		VirtualBox-OSE-3.2.10-xorg17.patch
 Patch9:		VirtualBox-OSE-3.2.4-optflags.patch
 Patch10:	VirtualBox-OSE-3.2.0-32bit.patch
 Patch11:        VirtualBox-OSE-3.2.0-visibility.patch
-Patch12:	VirtualBox-OSE-3.2.0-noansi.patch
-Patch13:	VirtualBox-OSE-3.2.0-cpuid.patch
+Patch12:	VirtualBox-OSE-3.2.10-noansi.patch
+Patch13:	VirtualBox-OSE-3.2.10-cpuid.patch
 Patch14:	VirtualBox-OSE-3.2.6-vboxkeyboard.patch
 Patch15:	VirtualBox-OSE-3.2.6-gcc45.patch
 
@@ -451,6 +451,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Fri Nov 12 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.10-1
+- New release
+
 * Sun Aug 8 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.8-1
 - New release
 
