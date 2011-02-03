@@ -1,0 +1,26 @@
+From 56a89fc1a9e0e8ea6b6a76220ab91745ab2032e1 Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Mon, 10 Jan 2011 15:05:01 +0100
+Subject: [PATCH] Do not look for makeself
+
+We neither have it nor use it for RPM packaging.
+---
+ configure |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/configure b/configure
+index 0932637..d365e48 100755
+--- a/configure
++++ b/configure
+@@ -2527,7 +2527,7 @@ if [ "$OS" = "linux" ]; then
+   check_compiler_h
+   #[ "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
+   # tools/common/makeself*
+-  [ $OSE -ge 1 ] && check_makeself
++  #[ $OSE -ge 1 ] && check_makeself
+ fi
+ 
+ [ -n "$SETUP_WINE" ] && setup_wine
+-- 
+1.7.3.4
+

@@ -1,0 +1,57 @@
+From f84b61d4d00a1a1525c59958b7446c2b4ee045b2 Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Thu, 3 Feb 2011 23:31:01 +0100
+Subject: [PATCH] Disable the aio bug detection
+
+---
+ src/VBox/Main/.ConsoleImpl2.cpp.swp |  Bin 229376 -> 229376 bytes
+ src/VBox/Main/ConsoleImpl2.cpp      |    3 +++
+ 2 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/src/VBox/Main/.ConsoleImpl2.cpp.swp b/src/VBox/Main/.ConsoleImpl2.cpp.swp
+index db1117dc3f4c33dad8425d2a76ee3f824f3b9ed4..fe6039bd1c33f553da2d9950092a2d74acac55a5 100644
+GIT binary patch
+delta 558
+zcmXBPze^hd6u|L!IZdj~g*%NI1W83392&V6idmG1iipin5W5v44mGBzh=VRUbZDT0
+zKMp;i6~v(>fkGuiTH3*Xz#c`aW80xwDikaU4nh4&9(*1T-s3%<Wd$rN5Slc{M-umX
+zx*rLli>yBwP3)S7p^Bksw$>C@QiW*KSycPw7wOV!Guo;Ve`UlKc#1|`{U6qv>9|U*
+zopOu`HJr%>MBZQ%8(2gT%_y<y7-`I46#clpa*7`);5E`1Kr703IfER=@fZR8YZN)b
+zSA4;Kqhw@<;w4P{ZV=hSTRg?p9g#!4$2+WH3ePcsUIbC~iBwR=IsW21Tzta;7BPet
+z{PBu>M%J4Vc}CHR%X*O`IM~J#<}rgO=s_nskgwxAWHF5w7>0qWDsq8Mn26v$G^i+f
+z_#PjS_LCmMgzF^Rm5`%vDZ2A9rg$B9SoPU@)?d6%s-OJM%1=+!o>*wz8B=w8c~H0W
+Ti8kAc)Y*MQvEtmUx}o0yjy7W@
+
+delta 566
+zcmXBRJ!n%=6u|NGa+{>)i}#8aX^b%l8InedOEQ#_p<+ypgNnGQG2##$5*i1Q(md$U
+zN{31>_#D(B3Zf86QHa>3)WNY!6Gaq99U2e=0YTA!=!M_qz&V`5x!1NswjCNTO<g)u
+zIF>$fQaGl_YGSUCQyb$0%kb;qSkx%LPK|v`1&;?sZeUpBU$U~xR@Q*4ZDmzI8azs-
+zYwV}Xj#X6AdLtzA5Dpd)#sqqF*+mWWIFB5@2SmQ&3*KQJHRKV)A3r0|!WB&85C%Sx
+z&v=h*JjY|7)a5oo8b1z*Ji}95h8u53MP8u^ja#^hJZ2Gw!e1|g(Z?@*LKhvpzyi+V
+z2=+W8TUf(YPhBKQ@Xsys0Z;G<Htt{^7che)64)4FJFKCK3eMp$6n-mS6ltU|iG%Q=
+z=VE)jK@FJzR~o}#={VP8M#M4K4by3543D#OT6wj(640BA*YwZkT)R<Hp@4Jmn=7u1
+dwTTB8m8tK}n)+oSqV4#Io;j6iS1ani`5&vjWuyQA
+
+diff --git a/src/VBox/Main/ConsoleImpl2.cpp b/src/VBox/Main/ConsoleImpl2.cpp
+index 347fccb..9c5b3d5 100644
+--- a/src/VBox/Main/ConsoleImpl2.cpp
++++ b/src/VBox/Main/ConsoleImpl2.cpp
+@@ -2867,6 +2867,8 @@ int Console::configMediumAttachment(PCFGMNODE pCtlInst,
+                     mfSnapshotFolderSizeWarningShown = true;
+                 }
+ 
++// In el6 we have a backported patch to address this
++#if 0
+ #ifdef RT_OS_LINUX
+                 /*
+                  * Ext4 bug: Check if the host I/O cache is disabled and the disk image is located
+@@ -2922,6 +2924,7 @@ int Console::configMediumAttachment(PCFGMNODE pCtlInst,
+                     }
+                 }
+ #endif
++#endif
+             }
+         }
+ 
+-- 
+1.7.1
+

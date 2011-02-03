@@ -1,34 +1,34 @@
-From 6ea579d79b86cff1a80899b5dcc22f4aa5a47b2b Mon Sep 17 00:00:00 2001
+From a9548501755beeec6fa11b0c261f167164a4ee70 Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Fri, 26 Mar 2010 04:44:55 +0100
-Subject: [PATCH 3/4] Build on x86_64 without 32bit toolchain.
+Subject: [PATCH] Build on x86_64 without 32bit toolchain.
 
 This disables the check for 32bit toolchain and tests that need it
 (boo).
 ---
  configure                              |    2 +-
  src/VBox/Devices/testcase/Makefile.kmk |    8 ++++++++
- src/VBox/VMM/testcase/Makefile.kmk     |   17 ++++++++++++++---
- 3 files changed, 23 insertions(+), 4 deletions(-)
+ src/VBox/VMM/testcase/Makefile.kmk     |    9 +++++++++
+ 3 files changed, 18 insertions(+), 1 deletions(-)
 
 diff --git a/configure b/configure
-index 59f4e4c..5ef90de 100755
+index 42ce775..0932637 100755
 --- a/configure
 +++ b/configure
-@@ -2491,7 +2491,7 @@ if [ "$OS" = "linux" ]; then
+@@ -2525,7 +2525,7 @@ if [ "$OS" = "linux" ]; then
    fi
    check_libcap
    check_compiler_h
 -  [ "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
 +  #[ "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
+   # tools/common/makeself*
+   [ $OSE -ge 1 ] && check_makeself
  fi
- 
- [ -n "$SETUP_WINE" ] && setup_wine
 diff --git a/src/VBox/Devices/testcase/Makefile.kmk b/src/VBox/Devices/testcase/Makefile.kmk
-index 5b46a7e..b2d34ff 100644
+index 4debf81..59dae0d 100644
 --- a/src/VBox/Devices/testcase/Makefile.kmk
 +++ b/src/VBox/Devices/testcase/Makefile.kmk
-@@ -29,23 +29,29 @@ BLDDIRS += $(VBOX_DEVICES_TEST_OUT_DIR)
+@@ -45,22 +45,28 @@ VBOX_DEVICES_TESTS_FEATURES = \
  # We setup one 'other' target for executing the structure & alignment
  # validation testcases. Perhaps a bit hackish, but extremely useful.
  #
@@ -47,7 +47,6 @@ index 5b46a7e..b2d34ff 100644
  	$(VBOX_DEVICES_TEST_OUT_DIR)/tstDeviceStructSize.run
 +endif
  
- 
  ifdef VBOX_WITH_RAW_MODE
   #
   # The testcase generator.
@@ -56,9 +55,9 @@ index 5b46a7e..b2d34ff 100644
   PROGRAMS += tstDeviceStructSizeRC
 +endif
   tstDeviceStructSizeRC_TEMPLATE  = VBoxRcExe
-  tstDeviceStructSizeRC_DEFS      = VBOX_WITH_RAW_MODE
-  ifdef VBOX_WITH_USB
-@@ -88,7 +94,9 @@ endif # VBOX_WITH_RAW_MODE
+  tstDeviceStructSizeRC_DEFS      = $(VBOX_DEVICES_TESTS_FEATURES)
+  tstDeviceStructSizeRC_SOURCES   = tstDeviceStructSizeRC.cpp
+@@ -73,7 +79,9 @@ endif # VBOX_WITH_RAW_MODE
  #
  # The testcase it self.
  #
@@ -66,31 +65,28 @@ index 5b46a7e..b2d34ff 100644
  PROGRAMS += tstDeviceStructSize
 +endif
  tstDeviceStructSize_TEMPLATE = VBOXR3AUTOTST
- tstDeviceStructSize_DEFS     =
- ifdef VBOX_WITH_USB
+ tstDeviceStructSize_DEFS     = $(VBOX_DEVICES_TESTS_FEATURES)
+ tstDeviceStructSize_INCS     = \
 diff --git a/src/VBox/VMM/testcase/Makefile.kmk b/src/VBox/VMM/testcase/Makefile.kmk
-index eb051ca..3b8beb8 100644
+index f947789..95882f1 100644
 --- a/src/VBox/VMM/testcase/Makefile.kmk
 +++ b/src/VBox/VMM/testcase/Makefile.kmk
-@@ -21,9 +21,15 @@ include	$(KBUILD_PATH)/subheader.kmk
+@@ -21,10 +21,14 @@ include	$(KBUILD_PATH)/subheader.kmk
  #
  # Target lists.
  #
--PROGRAMS   += tstVMStructSize tstAsmStructs tstGlobalConfig tstInstrEmul
-+PROGRAMS   += tstGlobalConfig tstInstrEmul
 +ifneq ($(KBUILD_HOST_ARCH),amd64)
-+ PROGRAMS   += tstVMStructSize tstAsmStructs
+ PROGRAMS   += tstVMStructSize tstAsmStructs
 +endif
  ifdef VBOX_WITH_RAW_MODE
-- PROGRAMS  += tstVMStructRC tstAsmStructsRC tstVMM tstVMM-HwAccm
-+ PROGRAMS  += tstVMM tstVMM-HwAccm
-+ ifneq ($(KBUILD_HOST_ARCH),amd64)
-+  PROGRAMS  += tstVMStructRC tstAsmStructsRC
-+ endif
-  ifneq ($(KBUILD_TARGET),win)
-   PROGRAMS += tstVMMFork
-  endif
-@@ -61,16 +67,21 @@ BLDDIRS += $(VBOX_VMM_TESTCASE_OUT_DIR)
++ifneq ($(KBUILD_HOST_ARCH),amd64)
+  PROGRAMS  += tstVMStructRC tstAsmStructsRC
+ endif
++endif
+ ifndef VBOX_ONLY_EXTPACKS_USE_IMPLIBS
+  PROGRAMS  += tstGlobalConfig tstInstrEmul
+  ifdef VBOX_WITH_RAW_MODE
+@@ -67,16 +71,21 @@ BLDDIRS += $(VBOX_VMM_TESTCASE_OUT_DIR)
  #
  ifeq ($(KBUILD_TARGET),$(KBUILD_HOST))
   ifeq ($(filter-out x86.x86 amd64.amd64 x86.amd64, $(KBUILD_TARGET_ARCH).$(KBUILD_HOST_ARCH)),)
@@ -103,16 +99,15 @@ index eb051ca..3b8beb8 100644
  endif
  
  # The normal testing pass.
++
 +ifneq ($(KBUILD_HOST_ARCH),amd64)
  TESTING += \
  	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstAsmStructs.run \
--	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstVMStructSize.run \
-+	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstVMStructSize.run
+ 	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstVMStructSize.run
 +endif
-+TESTING += \
-         $(VBOX_VMM_TESTCASE_OUT_DIR)/tstInstrEmul.run
- 
- OTHER_CLEAN += \
+ ifndef VBOX_ONLY_EXTPACKS_USE_IMPLIBS
+  TESTING += \
+ 	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstInstrEmul.run
 -- 
-1.7.0.1
+1.7.3.4
 

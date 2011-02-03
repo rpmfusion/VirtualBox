@@ -1,0 +1,28 @@
+From 2336bf28506eb2b7a94fdfe7b302c70b107482e2 Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Mon, 10 Jan 2011 15:39:07 +0100
+Subject: [PATCH] Fix path to USBLib
+
+kmk: *** No rule to make target `out/linux.x86/release/lib/USBLib.a',
+needed by `out/linux.x86/release/obj/tstHostHardwareLinux/tstHostHardwareLinux'.
+Stop.
+---
+ src/VBox/Main/testcase/Makefile.kmk |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/VBox/Main/testcase/Makefile.kmk b/src/VBox/Main/testcase/Makefile.kmk
+index 7a8218d..d353de3 100644
+--- a/src/VBox/Main/testcase/Makefile.kmk
++++ b/src/VBox/Main/testcase/Makefile.kmk
+@@ -161,7 +161,7 @@ tstHostHardwareLinux_DEFS      = \
+ 	$(if $(VBOX_USB_WITH_SYSFS),VBOX_USB_WITH_SYSFS,) \
+ 	$(if $(VBOX_USB_WITH_INOTIFY),VBOX_USB_WITH_INOTIFY,)
+ tstHostHardwareLinux_LIBS     += \
+-	$(PATH_OUT)/lib/USBLib.a
++	$(PATH_OUT)/obj/USBLib/USBLib.o
+ 
+ 
+ # generate rules.
+-- 
+1.7.3.4
+

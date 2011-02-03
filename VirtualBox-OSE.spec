@@ -14,15 +14,14 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	3.2.10
+Version:	4.0.0
 Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
 License:	GPLv2 or (GPLv2 and CDDL)
 URL:		http://www.virtualbox.org/wiki/VirtualBox
-Source0:	http://download.virtualbox.org/download/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}-OSE.tar.bz2
-Source1:	http://download.virtualbox.org/download/%{version}%{?prereltag}/UserManual.pdf
+Source0:	http://dlc.sun.com.edgesuite.net/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
 Source3:	VirtualBox-OSE-90-vboxdrv.rules
 Source5:	VirtualBox-OSE-60-vboxguest.rules
 Source6:	VirtualBox-OSE.modules
@@ -30,16 +29,18 @@ Source7:	VirtualBox-OSE-guest.modules
 Source8:	VirtualBox-OSE-vboxresize.desktop
 Source9:	VirtualBox-OSE-00-vboxvideo.conf
 Patch1:		VirtualBox-OSE-3.2.0-noupdate.patch
-Patch2:		VirtualBox-OSE-3.2.0-strings.patch
-Patch3:		VirtualBox-OSE-3.2.4-libcxx.patch
-Patch5:		VirtualBox-OSE-3.2.10-xorg17.patch
+Patch2:		VirtualBox-OSE-4.0.0-strings.patch
+Patch3:		VirtualBox-OSE-4.0.0-libcxx.patch
+Patch5:		VirtualBox-OSE-4.0.0-xorg17.patch
 Patch9:		VirtualBox-OSE-3.2.4-optflags.patch
-Patch10:	VirtualBox-OSE-3.2.0-32bit.patch
-Patch11:        VirtualBox-OSE-3.2.0-visibility.patch
+Patch10:	VirtualBox-OSE-4.0.0-32bit.patch
+Patch11:	VirtualBox-OSE-3.2.0-visibility.patch
 Patch12:	VirtualBox-OSE-3.2.10-noansi.patch
-Patch13:	VirtualBox-OSE-3.2.10-cpuid.patch
 Patch14:	VirtualBox-OSE-3.2.6-vboxkeyboard.patch
-Patch15:	VirtualBox-OSE-3.2.6-gcc45.patch
+Patch15:	VirtualBox-OSE-4.0.0-makeself.patch
+Patch16:	VirtualBox-OSE-4.0.0-usblib.patch
+Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
+Patch18:	VirtualBox-OSE-4.0.0-aiobug.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -59,6 +60,8 @@ BuildRequires:	qt4-devel
 BuildRequires:	gsoap-devel
 BuildRequires:	xz
 BuildRequires:	pam-devel
+BuildRequires:	java-devel >= 1.6
+BuildRequires:	/usr/bin/pdflatex
 
 # For the X11 module
 BuildRequires:	libdrm-devel
@@ -135,7 +138,7 @@ which is generated during the build of main package.
 
 %prep
 %setup -q -n VirtualBox-%{version}_OSE
-cp %{SOURCE1} . # PDF User Guide
+find -name '*.py[co]' -delete
 
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
@@ -145,9 +148,10 @@ cp %{SOURCE1} . # PDF User Guide
 %patch10 -p1 -b .32bit
 %patch11 -p1 -b .visibility
 %patch12 -p1 -b .noansi
-%patch13 -p1 -b .cpuid
 %patch14 -p1 -b .vboxkeyboard
-%patch15 -p1 -b .gcc45
+%patch15 -p1 -b .makeself
+%patch16 -p1 -b .usblib
+%patch17 -p1 -b .beramono
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -169,10 +173,12 @@ sed -i 's/\r//' COPYING
 echo %{optflags}
 kmk %{_smp_mflags} \
 	KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_INS="$PWD/obj"		\
+	VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox			\
 	VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=	\
 	KMK_REVISION=3000 KBUILD_KMK_REVISION=3000			\
 	VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"	\
 	VBOX_GCC_R0_OPT="%{optflags}" VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL" \
+	VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java				
 
 
 %install
@@ -215,12 +221,12 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
 
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
 	obj/bin/V*.gc		\
-	obj/bin/V*.r0           \
+	obj/bin/V*.r0		\
 	obj/bin/VBoxEFI*.fd
 
 # Documentation
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-	%{SOURCE1}
+	obj/bin/UserManual.pdf
 
 # Executables
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
@@ -322,10 +328,11 @@ tar --use-compress-program xz -cf $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{vers
 # Menu entry
 desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
 	--remove-key=DocPath --remove-category=X-MandrivaLinux-System \
-	--vendor='' src/VBox/Installer/linux/virtualbox.desktop
-
+	--vendor='' obj/bin/virtualbox.desktop
 
 %check
+exit 0
+
 # Dear contributor,
 #
 # If you forget a file when updating to a later version, it's
