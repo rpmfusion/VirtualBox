@@ -1,4 +1,4 @@
-From 7bfae220df8bfa772480ab5f860c46b06dcdf9fb Mon Sep 17 00:00:00 2001
+From 12c9d47c3cf09c5dd4be312e48a5fb0915d1d39e Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Fri, 18 Jun 2010 10:58:14 +0200
 Subject: [PATCH] Do not include statically linked libstdc++
@@ -13,10 +13,10 @@ Static linking is not really supported anyways.
  3 files changed, 17 insertions(+), 20 deletions(-)
 
 diff --git a/Config.kmk b/Config.kmk
-index 1dc7c3f..a58046e 100644
+index 3fab552..7f65bf8 100644
 --- a/Config.kmk
 +++ b/Config.kmk
-@@ -2778,7 +2778,7 @@ TEMPLATE_VBOXR3EXE_LIBS                = pthread m rt dl
+@@ -2979,7 +2979,7 @@ TEMPLATE_VBOXR3EXE_LIBS                = pthread m rt dl
  TEMPLATE_VBOXR3EXE_LIBS                = \
  	$(L4_LIBDIR)/libvboxserver.s.so \
  	$(L4_LIBDIR)/libuc++.0.s.so \
@@ -26,10 +26,10 @@ index 1dc7c3f..a58046e 100644
  	$(L4_LIBDIR)/libuc.0.s.so
   else ifeq ($(KBUILD_TARGET),os2)
 diff --git a/configure b/configure
-index ad35434..48d7a94 100755
+index c8a8d76..42ce775 100755
 --- a/configure
 +++ b/configure
-@@ -2445,7 +2445,7 @@ fi
+@@ -2507,7 +2507,7 @@ fi
  if [ "$OS" = "linux" ]; then
    # don't check for the static libstdc++ in the PUEL version as we build the
    # additions at a dedicated box
@@ -39,7 +39,7 @@ index ad35434..48d7a94 100755
      check_linux
    else
 diff --git a/src/VBox/Additions/x11/VBoxClient/Makefile.kmk b/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
-index 015a847..627f659 100644
+index 75a41b6..637e9e5 100644
 --- a/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
 +++ b/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
 @@ -50,10 +50,7 @@ VBoxClient_LIBS = \
@@ -59,7 +59,7 @@ index 015a847..627f659 100644
   VBoxClient_DEFS += VBOX_WITH_GUEST_PROPS
  endif
 -#
--# Link aginst libstdc++.a. (http://www.trilithium.com/johan/2005/06/static-libstdc/).
+-# Link against libstdc++.a. (http://www.trilithium.com/johan/2005/06/static-libstdc/).
 -# (It would've been preferred to avoid features depending on libstdc++, of course...)
 -#
 -# Actually, this is darn annoying and will *NOT* be tolerated for any new code!
@@ -73,7 +73,7 @@ index 015a847..627f659 100644
 -	$(QUIET)$(LN_EXT) -sf `$(TOOL_$(VBOX_GCC_TOOL)_CXX) $(TEMPLATE_VBOXGUESTR3CPPEXE_CXXFLAGS.$(KBUILD_TARGET_ARCH)) -print-file-name=libstdc++.a` $@ \
 -	     || $(CP_EXT) -f  `$(TOOL_$(VBOX_GCC_TOOL)_CXX) $(TEMPLATE_VBOXGUESTR3CPPEXE_CXXFLAGS.$(KBUILD_TARGET_ARCH)) -print-file-name=libstdc++.a` $@
 +##
-+## Link aginst libstdc++.a. (http://www.trilithium.com/johan/2005/06/static-libstdc/).
++## Link against libstdc++.a. (http://www.trilithium.com/johan/2005/06/static-libstdc/).
 +## (It would've been preferred to avoid features depending on libstdc++, of course...)
 +##
 +## Actually, this is darn annoying and will *NOT* be tolerated for any new code!
@@ -90,5 +90,17 @@ index 015a847..627f659 100644
  ifdef VBOX_X11_SEAMLESS_GUEST
   if defined(VBOX_WITH_TESTCASES) && !defined(VBOX_ONLY_ADDITIONS) && !defined(VBOX_ONLY_SDK)
 -- 
-1.7.0.1
+1.7.3.4
 
+diff -urp VirtualBox-4.0.0_OSE/src/VBox/Storage/testcase/Makefile.kmk VirtualBox-4.0.0_OSE.buildtree/src/VBox/Storage/testcase/Makefile.kmk
+--- VirtualBox-4.0.0_OSE/src/VBox/Storage/testcase/Makefile.kmk	2010-11-16 14:12:08.000000000 +0100
++++ VirtualBox-4.0.0_OSE/src/VBox/Storage/testcase/Makefile.kmk	2011-01-10 16:20:46.137459628 +0100
+@@ -39,7 +39,7 @@ ifdef VBOX_WITH_TESTCASES
+  tstVDCopy_TEMPLATE = VBOXR3TSTEXE
+  tstVDSnap_TEMPLATE = VBOXR3TSTEXE
+  tstVDShareable_TEMPLATE = VBOXR3TSTEXE
+- vbox-img_TEMPLATE = VBOXR3STATIC
++ vbox-img_TEMPLATE = VBOXR3EXE
+  tstVD_LIBS     = $(LIB_DDU) $(LIB_RUNTIME)
+  tstVD-2_LIBS   = $(LIB_DDU) $(LIB_RUNTIME)
+  tstVDCopy_LIBS   = $(LIB_DDU) $(LIB_RUNTIME)

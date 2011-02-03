@@ -1,0 +1,21 @@
+From depths of hell
+From: Lubomir Rintel <lkundrak@v3.sk>
+Subject: Do not rely on Bera Mono font
+
+We'd need texlive-fontsextra package which we do not have.
+
+diff -up VirtualBox-4.0.0_OSE/doc/manual/docbook2latex.xsl.beramono VirtualBox-4.0.0_OSE/doc/manual/docbook2latex.xsl
+--- VirtualBox-4.0.0_OSE/doc/manual/docbook2latex.xsl.beramono	2011-01-10 16:59:18.978038927 +0100
++++ VirtualBox-4.0.0_OSE/doc/manual/docbook2latex.xsl	2011-01-10 16:59:27.254065674 +0100
+@@ -129,9 +129,9 @@
+ 
+ % use Bera Mono (a variant of Bitstream Vera Mono) as typewriter font
+ % (requires texlive-fontsextra)
+-\usepackage[scaled]{beramono}
++% \usepackage[scaled]{beramono}
+ % previously: use Courier as typewriter font:
+-% \usepackage{courier}
++\usepackage{courier}
+ 
+ \definecolor{colNote}{rgb}{0,0,0}
+ \definecolor{colWarning}{rgb}{0,0,0}

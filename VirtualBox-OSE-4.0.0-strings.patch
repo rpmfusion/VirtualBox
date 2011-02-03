@@ -1,21 +1,20 @@
-From ecb686c1fd8638b788a9979cefeb9ded7add8707 Mon Sep 17 00:00:00 2001
+From 2706addd03b09c254ced281280ddd467ee7f1085 Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Mon, 10 May 2010 12:08:47 -0400
 Subject: [PATCH] Replace some strings
 
 With ones that (sometimes) make more sense.
 ---
- src/VBox/Frontends/VirtualBox/src/main.cpp  |   20 ++++++++++----------
- src/VBox/Installer/linux/VBox.sh            |   11 ++++++-----
- src/VBox/Installer/linux/virtualbox.desktop |    2 +-
- src/VBox/VMM/VM.cpp                         |    8 ++++----
- 4 files changed, 21 insertions(+), 20 deletions(-)
+ src/VBox/Frontends/VirtualBox/src/main.cpp |   20 ++++++++++----------
+ src/VBox/Installer/linux/VBox.sh           |   11 ++++++-----
+ src/VBox/VMM/VM.cpp                        |    8 ++++----
+ 3 files changed, 20 insertions(+), 19 deletions(-)
 
 diff --git a/src/VBox/Frontends/VirtualBox/src/main.cpp b/src/VBox/Frontends/VirtualBox/src/main.cpp
-index ecb461f..42c5188 100644
+index adbfcae..2a2f1da 100644
 --- a/src/VBox/Frontends/VirtualBox/src/main.cpp
 +++ b/src/VBox/Frontends/VirtualBox/src/main.cpp
-@@ -73,13 +73,13 @@ QString g_QStrHintLinuxNoMemory = QApplication::tr(
+@@ -72,13 +72,13 @@ QString g_QStrHintLinuxNoMemory = QApplication::tr(
    );
  
  QString g_QStrHintLinuxNoDriver = QApplication::tr(
@@ -36,7 +35,7 @@ index ecb461f..42c5188 100644
    );
  
  QString g_QStrHintOtherWrongDriverVersion = QApplication::tr(
-@@ -93,7 +93,7 @@ QString g_QStrHintLinuxWrongDriverVersion = QApplication::tr(
+@@ -92,7 +92,7 @@ QString g_QStrHintLinuxWrongDriverVersion = QApplication::tr(
    "The VirtualBox kernel modules do not match this version of "
    "VirtualBox. The installation of VirtualBox was apparently not "
    "successful. Executing<br/><br/>"
@@ -45,7 +44,7 @@ index ecb461f..42c5188 100644
    "may correct this. Make sure that you do not mix the "
    "OSE version and the PUEL version of VirtualBox."
    );
-@@ -102,9 +102,9 @@ QString g_QStrHintOtherNoDriver = QApplication::tr(
+@@ -101,9 +101,9 @@ QString g_QStrHintOtherNoDriver = QApplication::tr(
    "Make sure the kernel module has been loaded successfully."
    );
  
@@ -58,7 +57,7 @@ index ecb461f..42c5188 100644
  
  #if defined(DEBUG) && defined(Q_WS_X11) && defined(RT_OS_LINUX)
 diff --git a/src/VBox/Installer/linux/VBox.sh b/src/VBox/Installer/linux/VBox.sh
-index 27fb7e9..c32fdbe 100644
+index 9319696..0e782e0 100644
 --- a/src/VBox/Installer/linux/VBox.sh
 +++ b/src/VBox/Installer/linux/VBox.sh
 @@ -32,19 +32,20 @@ elif ! lsmod|grep -q vboxdrv; then
@@ -87,24 +86,11 @@ index 27fb7e9..c32fdbe 100644
  
           You will not be able to start VMs until this problem is fixed.
  EOF
-diff --git a/src/VBox/Installer/linux/virtualbox.desktop b/src/VBox/Installer/linux/virtualbox.desktop
-index c05588d..d931435 100644
---- a/src/VBox/Installer/linux/virtualbox.desktop
-+++ b/src/VBox/Installer/linux/virtualbox.desktop
-@@ -1,7 +1,7 @@
- [Desktop Entry]
- Encoding=UTF-8
- Version=1.0
--Name=Oracle VM VirtualBox
-+Name=VirtualBox OSE
- GenericName=Virtual Machine
- Type=Application
- Exec=VirtualBox
 diff --git a/src/VBox/VMM/VM.cpp b/src/VBox/VMM/VM.cpp
-index ac131ac..e4077ad 100644
+index 2a47e50..517ce6a 100644
 --- a/src/VBox/VMM/VM.cpp
 +++ b/src/VBox/VMM/VM.cpp
-@@ -332,8 +332,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCpus, PFNVMATERROR pfnVMAtError, void *pvU
+@@ -363,8 +363,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCpus, PCVMM2USERMETHODS pVmm2UserMethods,
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not loaded. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv is not set up properly. "
@@ -115,7 +101,7 @@ index ac131ac..e4077ad 100644
  #else
                      pszError = N_("VirtualBox kernel driver not loaded");
  #endif
-@@ -374,8 +374,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCpus, PFNVMATERROR pfnVMAtError, void *pvU
+@@ -405,8 +405,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCpus, PCVMM2USERMETHODS pVmm2UserMethods,
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not installed. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv was not created for some "
@@ -127,5 +113,5 @@ index ac131ac..e4077ad 100644
                      pszError = N_("VirtualBox kernel driver not installed");
  #endif
 -- 
-1.7.0.1
+1.7.3.4
 
