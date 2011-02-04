@@ -1,4 +1,4 @@
-From 12c9d47c3cf09c5dd4be312e48a5fb0915d1d39e Mon Sep 17 00:00:00 2001
+From 21fe4a32296cc6246c98e7ec31be9772c259306b Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Fri, 18 Jun 2010 10:58:14 +0200
 Subject: [PATCH] Do not include statically linked libstdc++
@@ -7,39 +7,12 @@ Not a good idea if we don't need to be binary-compatible across exotic
 distribution. Doesn't work with trunk glibc heading towards 2.11 anyways.
 Static linking is not really supported anyways.
 ---
- Config.kmk                                     |    2 +-
- configure                                      |    2 +-
  src/VBox/Additions/x11/VBoxClient/Makefile.kmk |   33 +++++++++++-------------
- 3 files changed, 17 insertions(+), 20 deletions(-)
+ src/VBox/Storage/testcase/Makefile.kmk         |    2 +-
+ 2 files changed, 16 insertions(+), 19 deletions(-)
 
-diff --git a/Config.kmk b/Config.kmk
-index 3fab552..7f65bf8 100644
---- a/Config.kmk
-+++ b/Config.kmk
-@@ -2979,7 +2979,7 @@ TEMPLATE_VBOXR3EXE_LIBS                = pthread m rt dl
- TEMPLATE_VBOXR3EXE_LIBS                = \
- 	$(L4_LIBDIR)/libvboxserver.s.so \
- 	$(L4_LIBDIR)/libuc++.0.s.so \
--	supc++ gcc_eh gcc \
-+	stdc++ \
- 	$(L4_LIBDIR)/libdl.s.so \
- 	$(L4_LIBDIR)/libuc.0.s.so
-  else ifeq ($(KBUILD_TARGET),os2)
-diff --git a/configure b/configure
-index c8a8d76..42ce775 100755
---- a/configure
-+++ b/configure
-@@ -2507,7 +2507,7 @@ fi
- if [ "$OS" = "linux" ]; then
-   # don't check for the static libstdc++ in the PUEL version as we build the
-   # additions at a dedicated box
--  [ $OSE -ge 1 ] && check_staticlibstdcxx
-+  #[ $OSE -ge 1 ] && check_staticlibstdcxx
-   if [ $WITH_KMODS -eq 1 ]; then
-     check_linux
-   else
 diff --git a/src/VBox/Additions/x11/VBoxClient/Makefile.kmk b/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
-index 75a41b6..637e9e5 100644
+index dd764a4..ddcd494 100644
 --- a/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
 +++ b/src/VBox/Additions/x11/VBoxClient/Makefile.kmk
 @@ -50,10 +50,7 @@ VBoxClient_LIBS = \
@@ -64,10 +37,10 @@ index 75a41b6..637e9e5 100644
 -#
 -# Actually, this is darn annoying and will *NOT* be tolerated for any new code!
 -#
--VBoxClient_LIBPATH  += $(PATH_VBoxClient)
--VBoxClient_ORDERDEPS = $(PATH_VBoxClient)/libstdc++.a
--VBoxClient_CLEAN     = $(PATH_VBoxClient)/libstdc++.a
--$$(PATH_VBoxClient)/libstdc++.a:
+-VBoxClient_LIBPATH  += $(VBoxClient_0_OUTDIR)
+-VBoxClient_ORDERDEPS = $(VBoxClient_0_OUTDIR)/libstdc++.a
+-VBoxClient_CLEAN     = $(VBoxClient_0_OUTDIR)/libstdc++.a
+-$$(VBoxClient_0_OUTDIR)/libstdc++.a:
 -	$(call MSG_L1,Forcing static libstdc++)
 -	$(QUIET)$(MKDIR) -p $(@D)
 -	$(QUIET)$(LN_EXT) -sf `$(TOOL_$(VBOX_GCC_TOOL)_CXX) $(TEMPLATE_VBOXGUESTR3CPPEXE_CXXFLAGS.$(KBUILD_TARGET_ARCH)) -print-file-name=libstdc++.a` $@ \
@@ -78,10 +51,10 @@ index 75a41b6..637e9e5 100644
 +##
 +## Actually, this is darn annoying and will *NOT* be tolerated for any new code!
 +##
-+#VBoxClient_LIBPATH  += $(PATH_VBoxClient)
-+#VBoxClient_ORDERDEPS = $(PATH_VBoxClient)/libstdc++.a
-+#VBoxClient_CLEAN     = $(PATH_VBoxClient)/libstdc++.a
-+#$$(PATH_VBoxClient)/libstdc++.a:
++#VBoxClient_LIBPATH  += $(VBoxClient_0_OUTDIR)
++#VBoxClient_ORDERDEPS = $(VBoxClient_0_OUTDIR)/libstdc++.a
++#VBoxClient_CLEAN     = $(VBoxClient_0_OUTDIR)/libstdc++.a
++#$$(VBoxClient_0_OUTDIR)/libstdc++.a:
 +#	$(call MSG_L1,Forcing static libstdc++)
 +#	$(QUIET)$(MKDIR) -p $(@D)
 +#	$(QUIET)$(LN_EXT) -sf `$(TOOL_$(VBOX_GCC_TOOL)_CXX) $(TEMPLATE_VBOXGUESTR3CPPEXE_CXXFLAGS.$(KBUILD_TARGET_ARCH)) -print-file-name=libstdc++.a` $@ \
@@ -89,18 +62,45 @@ index 75a41b6..637e9e5 100644
  
  ifdef VBOX_X11_SEAMLESS_GUEST
   if defined(VBOX_WITH_TESTCASES) && !defined(VBOX_ONLY_ADDITIONS) && !defined(VBOX_ONLY_SDK)
--- 
-1.7.3.4
-
-diff -urp VirtualBox-4.0.0_OSE/src/VBox/Storage/testcase/Makefile.kmk VirtualBox-4.0.0_OSE.buildtree/src/VBox/Storage/testcase/Makefile.kmk
---- VirtualBox-4.0.0_OSE/src/VBox/Storage/testcase/Makefile.kmk	2010-11-16 14:12:08.000000000 +0100
-+++ VirtualBox-4.0.0_OSE/src/VBox/Storage/testcase/Makefile.kmk	2011-01-10 16:20:46.137459628 +0100
-@@ -39,7 +39,7 @@ ifdef VBOX_WITH_TESTCASES
-  tstVDCopy_TEMPLATE = VBOXR3TSTEXE
+diff --git a/src/VBox/Storage/testcase/Makefile.kmk b/src/VBox/Storage/testcase/Makefile.kmk
+index 77075d9..b996e3d 100644
+--- a/src/VBox/Storage/testcase/Makefile.kmk
++++ b/src/VBox/Storage/testcase/Makefile.kmk
+@@ -40,7 +40,7 @@ ifdef VBOX_WITH_TESTCASES
   tstVDSnap_TEMPLATE = VBOXR3TSTEXE
   tstVDShareable_TEMPLATE = VBOXR3TSTEXE
+  tstVDIo_TEMPLATE = VBOXR3TSTEXE
 - vbox-img_TEMPLATE = VBOXR3STATIC
 + vbox-img_TEMPLATE = VBOXR3EXE
   tstVD_LIBS     = $(LIB_DDU) $(LIB_RUNTIME)
   tstVD-2_LIBS   = $(LIB_DDU) $(LIB_RUNTIME)
   tstVDCopy_LIBS   = $(LIB_DDU) $(LIB_RUNTIME)
+-- 
+1.7.3.4
+
+diff --git a/Config.kmk b/Config.kmk
+index 1d5174f..c377dbd 100644
+--- a/Config.kmk
++++ b/Config.kmk
+@@ -2986,7 +2986,7 @@ TEMPLATE_VBOXR3EXE_LIBS                = pthread m rt dl
+ TEMPLATE_VBOXR3EXE_LIBS                = \
+ 	$(L4_LIBDIR)/libvboxserver.s.so \
+ 	$(L4_LIBDIR)/libuc++.0.s.so \
+-	supc++ gcc_eh gcc \
++	stdc++ \
+ 	$(L4_LIBDIR)/libdl.s.so \
+ 	$(L4_LIBDIR)/libuc.0.s.so
+  else ifeq ($(KBUILD_TARGET),os2)
+diff --git a/configure b/configure
+index 87e6a29..d365e48 100755
+--- a/configure
++++ b/configure
+@@ -2507,7 +2507,7 @@ fi
+ if [ "$OS" = "linux" ]; then
+   # don't check for the static libstdc++ in the PUEL version as we build the
+   # additions at a dedicated box
+-  [ $OSE -ge 1 ] && check_staticlibstdcxx
++  #[ $OSE -ge 1 ] && check_staticlibstdcxx
+   if [ $WITH_KMODS -eq 1 ]; then
+     check_linux
+   else

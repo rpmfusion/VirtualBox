@@ -1,4 +1,4 @@
-From 42c45c7f8185616d55d128f8ef4abdc14870cdd4 Mon Sep 17 00:00:00 2001
+From dd72efd2e7245f28429caa7235fceae4a6cc71e1 Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Wed, 28 Apr 2010 12:04:23 +0200
 Subject: [PATCH] Build drivers for XOrg 1.7 ABI
@@ -10,7 +10,7 @@ And only them.
  2 files changed, 44 insertions(+), 32 deletions(-)
 
 diff --git a/src/VBox/Additions/x11/vboxmouse/Makefile.kmk b/src/VBox/Additions/x11/vboxmouse/Makefile.kmk
-index 185e2b4..3ba4dd8 100644
+index 283efdc..9fb1f36 100644
 --- a/src/VBox/Additions/x11/vboxmouse/Makefile.kmk
 +++ b/src/VBox/Additions/x11/vboxmouse/Makefile.kmk
 @@ -59,7 +59,7 @@ endif
@@ -21,7 +21,7 @@ index 185e2b4..3ba4dd8 100644
 +#DLLS += vboxmouse_drv_70
  vboxmouse_drv_70_TEMPLATE = VBOXGUESTR3XORGMOD
  vboxmouse_drv_70_DEFS = \
- 	XFree86Server IN_MODULE XFree86Module XFree86LOADER XINPUT XORG_7X
+ 	XFree86Server IN_MODULE XFree86Module XFree86LOADER XINPUT XORG_7X IN_XF86_MODULE
 @@ -80,7 +80,7 @@ vboxmouse_drv_70_SOURCES = \
  #
  # vboxmouse_drv_71
@@ -95,7 +95,7 @@ index 185e2b4..3ba4dd8 100644
    if1of ($(KBUILD_TARGET),linux solaris)
     ifeq ($(KBUILD_HOST_ARCH),$(KBUILD_TARGET_ARCH))
 diff --git a/src/VBox/Additions/x11/vboxvideo/Makefile.kmk b/src/VBox/Additions/x11/vboxvideo/Makefile.kmk
-index 44fb9d6..5810a45 100644
+index 1c55d2b..72ac0e2 100644
 --- a/src/VBox/Additions/x11/vboxvideo/Makefile.kmk
 +++ b/src/VBox/Additions/x11/vboxvideo/Makefile.kmk
 @@ -89,7 +89,7 @@ vboxvideo_drv_SOURCES = \

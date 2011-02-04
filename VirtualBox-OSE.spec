@@ -14,7 +14,7 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	4.0.0
+Version:	4.0.2
 Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
@@ -29,9 +29,9 @@ Source7:	VirtualBox-OSE-guest.modules
 Source8:	VirtualBox-OSE-vboxresize.desktop
 Source9:	VirtualBox-OSE-00-vboxvideo.conf
 Patch1:		VirtualBox-OSE-3.2.0-noupdate.patch
-Patch2:		VirtualBox-OSE-4.0.0-strings.patch
-Patch3:		VirtualBox-OSE-4.0.0-libcxx.patch
-Patch5:		VirtualBox-OSE-4.0.0-xorg17.patch
+Patch2:		VirtualBox-OSE-4.0.2-strings.patch
+Patch3:		VirtualBox-OSE-4.0.2-libcxx.patch
+Patch5:		VirtualBox-OSE-4.0.2-xorg17.patch
 Patch9:		VirtualBox-OSE-3.2.4-optflags.patch
 Patch10:	VirtualBox-OSE-4.0.0-32bit.patch
 Patch11:	VirtualBox-OSE-3.2.0-visibility.patch
@@ -40,7 +40,7 @@ Patch14:	VirtualBox-OSE-3.2.6-vboxkeyboard.patch
 Patch15:	VirtualBox-OSE-4.0.0-makeself.patch
 Patch16:	VirtualBox-OSE-4.0.0-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
-Patch18:	VirtualBox-OSE-4.0.0-aiobug.patch
+Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -152,6 +152,7 @@ find -name '*.py[co]' -delete
 %patch15 -p1 -b .makeself
 %patch16 -p1 -b .usblib
 %patch17 -p1 -b .beramono
+%patch18 -p1 -b .aiobug
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -458,6 +459,12 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Fri Feb 04 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.0.2-1
+- New release
+
+* Thu Feb 03 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.0.0-1
+- New release
+
 * Fri Nov 12 2010 Lubomir Rintel <lkundrak@v3.sk> - 3.2.10-1
 - New release
 

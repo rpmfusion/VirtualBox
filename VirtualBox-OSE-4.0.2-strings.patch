@@ -1,4 +1,4 @@
-From 2706addd03b09c254ced281280ddd467ee7f1085 Mon Sep 17 00:00:00 2001
+From 3a6d9a3d4f8d9084759fe871033b6b4a990aa761 Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Mon, 10 May 2010 12:08:47 -0400
 Subject: [PATCH] Replace some strings
@@ -7,11 +7,11 @@ With ones that (sometimes) make more sense.
 ---
  src/VBox/Frontends/VirtualBox/src/main.cpp |   20 ++++++++++----------
  src/VBox/Installer/linux/VBox.sh           |   11 ++++++-----
- src/VBox/VMM/VM.cpp                        |    8 ++++----
+ src/VBox/VMM/VMMR3/VM.cpp                  |    8 ++++----
  3 files changed, 20 insertions(+), 19 deletions(-)
 
 diff --git a/src/VBox/Frontends/VirtualBox/src/main.cpp b/src/VBox/Frontends/VirtualBox/src/main.cpp
-index adbfcae..2a2f1da 100644
+index 9ec09e1..fc1ebe9 100644
 --- a/src/VBox/Frontends/VirtualBox/src/main.cpp
 +++ b/src/VBox/Frontends/VirtualBox/src/main.cpp
 @@ -72,13 +72,13 @@ QString g_QStrHintLinuxNoMemory = QApplication::tr(
@@ -86,10 +86,10 @@ index 9319696..0e782e0 100644
  
           You will not be able to start VMs until this problem is fixed.
  EOF
-diff --git a/src/VBox/VMM/VM.cpp b/src/VBox/VMM/VM.cpp
-index 2a47e50..517ce6a 100644
---- a/src/VBox/VMM/VM.cpp
-+++ b/src/VBox/VMM/VM.cpp
+diff --git a/src/VBox/VMM/VMMR3/VM.cpp b/src/VBox/VMM/VMMR3/VM.cpp
+index d9e1bc1..c24f8dd 100644
+--- a/src/VBox/VMM/VMMR3/VM.cpp
++++ b/src/VBox/VMM/VMMR3/VM.cpp
 @@ -363,8 +363,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCpus, PCVMM2USERMETHODS pVmm2UserMethods,
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not loaded. The vboxdrv kernel module "
