@@ -1,0 +1,28 @@
+From fb2a3a2773905364fe3b8ee0ebd36c28e65da78a Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Tue, 8 Feb 2011 22:15:09 +0100
+Subject: [PATCH] Allow building with gcc-4.6
+
+---
+ configure |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index d365e48..f97b822 100755
+--- a/configure
++++ b/configure
+@@ -409,9 +409,9 @@ check_gcc()
+       elif [ $cc_maj -lt 3 \
+              -o \( $cc_maj -eq 3 -a $cc_min -lt 2 \) \
+              -o \( $cc_maj -eq 4 -a $cc_min -lt 1 -a "$OS" != "darwin" \) \
+-             -o \( $cc_maj -eq 4 -a $cc_min -gt 5 \) \
++             -o \( $cc_maj -eq 4 -a $cc_min -gt 6 \) \
+              -o $cc_maj -gt 4 ]; then
+-        log_failure "gcc version $cc_ver found, expected gcc 3.x with x>1 or gcc 4.x with 0<x<5"
++        log_failure "gcc version $cc_ver found, expected gcc 3.x with x>1 or gcc 4.x with 0<x<6"
+         fail really
+       else
+         log_success "found version $cc_ver"
+-- 
+1.7.3.4
+
