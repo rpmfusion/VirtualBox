@@ -61,6 +61,7 @@ BuildRequires:	qt4-devel
 BuildRequires:	gsoap-devel
 BuildRequires:	xz
 BuildRequires:	pam-devel
+BuildRequires:	mkisofs
 BuildRequires:	java-devel >= 1.6
 BuildRequires:	/usr/bin/pdflatex
 
