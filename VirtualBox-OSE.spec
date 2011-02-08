@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.0.2
-Release:	1%{?prerel:.%{prerel}}%{?dist}
+Release:	2%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -41,6 +41,7 @@ Patch15:	VirtualBox-OSE-4.0.0-makeself.patch
 Patch16:	VirtualBox-OSE-4.0.0-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
+Patch19:        VirtualBox-OSE-4.0.2-gcc46.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -153,6 +154,7 @@ find -name '*.py[co]' -delete
 %patch16 -p1 -b .usblib
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
+%patch19 -p1 -b .gcc46
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -459,6 +461,9 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Tue Feb 08 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.0.2-2
+- Fix build with GCC 4.6
+
 * Fri Feb 04 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.0.2-1
 - New release
 
