@@ -181,7 +181,8 @@ kmk %{_smp_mflags} \
 	VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=	\
 	KMK_REVISION=3000 KBUILD_KMK_REVISION=3000			\
 	VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"	\
-	VBOX_GCC_R0_OPT="%{optflags}" VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL" \
+	VBOX_GCC_R0_OPT="%{optflags}" VBOX_GCC_WERR=""			\
+	VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL" 			\
 	VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java				
 
 
