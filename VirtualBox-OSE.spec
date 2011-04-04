@@ -14,8 +14,8 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	4.0.2
-Release:	2%{?prerel:.%{prerel}}%{?dist}
+Version:	4.0.4
+Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -73,6 +73,7 @@ BuildRequires:	mesa-libOSMesa-devel
 BuildRequires:	pixman-devel
 BuildRequires:	xorg-x11-proto-devel
 BuildRequires:	xorg-x11-server-source
+BuildRequires:	xorg-x11-server-devel
 
 # Plague-specific weirdness
 %if 0%{?fedora} > 11 || 0%{?rhel} > 5
@@ -122,6 +123,12 @@ Requires:	xorg-x11-xinit
 Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
 Obsoletes:	xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
 Conflicts:	%{name} <= %{version}-%{release}
+%if "%(xserver-sdk-abi-requires 2>/dev/null)"
+Requires:       %(xserver-sdk-abi-requires ansic)
+Requires:       %(xserver-sdk-abi-requires videodrv)
+Requires:       %(xserver-sdk-abi-requires xinput)
+%endif
+
 
 %description guest
 Tools that utilize kernel modules for supporting integration
@@ -463,6 +470,10 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Sun Apr 03 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.0.4-1
+- New release
+- Add requires for particular server ABIs
+
 * Tue Feb 08 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.0.2-2
 - Fix build with GCC 4.6
 
