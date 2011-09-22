@@ -1,2 +1,3 @@
-ACTION=="add", DEVPATH=="/devices/virtual/misc/vboxdrv", OWNER="root", MODE="0666"
-ACTION=="add", DEVPATH=="/devices/virtual/misc/vboxnetctl", OWNER="root", MODE="0666"
+ACTION=="add", DEVPATH=="/devices/virtual/misc/vboxdrv", OWNER="root", MODE="0600"
+ACTION=="add", DEVPATH=="/devices/virtual/misc/vboxnetctl", OWNER="root", MODE="0600"
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{bDeviceClass}!="09", GROUP="vboxusers", MODE="660", SYMLINK+="vboxusb/$env{BUSNUM}/$env{DEVNUM}"

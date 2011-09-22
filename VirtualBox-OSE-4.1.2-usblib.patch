@@ -1,7 +1,7 @@
-From 2336bf28506eb2b7a94fdfe7b302c70b107482e2 Mon Sep 17 00:00:00 2001
+From 62776a195748d36f311bbbc3d7542e17a7cb4a86 Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Mon, 10 Jan 2011 15:39:07 +0100
-Subject: [PATCH] Fix path to USBLib
+Subject: [PATCH 3/3] Fix path to USBLib
 
 kmk: *** No rule to make target `out/linux.x86/release/lib/USBLib.a',
 needed by `out/linux.x86/release/obj/tstHostHardwareLinux/tstHostHardwareLinux'.
@@ -11,18 +11,18 @@ Stop.
  1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/src/VBox/Main/testcase/Makefile.kmk b/src/VBox/Main/testcase/Makefile.kmk
-index 7a8218d..d353de3 100644
+index c6acdd1..1e593d6 100644
 --- a/src/VBox/Main/testcase/Makefile.kmk
 +++ b/src/VBox/Main/testcase/Makefile.kmk
-@@ -161,7 +161,7 @@ tstHostHardwareLinux_DEFS      = \
- 	$(if $(VBOX_USB_WITH_SYSFS),VBOX_USB_WITH_SYSFS,) \
- 	$(if $(VBOX_USB_WITH_INOTIFY),VBOX_USB_WITH_INOTIFY,)
- tstHostHardwareLinux_LIBS     += \
+@@ -183,7 +183,7 @@ tstUSBProxyLinux_DEFS      = \
+ tstUSBProxyLinux_DEPS     = \
+ 	$(VBOX_PATH_SDK)/bindings/xpcom/include/VirtualBox_XPCOM.h
+ tstUSBProxyLinux_LIBS     += \
 -	$(PATH_OUT)/lib/USBLib.a
 +	$(PATH_OUT)/obj/USBLib/USBLib.o
  
  
  # generate rules.
 -- 
-1.7.3.4
+1.7.1
 
