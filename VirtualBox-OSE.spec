@@ -46,9 +46,8 @@ Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:	kBuild >= 0.1.5-1
+BuildRequires:	kBuild >= 0.1.98
 BuildRequires:	SDL-devel xalan-c-devel
-BuildRequires:	hal-devel
 BuildRequires:	openssl-devel
 BuildRequires:	libcurl-devel
 BuildRequires:	dev86 iasl libxslt-devel xerces-c-devel libXcursor-devel libIDL-devel
