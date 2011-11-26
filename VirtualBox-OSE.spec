@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.2
-Release:	1%{?prerel:.%{prerel}}%{?dist}
+Release:	2%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -231,9 +231,7 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
 
 # Components
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/components \
-	obj/bin/components/VBoxC.so	\
-	obj/bin/components/VBoxSVCM.so	\
-	obj/bin/components/*XPCOM*.so
+	obj/bin/components/*
 
 # Lib
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
@@ -497,6 +495,9 @@ fi
 
 
 %changelog
+* Sat Nov 26 2011 Sérgio Basto <sergio@serjux.com> - 4.1.2-2
+- small fix for bug #1979.
+
 * Wed Sep 21 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.1.2-1
 - New release
 - Assign USB devices to vboxusers
