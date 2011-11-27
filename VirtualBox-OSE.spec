@@ -14,7 +14,7 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	4.0.4
+Version:	4.1.2
 Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
@@ -28,26 +28,26 @@ Source6:	VirtualBox-OSE.modules
 Source7:	VirtualBox-OSE-guest.modules
 Source8:	VirtualBox-OSE-vboxresize.desktop
 Source9:	VirtualBox-OSE-00-vboxvideo.conf
-Patch1:		VirtualBox-OSE-3.2.0-noupdate.patch
+Source10:	vboxweb-service
+Patch1:		VirtualBox-OSE-4.1.2-noupdate.patch
 Patch2:		VirtualBox-OSE-4.0.2-strings.patch
-Patch3:		VirtualBox-OSE-4.0.2-libcxx.patch
+Patch3:		VirtualBox-OSE-4.1.2-libcxx.patch
 Patch5:		VirtualBox-OSE-4.0.2-xorg17.patch
 Patch9:		VirtualBox-OSE-3.2.4-optflags.patch
 Patch10:	VirtualBox-OSE-4.0.0-32bit.patch
 Patch11:	VirtualBox-OSE-3.2.0-visibility.patch
 Patch12:	VirtualBox-OSE-3.2.10-noansi.patch
-Patch14:	VirtualBox-OSE-3.2.6-vboxkeyboard.patch
 Patch15:	VirtualBox-OSE-4.0.0-makeself.patch
-Patch16:	VirtualBox-OSE-4.0.0-usblib.patch
+Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
-Patch19:        VirtualBox-OSE-4.0.2-gcc46.patch
+Patch19:	VirtualBox-OSE-4.1.2-vboxpci.patch
+Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:	kBuild >= 0.1.5-1
+BuildRequires:	kBuild >= 0.1.98
 BuildRequires:	SDL-devel xalan-c-devel
-BuildRequires:	hal-devel
 BuildRequires:	openssl-devel
 BuildRequires:	libcurl-devel
 BuildRequires:	dev86 iasl libxslt-devel xerces-c-devel libXcursor-devel libIDL-devel
@@ -83,6 +83,9 @@ ExclusiveArch:	i586 x86_64
 %else
 ExclusiveArch:	i386 x86_64
 %endif
+
+Requires(post): desktop-file-utils
+Requires(postun): desktop-file-utils
 
 Requires:	%{name}-kmod = %{version}%{?prereltag}
 Provides:	%{name}-kmod-common = %{version}%{?prereltag}
@@ -124,9 +127,9 @@ Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
 Obsoletes:	xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
 Conflicts:	%{name} <= %{version}-%{release}
 %if "%(xserver-sdk-abi-requires 2>/dev/null)"
-Requires:       %(xserver-sdk-abi-requires ansic)
-Requires:       %(xserver-sdk-abi-requires videodrv)
-Requires:       %(xserver-sdk-abi-requires xinput)
+Requires:	%(xserver-sdk-abi-requires ansic)
+Requires:	%(xserver-sdk-abi-requires videodrv)
+Requires:	%(xserver-sdk-abi-requires xinput)
 %endif
 
 
@@ -157,12 +160,12 @@ find -name '*.py[co]' -delete
 %patch10 -p1 -b .32bit
 %patch11 -p1 -b .visibility
 %patch12 -p1 -b .noansi
-%patch14 -p1 -b .vboxkeyboard
 %patch15 -p1 -b .makeself
 %patch16 -p1 -b .usblib
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
-%patch19 -p1 -b .gcc46
+%patch19 -p1 -b .vboxpci
+%patch20 -p1 -b .testmangle
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -181,16 +184,14 @@ sed -i 's/\r//' COPYING
 # really been installed to. Therefore we do not override any of
 # the installation paths, but install the tree with the default
 # layout under 'obj' and shuffle files around in %%install.
-echo %{optflags}
 kmk %{_smp_mflags} \
-	KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_INS="$PWD/obj"		\
+	KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_OUT="$PWD/obj"		\
 	VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox			\
 	VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=	\
-	KMK_REVISION=3000 KBUILD_KMK_REVISION=3000			\
 	VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"	\
 	VBOX_GCC_R0_OPT="%{optflags}" VBOX_GCC_WERR=""			\
-	VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL" 			\
-	VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java				
+	VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"				\
+	VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java
 
 
 %install
@@ -206,9 +207,12 @@ install -d $RPM_BUILD_ROOT%{_libdir}
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/components
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls
+install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/ExtensionPacks
 install -d $RPM_BUILD_ROOT%{_libdir}/dri
-install -d $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk
+install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk
 install -d $RPM_BUILD_ROOT%{_datadir}/pixmaps
+install -d $RPM_BUILD_ROOT%{_datadir}/mime/packages
+install -d $RPM_BUILD_ROOT%{_datadir}/icons
 install -d $RPM_BUILD_ROOT%{_prefix}/src/%{name}-kmod-%{version}
 install -d $RPM_BUILD_ROOT%{python_sitelib}/virtualbox
 
@@ -216,12 +220,14 @@ install -d $RPM_BUILD_ROOT%{python_sitelib}/virtualbox
 install -p -m 0755 obj/bin/VBox.sh $RPM_BUILD_ROOT%{_bindir}/VBox
 ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxHeadless
 ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxManage
+ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBalloonCtrl
+ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBFE
 ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxSDL
 ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VirtualBox
+ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
 
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
 	obj/bin/VBoxTunctl	\
-	obj/bin/VBoxBFE
 
 # Components
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/components \
@@ -242,7 +248,6 @@ install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
 
 # Executables
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-	obj/bin/EfiThunk	\
 	obj/bin/VBoxHeadless	\
 	obj/bin/VBoxSDL		\
 	obj/bin/VBoxNetDHCP	\
@@ -255,22 +260,43 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
 	obj/bin/vboxshell.py	\
 	obj/bin/VBoxTestOGL	\
 	obj/bin/vboxwebsrv	\
-	obj/bin/webtest
+	obj/bin/VBoxBalloonCtrl	\
+	obj/bin/webtest		\
+	obj/bin/VBoxBFE
+
+# Lowercase aliases
+for F in VBoxBalloonCtrl VBoxHeadless VBoxManage VBoxSDL VirtualBox VBoxBFE
+do
+	ln $RPM_BUILD_ROOT%{_bindir}/$F \
+		$RPM_BUILD_ROOT%{_bindir}/$(echo $F |awk '{print tolower($0)}')
+done
 
 # Language files
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
 	obj/bin/nls/*
 
 # SDK
-cp -rp obj/bin/sdk/. $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk
-mv $RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom \
-	$RPM_BUILD_ROOT%{python_sitelib}/virtualbox
-ln -sf ../../../../../../..%{python_sitelib}/virtualbox/xpcom \
-	$RPM_BUILD_ROOT%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
+pushd obj/bin/sdk/installer
+VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
+	python vboxapisetup.py install --prefix %{_prefix} --root $RPM_BUILD_ROOT
+popd
+cp -rp obj/bin/sdk/. $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk
+rm -rf $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk/installer
 
-# Icon
+# Icons
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
 	obj/bin/VBox.png
+ln -f $RPM_BUILD_ROOT%{_datadir}/pixmaps/{VBox,virtualbox}.png
+for S in obj/bin/icons/*
+do
+	SIZE=$(basename $S)
+	install -d $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/{mimetypes,apps}
+	install -p -m 0644 $S/* $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes
+	[ -f $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png ] && mv \
+		$RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png \
+		$RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/apps/virtualbox.png
+done
+install -p -m 0644 obj/bin/virtualbox.xml $RPM_BUILD_ROOT%{_datadir}/mime/packages
 
 # Guest X.Org drivers
 # With the xorg17 patch, the _17 driver builds against what's
@@ -342,55 +368,42 @@ desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
 	--remove-key=DocPath --remove-category=X-MandrivaLinux-System \
 	--vendor='' obj/bin/virtualbox.desktop
 
-%check
-exit 0
-
-# Dear contributor,
-#
-# If you forget a file when updating to a later version, it's
-# not you fault; as you can see, install section is far from
-# ideal. This section is meant to make it easier for you to spot
-# files you've forgotten to include. Feel free to blacklist
-# uninteresting files here.
-#
-# Not sure if a file is "uninteresting"? See if closed version
-# contains it? No? Remove it. Application doesn't run without
-# it? Bring it back.
-
-set +o posix
-diff -u <((find obj/bin/additions/* -maxdepth 0 -type f	   \
-		-not -name 'autorun.sh'			\
-		-not -name '*_drv*'			\
-		-not -name 'pam_vbox.so'		\
-		-exec basename '{}' \;
-	find obj/bin/* -maxdepth 0 -type f		\
-		-not -name 'tst*'			\
-		-not -name 'SUP*'			\
-		-not -name 'VBox.sh'			\
-		-not -name 'xpidl'			\
-		-not -name 'scm'			\
-		-not -name 'vboxkeyboard.tar.*'		\
-		-exec basename '{}' \;) |sort) \
-	<(find $RPM_BUILD_ROOT%{_libdir}/virtualbox/*	\
-		$RPM_BUILD_ROOT%{_bindir}/*		\
-		$RPM_BUILD_ROOT%{_libdir}/*OGL*.so	\
-		$RPM_BUILD_ROOT%{_datadir}/{pixmaps,applications}/* \
-		-maxdepth 0 -type f			\
-		-not -name '*.py[co]'			\
-		-not -name 'UserManual.pdf'		\
-		-not -name VBox -exec basename '{}' \; |sort)
-set -o posix
-
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 
-%pre devel
-# This changed to a symlink from directory, which would cause
-# the new package's CPIO payload to fail to unpack unless removed
-PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
-[ -d "$PYXP" ] && rm -rf "$PYXP"
+%post
+# Group for USB devices
+getent group vboxusers >/dev/null || groupadd -r vboxusers
+
+# Desktop databases
+/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+/usr/bin/update-desktop-database &>/dev/null || :
+/usr/bin/update-mime-database %{_datadir}/mime &>/dev/null || :
+
+# Web service
+/sbin/chkconfig --add vboxweb-service >/dev/null 2>&1 || :
+
+# Assign USB devices
+if /sbin/udevadm control --reload-rules >/dev/null 2>&1
+then
+	/sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
+	/sbin/udevadm settle >/dev/null 2>&1 || :
+fi
+
+
+%preun
+[ $1 = 0 ] && /sbin/chkconfig --del vboxweb-service >/dev/null 2>&1 || :
+
+
+%postun
+/usr/bin/update-desktop-database &>/dev/null || :
+/usr/bin/update-mime-database %{_datadir}/mime &>/dev/null || :
+
+
+%posttrans
+/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
 # Guest additions install the OGL libraries
@@ -401,12 +414,20 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %files
 %defattr(-,root,root,-)
 %{_bindir}/VBox
+%{_bindir}/vboxballoonctrl
+%{_bindir}/VBoxBalloonCtrl
+%{_bindir}/vboxbfe
 %{_bindir}/VBoxBFE
+%{_bindir}/vboxheadless
 %{_bindir}/VBoxHeadless
+%{_bindir}/vboxmanage
 %{_bindir}/VBoxManage
+%{_bindir}/vboxsdl
 %{_bindir}/VBoxSDL
 %{_bindir}/VBoxTunctl
+%{_bindir}/virtualbox
 %{_bindir}/VirtualBox
+%{_bindir}/vboxwebsrv
 %dir %{_libdir}/virtualbox
 %doc %{_libdir}/virtualbox/*.pdf
 %{_libdir}/virtualbox/*.[^p]*
@@ -417,15 +438,18 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 %{_libdir}/virtualbox/VBoxSVC
 %{_libdir}/virtualbox/VBoxTestOGL
 %{_libdir}/virtualbox/VBoxXPCOMIPCD
+%{_libdir}/virtualbox/VBoxBalloonCtrl
 %{_libdir}/virtualbox/vboxwebsrv
 %{_libdir}/virtualbox/webtest
-%{_libdir}/virtualbox/EfiThunk
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxHeadless
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxSDL
+%attr(4755,root,root) %{_libdir}/virtualbox/VBoxBFE
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
 %attr(4755,root,root) %{_libdir}/virtualbox/VirtualBox
 %{_datadir}/pixmaps/*
+%{_datadir}/icons/*
+%{_datadir}/mime/*
 %{_datadir}/applications/*.desktop
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
@@ -436,12 +460,13 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 %files devel
 %defattr(0644,root,root,0755)
-%{_datadir}/virtualbox
+%{_libdir}/virtualbox/sdk
 
 
 %files -n python-%{name}
 %defattr(0644,root,root,0755)
 %{python_sitelib}/virtualbox
+%{python_sitelib}/vboxapi*
 
 
 %files guest
@@ -470,6 +495,15 @@ PYXP=%{_datadir}/virtualbox/sdk/bindings/xpcom/python/xpcom
 
 
 %changelog
+* Sun Nov 27 2011 Sérgio Basto <sergio@serjux.com> - 4.1.2-1
+- fix bug #1877, the fix is update VirtualBox-OSE to 4.1.x
+- small fix for bug #1979.
+- from 4.1.2.f16 Lubomir Rintel <lkundrak@v3.sk>  
+  - New release Lubomir 
+  - Assign USB devices to vboxusers
+  - Add a web service
+  - Install MIME types for disk images
+
 * Sun Apr 03 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.0.4-1
 - New release
 - Add requires for particular server ABIs
