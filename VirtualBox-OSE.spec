@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.6
-Release:	3%{?prerel:.%{prerel}}%{?dist}
+Release:	4%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -88,6 +88,7 @@ Requires(postun): desktop-file-utils
 
 Requires:	%{name}-kmod = %{version}%{?prereltag}
 Provides:	%{name}-kmod-common = %{version}%{?prereltag}
+Conflicts:	%{name}-guest <= %{version}-%{release}
 
 %description
 A general-purpose full virtualizer and emulator for 32-bit and
@@ -125,6 +126,7 @@ Requires:	xorg-x11-server-Xorg
 Requires:	xorg-x11-xinit
 Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
 Obsoletes:	xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
+Conflicts:	%{name} <= %{version}-%{release}
 %if "%(xserver-sdk-abi-requires 2>/dev/null)"
 Requires:       %(xserver-sdk-abi-requires ansic)
 Requires:       %(xserver-sdk-abi-requires videodrv)
@@ -472,6 +474,9 @@ fi
 
 
 %changelog
+* Mon Dec 5 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-4
+- revert change for "bug #1468, conflict symbols have been fixed upstream".
+
 * Sat Dec 3 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-3
 - increase one release number to override my external link.
 
