@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.6
-Release:	4%{?prerel:.%{prerel}}%{?dist}
+Release:	5%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -63,6 +63,7 @@ BuildRequires:	pam-devel
 BuildRequires:	mkisofs
 BuildRequires:	java-devel >= 1.6
 BuildRequires:	/usr/bin/pdflatex
+BuildRequires:	libpng-devel
 
 # For the X11 module
 BuildRequires:	libdrm-devel
@@ -474,6 +475,9 @@ fi
 
 
 %changelog
+* Mon Dec 5 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-5
+- Now rawhide needs explicit BuildRequires libpng-devel
+
 * Mon Dec 5 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-4
 - revert change for "bug #1468, conflict symbols have been fixed upstream".
 
