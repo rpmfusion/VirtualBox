@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.6
-Release:	5%{?prerel:.%{prerel}}%{?dist}
+Release:	6%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -42,6 +42,7 @@ Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
 Patch20:    VirtualBox-OSE-4.1.2-testmangle.patch
+Patch21:    VirtualBox-OSE-4.1.6-kernel-3.2_compile_fixes.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -167,6 +168,7 @@ find -name '*.py[co]' -delete
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
 %patch20 -p1 -b .testmangle
+%patch21 -p1 -b .kernel3.2
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -475,6 +477,10 @@ fi
 
 
 %changelog
+* Sun Dec 11 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-6
+- added compile fixes for kernel 3.2, although guest client still not start with X, now I got a
+  segfault, but will help who want try guest client with rawhide. 
+
 * Mon Dec 5 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-5
 - Now rawhide needs explicit BuildRequires libpng-devel
 
