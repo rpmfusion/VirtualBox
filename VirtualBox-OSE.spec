@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.6
-Release:	3%{?prerel:.%{prerel}}%{?dist}
+Release:	4%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -219,13 +219,19 @@ install -d $RPM_BUILD_ROOT%{python_sitelib}/virtualbox
 
 # Binaries and Wrapper with Launchers
 install -p -m 0755 obj/bin/VBox.sh $RPM_BUILD_ROOT%{_bindir}/VBox
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxHeadless
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxManage
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBalloonCtrl
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBFE
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxSDL
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VirtualBox
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VirtualBox
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/virtualbox
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxManage
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxmanage
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxSDL
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxsdl
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxVRDP
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxHeadless
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxheadless
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBalloonCtrl
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxballoonctrl
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBFE
 
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
 	obj/bin/VBoxTunctl	\
@@ -281,7 +287,7 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk/installer
 # Icons
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
 	obj/bin/VBox.png
-ln -f $RPM_BUILD_ROOT%{_datadir}/pixmaps/{VBox,virtualbox}.png
+#ln -f $RPM_BUILD_ROOT%{_datadir}/pixmaps/{VBox,virtualbox}.png
 for S in obj/bin/icons/*
 do
 	SIZE=$(basename $S)
@@ -314,6 +320,9 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}	\
 # Ideally, Xorg should autodetect this, but for some reason it no longer does
 install -m 0755 -D %{SOURCE9} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
+
+install -m 0755 -D %{SOURCE10} \
+	$RPM_BUILD_ROOT%{_initrddir}/%{SOURCE10}
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
@@ -403,11 +412,18 @@ fi
 %{_bindir}/VBoxBalloonCtrl
 %{_bindir}/VBoxBFE
 %{_bindir}/VBoxHeadless
+%{_bindir}/vboxheadless
 %{_bindir}/VBoxManage
+%{_bindir}/vboxmanage
 %{_bindir}/VBoxSDL
+%{_bindir}/vboxsdl
 %{_bindir}/VBoxTunctl
 %{_bindir}/VirtualBox
+%{_bindir}/virtualbox
 %{_bindir}/vboxwebsrv
+%{_bindir}/VBoxVRDP
+%{_bindir}/VBoxBalloonCtrl
+%{_bindir}/vboxballoonctrl
 %dir %{_libdir}/virtualbox
 %doc %{_libdir}/virtualbox/*.pdf
 %{_libdir}/virtualbox/*.[^p]*
@@ -437,6 +453,7 @@ fi
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
 %doc COPYING
+%attr(755,root,root) %{_initrddir}/*
 
 
 %files devel
@@ -475,6 +492,11 @@ fi
 
 
 %changelog
+* Mon Dec 12 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-4                                          
+- complete list of commands of VBox command line based on                                             
+  src/VBox/Installer/linux/rpm/VirtualBox.tmpl.spec, revert some cleanups.                            
+- add source vboxweb-service to package. 
+
 * Sat Dec 3 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-3
 - New release
 - fix strings patch
