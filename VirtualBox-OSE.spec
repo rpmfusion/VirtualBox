@@ -14,7 +14,7 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	4.1.2
+Version:	4.1.6
 Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
@@ -29,10 +29,10 @@ Source7:	VirtualBox-OSE-guest.modules
 Source8:	VirtualBox-OSE-vboxresize.desktop
 Source9:	VirtualBox-OSE-00-vboxvideo.conf
 Source10:	vboxweb-service
-Patch1:		VirtualBox-OSE-4.1.2-noupdate.patch
-Patch2:		VirtualBox-OSE-4.0.2-strings.patch
+Patch1:		VirtualBox-OSE-4.1.4-noupdate.patch
+Patch2:		VirtualBox-OSE-4.1.6-strings.patch
 Patch3:		VirtualBox-OSE-4.1.2-libcxx.patch
-Patch5:		VirtualBox-OSE-4.0.2-xorg17.patch
+Patch5:		VirtualBox-OSE-4.1.4-xorg17.patch
 Patch9:		VirtualBox-OSE-3.2.4-optflags.patch
 Patch10:	VirtualBox-OSE-4.0.0-32bit.patch
 Patch11:	VirtualBox-OSE-3.2.0-visibility.patch
@@ -41,16 +41,18 @@ Patch15:	VirtualBox-OSE-4.0.0-makeself.patch
 Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
-Patch19:	VirtualBox-OSE-4.1.2-vboxpci.patch
-Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
+Patch20:    VirtualBox-OSE-4.1.2-testmangle.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	kBuild >= 0.1.98
 BuildRequires:	SDL-devel xalan-c-devel
+%if 0%{?fedora} < 16
+BuildRequires: hal-devel
+%endif
 BuildRequires:	openssl-devel
 BuildRequires:	libcurl-devel
-BuildRequires:	dev86 iasl libxslt-devel xerces-c-devel libXcursor-devel libIDL-devel
+BuildRequires:	dev86 iasl libxslt-devel xerces-c-devel libXcursor-devel libIDL-devel libXcomposite-devel
 BuildRequires:	yasm
 BuildRequires:	pulseaudio-libs-devel
 BuildRequires:	libXmu-devel
@@ -64,6 +66,7 @@ BuildRequires:	pam-devel
 BuildRequires:	mkisofs
 BuildRequires:	java-devel >= 1.6
 BuildRequires:	/usr/bin/pdflatex
+BuildRequires:	libpng-devel
 
 # For the X11 module
 BuildRequires:	libdrm-devel
@@ -120,16 +123,18 @@ Summary:	%{name} Guest Additions
 Group:		System Environment/Base
 Requires:	%{name}-kmod = %{version}
 Provides:	%{name}-kmod-common = %{version}
+%if 0%{?fedora} < 16
 Requires:	hal
+%endif 
 Requires:	xorg-x11-server-Xorg
 Requires:	xorg-x11-xinit
 Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
 Obsoletes:	xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
 Conflicts:	%{name} <= %{version}-%{release}
 %if "%(xserver-sdk-abi-requires 2>/dev/null)"
-Requires:	%(xserver-sdk-abi-requires ansic)
-Requires:	%(xserver-sdk-abi-requires videodrv)
-Requires:	%(xserver-sdk-abi-requires xinput)
+Requires:       %(xserver-sdk-abi-requires ansic)
+Requires:       %(xserver-sdk-abi-requires videodrv)
+Requires:       %(xserver-sdk-abi-requires xinput)
 %endif
 
 
@@ -164,7 +169,6 @@ find -name '*.py[co]' -delete
 %patch16 -p1 -b .usblib
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
-%patch19 -p1 -b .vboxpci
 %patch20 -p1 -b .testmangle
 
 # Remove prebuilt binary tools
@@ -176,7 +180,7 @@ sed -i 's/\r//' COPYING
 
 
 %build
-./configure --disable-kmods --enable-webservice
+./configure --disable-kmods --enable-webservice --disable-java
 . ./env.sh
 
 # VirtualBox build system installs and builds in the same step,
@@ -218,13 +222,20 @@ install -d $RPM_BUILD_ROOT%{python_sitelib}/virtualbox
 
 # Binaries and Wrapper with Launchers
 install -p -m 0755 obj/bin/VBox.sh $RPM_BUILD_ROOT%{_bindir}/VBox
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxHeadless
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxManage
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBalloonCtrl
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBFE
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VBoxSDL
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/VirtualBox
-ln -sf VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VirtualBox
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/virtualbox
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxManage
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxmanage
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxSDL
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxsdl
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxVRDP
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxHeadless
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxheadless
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBalloonCtrl
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxballoonctrl
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBFE
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxbfe
 
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
 	obj/bin/VBoxTunctl	\
@@ -259,17 +270,11 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
 	obj/bin/VBoxSysInfo.sh	\
 	obj/bin/vboxshell.py	\
 	obj/bin/VBoxTestOGL	\
+	obj/bin/VBoxExtPackHelperApp \
 	obj/bin/vboxwebsrv	\
 	obj/bin/VBoxBalloonCtrl	\
 	obj/bin/webtest		\
 	obj/bin/VBoxBFE
-
-# Lowercase aliases
-for F in VBoxBalloonCtrl VBoxHeadless VBoxManage VBoxSDL VirtualBox VBoxBFE
-do
-	ln $RPM_BUILD_ROOT%{_bindir}/$F \
-		$RPM_BUILD_ROOT%{_bindir}/$(echo $F |awk '{print tolower($0)}')
-done
 
 # Language files
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
@@ -286,7 +291,7 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk/installer
 # Icons
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
 	obj/bin/VBox.png
-ln -f $RPM_BUILD_ROOT%{_datadir}/pixmaps/{VBox,virtualbox}.png
+#ln -f $RPM_BUILD_ROOT%{_datadir}/pixmaps/{VBox,virtualbox}.png
 for S in obj/bin/icons/*
 do
 	SIZE=$(basename $S)
@@ -309,10 +314,6 @@ install -m 0755 -D obj/bin/additions/vboxmouse_drv_%{x11_api}.so \
 install -m 0755 -D obj/bin/additions/vboxvideo_drv_%{x11_api}.so \
 	$RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
-# This is no longer needed for a more recent Xorg, since evdev uses udev
-install -m 0755 -D src/VBox/Additions/linux/installer/90-vboxguest.fdi \
-	$RPM_BUILD_ROOT%{_datadir}/hal/fdi/policy/20thirdparty/90-vboxguest.fdi
-
 # Guest tools
 install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}	\
 	obj/bin/additions/mount.vboxsf		\
@@ -323,6 +324,9 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}	\
 # Ideally, Xorg should autodetect this, but for some reason it no longer does
 install -m 0755 -D %{SOURCE9} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
+
+install -m 0755 -D %{SOURCE10} \
+	$RPM_BUILD_ROOT%{_initrddir}/%{SOURCE10}
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
@@ -367,11 +371,6 @@ tar --use-compress-program xz -cf $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{vers
 desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
 	--remove-key=DocPath --remove-category=X-MandrivaLinux-System \
 	--vendor='' obj/bin/virtualbox.desktop
-
-
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 
 %post
 # Group for USB devices
@@ -428,12 +427,14 @@ fi
 %{_bindir}/virtualbox
 %{_bindir}/VirtualBox
 %{_bindir}/vboxwebsrv
+%{_bindir}/VBoxVRDP
 %dir %{_libdir}/virtualbox
 %doc %{_libdir}/virtualbox/*.pdf
 %{_libdir}/virtualbox/*.[^p]*
 %{_libdir}/virtualbox/*.py*
 %{_libdir}/virtualbox/components
 %{_libdir}/virtualbox/nls
+%{_libdir}/virtualbox/VBoxExtPackHelperApp
 %{_libdir}/virtualbox/VBoxManage
 %{_libdir}/virtualbox/VBoxSVC
 %{_libdir}/virtualbox/VBoxTestOGL
@@ -456,6 +457,7 @@ fi
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
 %doc COPYING
+%attr(755,root,root) %{_initrddir}/*
 
 
 %files devel
@@ -483,7 +485,6 @@ fi
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %exclude %{_datadir}/gdm
-%{_datadir}/hal/fdi/policy/20thirdparty/90-vboxguest.fdi
 %config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
 %doc COPYING
@@ -495,11 +496,28 @@ fi
 
 
 %changelog
+* Sat Dec 24 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-1
+- New release
+- drop up streamed patch VirtualBox-OSE-4.1.2-vboxpci.patch 
+- fix strings patch
+- add VirtualBox-OSE-add-VBoxExtPackHelperApp.patch bz #1656
+- redo xorg17 patch (still need some improvements, I will wait for a new change that break the patch) 
+- redo noupdate patch.
+- disable java binding seems non maintained. 
+- some cleanups.
+- bug #2052, drop requirement of HAL in Fedora >= 16.
+- bug #2040, is also fixed (update to 4.1.6).
+- Now rawhide needs explicit BuildRequires libpng-devel
+- complete list of commands of VBox command line based on
+  src/VBox/Installer/linux/rpm/VirtualBox.tmpl.spec, revert some cleanups.
+- add source vboxweb-service to package.
+- merge spec 4.0.4 from Lubomir Rintel <lkundrak@v3.sk>, which re-add BuildRequires: hal-devel on F-15.
+
 * Sun Nov 27 2011 Sérgio Basto <sergio@serjux.com> - 4.1.2-1
 - fix bug #1877, the fix is update VirtualBox-OSE to 4.1.x
 - small fix for bug #1979.
-- from 4.1.2.f16 Lubomir Rintel <lkundrak@v3.sk>  
-  - New release Lubomir 
+- from .f16 * Wed Sep 21 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.1.2-1
+  - New release
   - Assign USB devices to vboxusers
   - Add a web service
   - Install MIME types for disk images
