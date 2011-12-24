@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.8
-Release:	1%{?prerel:.%{prerel}}%{?dist}
+Release:	2%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
