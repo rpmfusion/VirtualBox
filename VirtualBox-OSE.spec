@@ -14,8 +14,8 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	4.1.6
-Release:	4%{?prerel:.%{prerel}}%{?dist}
+Version:	4.1.8
+Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -47,6 +47,9 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	kBuild >= 0.1.98
 BuildRequires:	SDL-devel xalan-c-devel
+%if 0%{?fedora} < 16
+BuildRequires: hal-devel
+%endif
 BuildRequires:	openssl-devel
 BuildRequires:	libcurl-devel
 BuildRequires:	dev86 iasl libxslt-devel xerces-c-devel libXcursor-devel libIDL-devel libXcomposite-devel
@@ -232,6 +235,7 @@ ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBalloonCtrl
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxballoonctrl
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBFE
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxbfe
 
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
 	obj/bin/VBoxTunctl	\
@@ -409,21 +413,21 @@ fi
 %files
 %defattr(-,root,root,-)
 %{_bindir}/VBox
+%{_bindir}/vboxballoonctrl
 %{_bindir}/VBoxBalloonCtrl
+%{_bindir}/vboxbfe
 %{_bindir}/VBoxBFE
-%{_bindir}/VBoxHeadless
 %{_bindir}/vboxheadless
-%{_bindir}/VBoxManage
+%{_bindir}/VBoxHeadless
 %{_bindir}/vboxmanage
-%{_bindir}/VBoxSDL
+%{_bindir}/VBoxManage
 %{_bindir}/vboxsdl
+%{_bindir}/VBoxSDL
 %{_bindir}/VBoxTunctl
-%{_bindir}/VirtualBox
 %{_bindir}/virtualbox
+%{_bindir}/VirtualBox
 %{_bindir}/vboxwebsrv
 %{_bindir}/VBoxVRDP
-%{_bindir}/VBoxBalloonCtrl
-%{_bindir}/vboxballoonctrl
 %dir %{_libdir}/virtualbox
 %doc %{_libdir}/virtualbox/*.pdf
 %{_libdir}/virtualbox/*.[^p]*
@@ -492,6 +496,11 @@ fi
 
 
 %changelog
+* Sat Dec 24 2011 Sérgio Basto <sergio@serjux.com> - 4.1.8-1                                          
+- New release.                                                                                        
+- merge spec 4.0.4 from Lubomir Rintel <lkundrak@v3.sk>, which re-add BuildRequires: hal-devel on     
+  F-15                                                                                                
+
 * Mon Dec 12 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-4                                          
 - complete list of commands of VBox command line based on                                             
   src/VBox/Installer/linux/rpm/VirtualBox.tmpl.spec, revert some cleanups.                            
