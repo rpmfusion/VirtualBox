@@ -41,7 +41,7 @@ Patch15:	VirtualBox-OSE-4.0.0-makeself.patch
 Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
-Patch20:    VirtualBox-OSE-4.1.2-testmangle.patch
+Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
