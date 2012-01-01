@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.8
-Release:	2%{?prerel:.%{prerel}}%{?dist}
+Release:	3%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -496,6 +496,9 @@ fi
 
 
 %changelog
+* Sun Jan 01 2012 Nicolas Chauvet <kwizart@gmail.com> - 4.1.8-3
+- Fix vboxweb-service installation
+
 * Sat Dec 24 2011 Sérgio Basto <sergio@serjux.com> - 4.1.8-2
 - merge spec 4.0.4 from Lubomir Rintel <lkundrak@v3.sk>, which re-add BuildRequires: hal-devel on
   F-15
