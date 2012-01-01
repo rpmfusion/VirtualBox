@@ -326,7 +326,7 @@ install -m 0755 -D %{SOURCE9} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
 install -m 0755 -D %{SOURCE10} \
-	$RPM_BUILD_ROOT%{_initrddir}/
+	$RPM_BUILD_ROOT%{_initrddir}/vboxweb-service
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
