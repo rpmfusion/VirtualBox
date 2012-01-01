@@ -326,7 +326,7 @@ install -m 0755 -D %{SOURCE9} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
 install -m 0755 -D %{SOURCE10} \
-	$RPM_BUILD_ROOT%{_initrddir}/%{SOURCE10}
+	$RPM_BUILD_ROOT%{_initrddir}/
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
@@ -457,7 +457,7 @@ fi
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
 %doc COPYING
-%attr(755,root,root) %{_initrddir}/*
+%attr(755,root,root) %{_initrddir}/vboxweb-service
 
 
 %files devel
