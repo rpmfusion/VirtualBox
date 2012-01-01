@@ -132,9 +132,9 @@ Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
 Obsoletes:	xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
 Conflicts:	%{name} <= %{version}-%{release}
 %if "%(xserver-sdk-abi-requires 2>/dev/null)"
-Requires:       %(xserver-sdk-abi-requires ansic)
-Requires:       %(xserver-sdk-abi-requires videodrv)
-Requires:       %(xserver-sdk-abi-requires xinput)
+Requires:	%(xserver-sdk-abi-requires ansic)
+Requires:	%(xserver-sdk-abi-requires videodrv)
+Requires:	%(xserver-sdk-abi-requires xinput)
 %endif
 
 
