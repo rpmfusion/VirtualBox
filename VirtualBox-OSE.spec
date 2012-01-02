@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.6
-Release:	1%{?prerel:.%{prerel}}%{?dist}
+Release:	2%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -41,7 +41,7 @@ Patch15:	VirtualBox-OSE-4.0.0-makeself.patch
 Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
-Patch20:    VirtualBox-OSE-4.1.2-testmangle.patch
+Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -132,9 +132,9 @@ Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
 Obsoletes:	xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
 Conflicts:	%{name} <= %{version}-%{release}
 %if "%(xserver-sdk-abi-requires 2>/dev/null)"
-Requires:       %(xserver-sdk-abi-requires ansic)
-Requires:       %(xserver-sdk-abi-requires videodrv)
-Requires:       %(xserver-sdk-abi-requires xinput)
+Requires:	%(xserver-sdk-abi-requires ansic)
+Requires:	%(xserver-sdk-abi-requires videodrv)
+Requires:	%(xserver-sdk-abi-requires xinput)
 %endif
 
 
@@ -326,7 +326,7 @@ install -m 0755 -D %{SOURCE9} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
 install -m 0755 -D %{SOURCE10} \
-	$RPM_BUILD_ROOT%{_initrddir}/%{SOURCE10}
+	$RPM_BUILD_ROOT%{_initrddir}/vboxweb-service
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
@@ -457,7 +457,7 @@ fi
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
 %doc COPYING
-%attr(755,root,root) %{_initrddir}/*
+%attr(755,root,root) %{_initrddir}/vboxweb-service
 
 
 %files devel
@@ -496,6 +496,9 @@ fi
 
 
 %changelog
+* Sun Jan 01 2012 Nicolas Chauvet <kwizart@gmail.com> - 4.1.6-2
+- Fix vboxweb-service installation
+
 * Sat Dec 24 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-1
 - New release
 - drop up streamed patch VirtualBox-OSE-4.1.2-vboxpci.patch 
