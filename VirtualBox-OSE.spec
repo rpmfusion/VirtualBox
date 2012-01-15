@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.8
-Release:	1%{?prerel:.%{prerel}}%{?dist}.1
+Release:	2%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -387,8 +387,10 @@ getent group vboxusers >/dev/null || groupadd -r vboxusers
 # Assign USB devices
 if /sbin/udevadm control --reload-rules >/dev/null 2>&1
 then
-	/sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
-	/sbin/udevadm settle >/dev/null 2>&1 || :
+#	/sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
+#	/sbin/udevadm settle >/dev/null 2>&1 || :
+    systemctl restart udev-trigger.service
+    systemctl restart udev-settle.service
 fi
 
 
@@ -496,6 +498,10 @@ fi
 
 
 %changelog
+* Tue Jan 15 2012 Sérgio Basto <sergio@serjux.com> - 4.1.8-2
+- Try fix usb/udev problem on updates without reboot computer.
+- Improves on xorg17 patch, which is the xorg on guest part, we try build with our sources!.
+
 * Sun Jan 01 2012 Nicolas Chauvet <kwizart@gmail.com> - 4.1.8-1.1
 - Fix vboxweb-service installation
 

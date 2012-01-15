@@ -27,37 +27,25 @@ diff --git a/src/VBox/Additions/common/crOpenGL/Makefile.kmk b/src/VBox/Addition
   VBoxOGL_DEFS     += VBOX_NO_NATIVEGL
  endif
  
-diff --git a/src/VBox/Additions/x11/Makefile.kmk b/src/VBox/Additions/x11/Makefile.kmk
---- a/src/VBox/Additions/x11/Makefile.kmk
-+++ b/src/VBox/Additions/x11/Makefile.kmk
-@@ -17,6 +17,10 @@
- SUB_DEPTH = ../../../..
- include $(KBUILD_PATH)/subheader.kmk
- 
-+ifn1of ($(XSERVER_VERSION), 13 14 15 16 17 18 19 110)
-+ XSERVER_VERSION := 17
-+endif
-+
- # Include sub-makefiles.
- if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris)
-  include $(PATH_SUB_CURRENT)/VBoxClient/Makefile.kmk
 diff --git a/src/VBox/Additions/x11/vboxmouse/Makefile.kmk b/src/VBox/Additions/x11/vboxmouse/Makefile.kmk
 --- a/src/VBox/Additions/x11/vboxmouse/Makefile.kmk
 +++ b/src/VBox/Additions/x11/vboxmouse/Makefile.kmk
-@@ -56,6 +56,18 @@
- endif
+@@ -53,9 +53,18 @@
+ 	mouse.c \
+ 	pnp.c \
+ 	VBoxUtils_68.c
+-endif
+-
  
- 
-+ifeq ($(KBUILD_TARGET), linux)
-+DLLS += vboxmouse_drv_$(XSERVER_VERSION)
-+vboxmouse_drv_$(XSERVER_VERSION)_TEMPLATE = VBOXGUESTR3XORGMOD
-+vboxmouse_drv_$(XSERVER_VERSION)_DEFS = XFree86Server IN_MODULE XFree86Module XFree86LOADER XINPUT XORG_7X IN_XF86_MODULE \
++DLLS += vboxmouse_drv_17
++vboxmouse_drv_17_TEMPLATE = VBOXGUESTR3XORGMOD
++vboxmouse_drv_17_DEFS = XFree86Server IN_MODULE XFree86Module XFree86LOADER XINPUT XORG_7X IN_XF86_MODULE \
 +		NO_ANSIC
-+vboxmouse_drv_$(XSERVER_VERSION)_INCS := \
++vboxmouse_drv_17_INCS := \
 +   /usr/include/x11 \
 +   /usr/include/xorg \
 +   /usr/include/pixman-1
-+vboxmouse_drv_$(XSERVER_VERSION) = \
++vboxmouse_drv_17 = \
 +	vboxmouse_15.c
 +else
  #
@@ -89,80 +77,18 @@ diff --git a/src/VBox/Additions/x11/vboxmouse/Makefile.kmk b/src/VBox/Additions/
       TESTING += $(vboxmouse_drv_17_0_OUTDIR)/tstvboxmouse17.run
       OTHERS += $(vboxmouse_drv_17_0_OUTDIR)/tstvboxmouse17.run
  $$(vboxmouse_drv_17_0_OUTDIR)/tstvboxmouse17.run: $$(vboxmouse_drv_17_1_STAGE_TARGET)
---- a/src/VBox/Additions/x11/vboxvideo/Makefile.kmk
-+++ b/src/VBox/Additions/x11/vboxvideo/Makefile.kmk
-@@ -89,7 +89,7 @@ vboxvideo_drv_SOURCES = \
- #         base keywords instead of using .solaris or .linux.
- #         Also it is *important* to use := and not = when deriving a property.
- #
--DLLS += vboxvideo_drv_70
-+#DLLS += vboxvideo_drv_70
- vboxvideo_drv_70_TEMPLATE = VBOXGUESTR3XORGMOD
- if1of ($(KBUILD_TARGET), linux)
-  vboxvideo_drv_70_CFLAGS += \
-@@ -112,7 +112,7 @@ vboxvideo_drv_70_SOURCES  = $(vboxvideo_drv_SOURCES)
- #
- # vboxvideo_drv_71
- #
--DLLS += vboxvideo_drv_71
-+#DLLS += vboxvideo_drv_71
- vboxvideo_drv_71_TEMPLATE = VBOXGUESTR3XORGMOD
- vboxvideo_drv_71_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
- vboxvideo_drv_71_DEFS := $(vboxvideo_drv_70_DEFS)
-@@ -127,7 +127,7 @@ vboxvideo_drv_71_SOURCES  = $(vboxvideo_drv_SOURCES)
- #
- # vboxvideo_drv_13
- #
--DLLS += vboxvideo_drv_13
-+#DLLS += vboxvideo_drv_13
- vboxvideo_drv_13_TEMPLATE = VBOXGUESTR3XORGMOD
- vboxvideo_drv_13_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
- vboxvideo_drv_13_DEFS := $(vboxvideo_drv_70_DEFS) VBOXVIDEO_13
-@@ -146,7 +146,7 @@ vboxvideo_drv_13_SOURCES = $(vboxvideo_drv_SOURCES)
- #
- # vboxvideo_drv_14
- #
--DLLS += vboxvideo_drv_14
-+#DLLS += vboxvideo_drv_14
- vboxvideo_drv_14_TEMPLATE = VBOXGUESTR3XORGMOD
- vboxvideo_drv_14_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
- vboxvideo_drv_14_DEFS := $(vboxvideo_drv_13_DEFS)
-@@ -165,7 +165,7 @@ vboxvideo_drv_14_SOURCES  = $(vboxvideo_drv_SOURCES)
- #
- # vboxvideo_drv_15
- #
--DLLS += vboxvideo_drv_15
-+#DLLS += vboxvideo_drv_15
- vboxvideo_drv_15_TEMPLATE = VBOXGUESTR3XORGMOD
- vboxvideo_drv_15_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
- vboxvideo_drv_15_DEFS := $(vboxvideo_drv_13_DEFS) NO_ANSIC PCIACCESS \
-@@ -192,7 +192,7 @@ endif
- #
- # vboxvideo_drv_16
- #
--DLLS += vboxvideo_drv_16
-+#DLLS += vboxvideo_drv_16
- vboxvideo_drv_16_TEMPLATE = VBOXGUESTR3XORGMOD
- vboxvideo_drv_16_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
- vboxvideo_drv_16_DEFS := $(vboxvideo_drv_15_DEFS)
-@@ -218,20 +218,32 @@ vboxvideo_drv_17_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
- vboxvideo_drv_17_DEFS := $(vboxvideo_drv_15_DEFS)
- ## @todo replace $(VBOX_PATH_X11_ROOT)/xorg-server-1.6.0-local
- vboxvideo_drv_17_INCS = \
--	$(VBOX_PATH_X11_ROOT)/fontsproto-2.1.0 \
--	$(VBOX_PATH_X11_ROOT)/glproto-1.4.10 \
--	$(VBOX_PATH_X11_ROOT)/mesa-7.2/include \
--	$(VBOX_PATH_X11_ROOT)/inputproto-1.9.99.902 \
--	$(VBOX_PATH_X11_ROOT)/libdrm-2.4.13 \
--	$(VBOX_PATH_X11_ROOT)/libpciaccess-0.10.8 \
--	$(VBOX_PATH_X11_ROOT)/pixman-0.16.0 \
--	$(VBOX_PATH_X11_ROOT)/randrproto-1.3.0 \
--	$(VBOX_PATH_X11_ROOT)/renderproto-0.11 \
--	$(VBOX_PATH_X11_ROOT)/xextproto-7.1.1 \
--	$(VBOX_PATH_X11_ROOT)/xf86driproto-2.1.0 \
--	$(VBOX_PATH_X11_ROOT)/xorg-server-1.6.99-20090831 \
--	$(VBOX_PATH_X11_ROOT)/xorg-server-1.6.0-local \
--	$(VBOX_PATH_X11_ROOT)/xproto-7.0.18
+--- a/src/VBox/Additions/x11/vboxvideo/Makefile.kmk	2011-12-19 12:58:57.000000000 +0000
++++ b/src/VBox/Additions/x11/vboxvideo/Makefile.kmk	2012-01-12 03:47:06.381765975 +0000
+@@ -88,6 +88,42 @@ vboxvideo_drv_SOURCES = \
+ 	$(PATH_ROOT)/src/VBox/Runtime/common/alloc/heapsimple.cpp \
+ 	$(PATH_ROOT)/src/VBox/Runtime/common/alloc/heapoffset.cpp
+ 
++DLLS += vboxvideo_drv_17
++vboxvideo_drv_17_TEMPLATE = VBOXGUESTR3XORGMOD
++vboxvideo_drv_17_CFLAGS += -Wno-conversion -Wno-unused-parameter $(VBOX_GCC_Wno-variadic-macros) # template?
++vboxvideo_drv_17_DEFS := XFree86Server IN_MODULE XFree86Module XFree86LOADER XORG_7X RENDER=1 \
++	IN_XF86_MODULE IN_RT_STATIC VBOXVIDEO_13 NO_ANSIC PCIACCESS VBOX_NO_LOW_COLOUR VBOX_DRI
++vboxvideo_drv_17_INCS = \
 +	/usr/include/drm \
 +	/usr/include/X11/dri \
 +	/usr/include/pixman-1 \
@@ -189,36 +115,34 @@ diff --git a/src/VBox/Additions/x11/vboxmouse/Makefile.kmk b/src/VBox/Additions/
 +	/usr/share/xorg-x11-server-source/Xext \
 +	/usr/share/xorg-x11-server-source/render \
 +	/usr/share/xorg-x11-server-source/hw/xfree86/parser
- vboxvideo_drv_17_INCS += $(PATH_ROOT)/src/VBox/Runtime/include
- vboxvideo_drv_17_SOURCES := $(vboxvideo_drv_15_SOURCES)
++vboxvideo_drv_17_INCS += $(PATH_ROOT)/src/VBox/Runtime/include
++vboxvideo_drv_17_SOURCES = $(vboxvideo_drv_SOURCES) edid.c vboxvideo_dri.c
++
++ifdef NOT_FEDORA_VBOX_WITH_TESTCASES
  
-@@ -239,7 +251,7 @@ vboxvideo_drv_17_SOURCES := $(vboxvideo_drv_15_SOURCES)
  #
- # vboxvideo_drv_18
- #
--DLLS += vboxvideo_drv_18
-+#DLLS += vboxvideo_drv_18
- vboxvideo_drv_18_TEMPLATE = VBOXGUESTR3XORGMOD
- vboxvideo_drv_18_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
- vboxvideo_drv_18_DEFS := $(vboxvideo_drv_15_DEFS)
-@@ -266,7 +278,7 @@ vboxvideo_drv_18_SOURCES := $(vboxvideo_drv_15_SOURCES)
- #
- # vboxvideo_drv_19
- #
--DLLS += vboxvideo_drv_19
-+#DLLS += vboxvideo_drv_19
- vboxvideo_drv_19_TEMPLATE = VBOXGUESTR3XORGMOD
- vboxvideo_drv_19_CFLAGS := $(vboxvideo_drv_70_CFLAGS)
- vboxvideo_drv_19_DEFS := $(vboxvideo_drv_15_DEFS)
-@@ -292,7 +304,7 @@ vboxvideo_drv_19_SOURCES := $(vboxvideo_drv_15_SOURCES)
+ # vboxvideo_drv_70
+@@ -354,7 +390,6 @@ vboxvideo_drv_111_SOURCES := $(vboxvideo
  
  # Check the undefined symbols in the X.Org modules against lists of allowed
  # symbols.  Not very elegant, but it will catch problems early.
 -ifdef VBOX_WITH_TESTCASES
-+ifdef NOT_VBOX_WITH_TESTCASES
  # ifndef VBOX_ONLY_ADDITIONS
    if1of ($(KBUILD_TARGET),linux solaris)
     ifeq ($(KBUILD_HOST_ARCH),$(KBUILD_TARGET_ARCH))
--- 
-1.7.3.4
-
+--- a/src/VBox/Additions/x11/vboxvideo/testcase/Makefile.kmk	2012-01-12 19:57:53.762613198 +0000
++++ b/src/VBox/Additions/x11/vboxvideo/testcase/Makefile.kmk	2012-01-12 20:01:17.296596446 +0000
+@@ -36,11 +36,11 @@ endif # !VBOX_ONLY_SDK
+ #
+ tstSetModeXOrg_TEMPLATE = VBOXR3TSTEXE
+ tstSetModeXOrg_CFLAGS += -std=c99
+-tstSetModeXOrg_DEFS = $(filter-out IN_RT_STATIC,$(vboxvideo_drv_15_DEFS)) TESTCASE
++tstSetModeXOrg_DEFS = $(filter-out IN_RT_STATIC,$(vboxvideo_drv_17_DEFS)) TESTCASE
+ tstSetModeXOrg_SOURCES  = \
+ 	tstSetModeXOrg.c \
+ 	../setmode.c
+-tstSetModeXOrg_INCS = $(vboxvideo_drv_15_INCS)
++tstSetModeXOrg_INCS = $(vboxvideo_drv_17_INCS)
+ 
+ 
+ # generate rules.
