@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.8
-Release:	3%{?prerel:.%{prerel}}%{?dist}
+Release:	4%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -42,6 +42,7 @@ Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
 Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
+Patch21:	VirtualBox-OSE-4.1.8-gcc47.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -170,6 +171,7 @@ find -name '*.py[co]' -delete
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
 %patch20 -p1 -b .testmangle
+%patch21 -p1 -b .gcc47
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -387,8 +389,10 @@ getent group vboxusers >/dev/null || groupadd -r vboxusers
 # Assign USB devices
 if /sbin/udevadm control --reload-rules >/dev/null 2>&1
 then
-	/sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
-	/sbin/udevadm settle >/dev/null 2>&1 || :
+#	/sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
+#	/sbin/udevadm settle >/dev/null 2>&1 || :
+    systemctl restart udev-trigger.service
+    systemctl restart udev-settle.service
 fi
 
 
@@ -496,6 +500,14 @@ fi
 
 
 %changelog
+* Tue Jan 15 2012 Sérgio Basto <sergio@serjux.com> - 4.1.8-4
+- Patch to allow to build with GCC 4.7
+- Try fix usb/udev problem on updates without reboot computer.
+- Improves on xorg17 patch, which is the xorg on guest part, we try build with our sources!. 
+  Currently broken on rawhide with xorg-x11-server-1.11.99.901-2.20120103.fc17. As mentioned on
+  https://bugs.freedesktop.org/show_bug.cgi?id=43235, it fix on git, so I hope that will be fix on 
+  next build of xorg-x11-server.
+
 * Sun Jan 01 2012 Nicolas Chauvet <kwizart@gmail.com> - 4.1.8-3
 - Fix vboxweb-service installation
 
