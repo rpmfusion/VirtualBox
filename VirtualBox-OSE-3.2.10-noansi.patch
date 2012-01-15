@@ -5,6 +5,8 @@ Subject: [PATCH] Build as c99
 
 On Rawhide as of 01 Sep 2009 x86_64 /usr/include/bits/mathinline.h
 contains a non-iso/ansi c inline assembly construct.
+
+add by Sérgio M. B. file x11/vboxvideo/testcase/Makefile.kmk
 ---
  Config.kmk |    4 ++--
  1 files changed, 2 insertions(+), 2 deletions(-)
@@ -31,6 +33,14 @@ index 47394a4..83c6243 100644
  TEMPLATE_VBOXGUESTR3XORGMOD_DEFS = $(TEMPLATE_VBOXGUESTR3DLL_DEFS) LOG_TO_BACKDOOR VBOX_GUESTR3XORGMOD RTMEM_NO_WRAP_TO_EF_APIS
  ifeq ($(KBUILD_TARGET_ARCH),amd64)
   TEMPLATE_VBOXGUESTR3XORGMOD_DEFS += _XSERVER64
--- 
-1.7.3.1
-
+--- a/src/VBox/Additions/x11/vboxvideo/testcase/Makefile.kmk	2012-01-12 20:46:24.695866363 +0000
++++ b/src/VBox/Additions/x11/vboxvideo/testcase/Makefile.kmk	2012-01-12 20:46:38.202992949 +0000
+@@ -35,7 +35,7 @@ endif # !VBOX_ONLY_SDK
+ # tstSetModeXOrg
+ #
+ tstSetModeXOrg_TEMPLATE = VBOXR3TSTEXE
+-tstSetModeXOrg_CFLAGS += -std=c99
++tstSetModeXOrg_CFLAGS += -std=gnu99
+ tstSetModeXOrg_DEFS = $(filter-out IN_RT_STATIC,$(vboxvideo_drv_17_DEFS)) TESTCASE
+ tstSetModeXOrg_SOURCES  = \
+ 	tstSetModeXOrg.c \
