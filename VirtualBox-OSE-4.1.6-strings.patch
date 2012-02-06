@@ -76,7 +76,7 @@ index 9319696..0e782e0 100644
 +WARNING: The character device /dev/vboxdrv does not exist. Try running
  
 -           sudo /etc/init.d/vboxdrv restart
-+           '/sbin/udevtrigger' (as root)
++           'systemctl restart udev-trigger.service' (as root)
  
 -         and if that is not successful, try to re-install the package.
 +         and if that is not successful, then you're in situation that

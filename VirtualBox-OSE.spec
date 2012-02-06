@@ -14,8 +14,8 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	4.1.6
-Release:	2%{?prerel:.%{prerel}}%{?dist}
+Version:	4.1.8
+Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -387,8 +387,10 @@ getent group vboxusers >/dev/null || groupadd -r vboxusers
 # Assign USB devices
 if /sbin/udevadm control --reload-rules >/dev/null 2>&1
 then
-	/sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
-	/sbin/udevadm settle >/dev/null 2>&1 || :
+#	/sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
+#	/sbin/udevadm settle >/dev/null 2>&1 || :
+    systemctl restart udev-trigger.service
+    systemctl restart udev-settle.service
 fi
 
 
@@ -496,21 +498,26 @@ fi
 
 
 %changelog
+* Mon Feb 6 2012 Sérgio Basto <sergio@serjux.com> - 4.1.8-1
+- New release.
+- Try fix usb/udev problem on updates without reboot computer.
+- Improves on xorg17 patch, which is the xorg on guest part, we try build with our sources!.
+
 * Sun Jan 01 2012 Nicolas Chauvet <kwizart@gmail.com> - 4.1.6-2
 - Fix vboxweb-service installation
 
 * Sat Dec 24 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-1
 - New release
-- drop up streamed patch VirtualBox-OSE-4.1.2-vboxpci.patch 
+- drop up streamed patch VirtualBox-OSE-4.1.2-vboxpci.patch
 - fix strings patch
 - add VirtualBox-OSE-add-VBoxExtPackHelperApp.patch bz #1656
-- redo xorg17 patch (still need some improvements, I will wait for a new change that break the patch) 
+- redo xorg17 patch (still need some improvements, I will wait for a new change that break the patch)
 - redo noupdate patch.
-- disable java binding seems non maintained. 
+- disable java binding seems unmaintained.
 - some cleanups.
 - bug #2052, drop requirement of HAL in Fedora >= 16.
 - bug #2040, is also fixed (update to 4.1.6).
-- Now rawhide needs explicit BuildRequires libpng-devel
+- Now rawhide needs explicit BuildRequires libpng-devel.
 - complete list of commands of VBox command line based on
   src/VBox/Installer/linux/rpm/VirtualBox.tmpl.spec, revert some cleanups.
 - add source vboxweb-service to package.
