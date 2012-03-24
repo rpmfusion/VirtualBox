@@ -512,39 +512,57 @@ fi
   apply these fixes to VBox 4.1.10 as well." and add -lssl and -lcrypto by my self.
 - drop Patch to allow to build with GCC 4.7
 
-* Tue Jan 15 2012 Sérgio Basto <sergio@serjux.com> - 4.1.8-2
+* Tue Jan 15 2012 Sérgio Basto <sergio@serjux.com> - 4.1.8-4
+- Patch to allow to build with GCC 4.7
 - Try fix usb/udev problem on updates without reboot computer.
 - Improves on xorg17 patch, which is the xorg on guest part, we try build with our sources!.
+  Currently broken on rawhide with xorg-x11-server-1.11.99.901-2.20120103.fc17. As mentioned on
+  https://bugs.freedesktop.org/show_bug.cgi?id=43235, it fix on git, so I hope that will be fix on
+  next build of xorg-x11-server.
 
-* Sun Jan 01 2012 Nicolas Chauvet <kwizart@gmail.com> - 4.1.8-1.1
+* Sun Jan 01 2012 Nicolas Chauvet <kwizart@gmail.com> - 4.1.8-3
 - Fix vboxweb-service installation
 
-* Sat Dec 24 2011 Sérgio Basto <sergio@serjux.com> - 4.1.8-1
-- New release.
+* Sat Dec 24 2011 Sérgio Basto <sergio@serjux.com> - 4.1.8-2
 - merge spec 4.0.4 from Lubomir Rintel <lkundrak@v3.sk>, which re-add BuildRequires: hal-devel on
   F-15
 
-* Mon Dec 12 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-4
+* Fri Dec 23 2011 Sérgio Basto <sergio@serjux.com> - 4.1.8-1
+- New release.
+- remove backported patch, compile_fixes, for reference https://www.virtualbox.org/ticket/9743.
+
+* Mon Dec 12 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-7
 - complete list of commands of VBox command line based on
   src/VBox/Installer/linux/rpm/VirtualBox.tmpl.spec, revert some cleanups.
 - add source vboxweb-service to package.
 
+* Sun Dec 11 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-6
+- added compile fixes for kernel 3.2, although guest client still not start with X, now I got a
+  segfault, but will help who want try guest client with rawhide.
+
+* Mon Dec 5 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-5
+- Now rawhide needs explicit BuildRequires libpng-devel
+
+* Mon Dec 5 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-4
+- revert change for "bug #1468, conflict symbols have been fixed upstream".
+
 * Sat Dec 3 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-3
-- New release
-- fix strings patch
-- redo xorg17 patch (still need some improvements, I will wait for a new change that break the patch)
-- redo noupdate patch.
-- some cleanups.
-- drop upstream patch VirtualBox-OSE-4.1.2-vboxpci.patch
-- bug #1656 add VirtualBox-OSE-add-VBoxExtPackHelperApp.patch
-- disable java binding, seems non maintained and doesn't compile with java-1.7.0-openjdk-devel.
+- increase one release number to override my external link.
+
+* Sat Dec 3 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-2
+- bug #1468, conflict symbols have been fixed upstream.
 - bug #2052, drop requirement of HAL in Fedora >= 16.
 - bug #2040, is also fixed (update to 4.1.6).
-- Now rawhide needs explicit BuildRequires libpng-devel
-- Bump to release 3 to overwrite my external link.
 
-* Sat Nov 26 2011 Sérgio Basto <sergio@serjux.com> - 4.1.2-2
-- small fix for bug #1979.
+* Fri Dec 2 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-1
+- New release
+- drop up streamed patch VirtualBox-OSE-4.1.2-vboxpci.patch
+- fix strings patch
+- add VirtualBox-OSE-add-VBoxExtPackHelperApp.patch bz #1656
+- redo xorg17 patch (still need some improvements, I will wait for a new change that break the patch)
+- redo noupdate patch.
+- disable java binding seems non maintained.
+- some cleanups.
 
 * Wed Sep 21 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.1.2-1
 - New release
