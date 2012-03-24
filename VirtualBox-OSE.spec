@@ -517,7 +517,7 @@ fi
 - Try fix usb/udev problem on updates without reboot computer.
 - Improves on xorg17 patch, which is the xorg on guest part, we try build with our sources!.
   Currently broken on rawhide with xorg-x11-server-1.11.99.901-2.20120103.fc17. As mentioned on
-  https://bugs.freedesktop.org/show_bug.cgi?id=43235, it fix on git, so I hope that will be fix on 
+  https://bugs.freedesktop.org/show_bug.cgi?id=43235, it fix on git, so I hope that will be fix on
   next build of xorg-x11-server.
 
 * Sun Jan 01 2012 Nicolas Chauvet <kwizart@gmail.com> - 4.1.8-3
@@ -538,7 +538,7 @@ fi
 
 * Sun Dec 11 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-6
 - added compile fixes for kernel 3.2, although guest client still not start with X, now I got a
-  segfault, but will help who want try guest client with rawhide. 
+  segfault, but will help who want try guest client with rawhide.
 
 * Mon Dec 5 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-5
 - Now rawhide needs explicit BuildRequires libpng-devel
@@ -556,12 +556,12 @@ fi
 
 * Fri Dec 2 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-1
 - New release
-- drop up streamed patch VirtualBox-OSE-4.1.2-vboxpci.patch 
+- drop up streamed patch VirtualBox-OSE-4.1.2-vboxpci.patch
 - fix strings patch
 - add VirtualBox-OSE-add-VBoxExtPackHelperApp.patch bz #1656
-- redo xorg17 patch (still need some improvements, I will wait for a new change that break the patch) 
+- redo xorg17 patch (still need some improvements, I will wait for a new change that break the patch)
 - redo noupdate patch.
-- disable java binding seems non maintained. 
+- disable java binding seems non maintained.
 - some cleanups.
 
 * Wed Sep 21 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.1.2-1
