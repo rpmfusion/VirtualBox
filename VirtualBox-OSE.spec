@@ -14,7 +14,7 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	4.1.10
+Version:	4.1.12
 Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
@@ -42,9 +42,6 @@ Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
 Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
-Patch22:	VirtualBox-OSE-4.1.10-gsoap.patch
-
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	kBuild >= 0.1.98
 BuildRequires:	SDL-devel xalan-c-devel
@@ -90,8 +87,6 @@ ExclusiveArch:	i586 x86_64
 ExclusiveArch:	i386 x86_64
 %endif
 
-Requires(post): desktop-file-utils
-Requires(postun): desktop-file-utils
 Requires(post): systemd-units
 
 Requires:	%{name}-kmod = %{version}%{?prereltag}
@@ -174,7 +169,6 @@ find -name '*.py[co]' -delete
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
 %patch20 -p1 -b .testmangle
-%patch22 -p1 -b .gsoap
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -503,6 +497,11 @@ fi
 
 
 %changelog
+* Tue Apr 3 2012 Sérgio Basto <sergio@serjux.com> - 4.1.12-1
+- New release.
+- drop buildroot
+- drop the backported patch.
+
 * Fri Mar 23 2012 Sérgio Basto <sergio@serjux.com> - 4.1.10-1
 - New release.
 - Upsteam says that java stuff is fiexd , https://www.virtualbox.org/ticket/9848#comment:5
