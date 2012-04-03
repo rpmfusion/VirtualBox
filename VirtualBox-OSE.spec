@@ -14,7 +14,7 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	4.1.8
+Version:	4.1.10
 Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
@@ -42,6 +42,7 @@ Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
 Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
+Patch22:	VirtualBox-OSE-4.1.10-gsoap.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -52,10 +53,9 @@ BuildRequires: hal-devel
 %endif
 BuildRequires:	openssl-devel
 BuildRequires:	libcurl-devel
-BuildRequires:	dev86 iasl libxslt-devel xerces-c-devel libXcursor-devel libIDL-devel libXcomposite-devel
+BuildRequires:	dev86 iasl libxslt-devel xerces-c-devel libIDL-devel
 BuildRequires:	yasm
 BuildRequires:	pulseaudio-libs-devel
-BuildRequires:	libXmu-devel
 BuildRequires:	python-devel
 BuildRequires:	desktop-file-utils
 BuildRequires:	libcap-devel
@@ -77,6 +77,9 @@ BuildRequires:	pixman-devel
 BuildRequires:	xorg-x11-proto-devel
 BuildRequires:	xorg-x11-server-source
 BuildRequires:	xorg-x11-server-devel
+BuildRequires:	libXcursor-devel
+BuildRequires:	libXcomposite-devel
+BuildRequires:	libXmu-devel
 
 # Plague-specific weirdness
 %if 0%{?fedora} > 11 || 0%{?rhel} > 5
@@ -89,6 +92,7 @@ ExclusiveArch:	i386 x86_64
 
 Requires(post): desktop-file-utils
 Requires(postun): desktop-file-utils
+Requires(post): systemd-units
 
 Requires:	%{name}-kmod = %{version}%{?prereltag}
 Provides:	%{name}-kmod-common = %{version}%{?prereltag}
@@ -154,7 +158,7 @@ which is generated during the build of main package.
 
 
 %prep
-%setup -q -n VirtualBox-%{version}_OSE
+%setup -q -n VirtualBox-%{version}
 find -name '*.py[co]' -delete
 
 %patch1 -p1 -b .noupdates
@@ -170,6 +174,7 @@ find -name '*.py[co]' -delete
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
 %patch20 -p1 -b .testmangle
+%patch22 -p1 -b .gsoap
 
 # Remove prebuilt binary tools
 rm -rf kBuild
@@ -180,7 +185,7 @@ sed -i 's/\r//' COPYING
 
 
 %build
-./configure --disable-kmods --enable-webservice --disable-java
+./configure --disable-kmods --enable-webservice 
 . ./env.sh
 
 # VirtualBox build system installs and builds in the same step,
@@ -498,39 +503,72 @@ fi
 
 
 %changelog
-* Mon Feb 6 2012 Sérgio Basto <sergio@serjux.com> - 4.1.8-1
+* Fri Mar 23 2012 Sérgio Basto <sergio@serjux.com> - 4.1.10-1
 - New release.
+- Upsteam says that java stuff is fiexd , https://www.virtualbox.org/ticket/9848#comment:5
+- Upsteam says that have compile fixes for kernel 3.3-rc1 (in changelog).
+- backport fix for web-service with newer versions of GSOAP, Changeset 40476 and 40477 in vbox, kindly
+  fixed from Frank Mehnert "The real fix can be found in r40476 and r40477. You should be able to 
+  apply these fixes to VBox 4.1.10 as well." and add -lssl and -lcrypto by my self.
+- drop Patch to allow to build with GCC 4.7
+
+* Tue Jan 15 2012 Sérgio Basto <sergio@serjux.com> - 4.1.8-4
+- Patch to allow to build with GCC 4.7
 - Try fix usb/udev problem on updates without reboot computer.
 - Improves on xorg17 patch, which is the xorg on guest part, we try build with our sources!.
+  Currently broken on rawhide with xorg-x11-server-1.11.99.901-2.20120103.fc17. As mentioned on
+  https://bugs.freedesktop.org/show_bug.cgi?id=43235, it fix on git, so I hope that will be fix on
+  next build of xorg-x11-server.
 
-* Sun Jan 01 2012 Nicolas Chauvet <kwizart@gmail.com> - 4.1.6-2
+* Sun Jan 01 2012 Nicolas Chauvet <kwizart@gmail.com> - 4.1.8-3
 - Fix vboxweb-service installation
 
-* Sat Dec 24 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-1
+* Sat Dec 24 2011 Sérgio Basto <sergio@serjux.com> - 4.1.8-2
+- merge spec 4.0.4 from Lubomir Rintel <lkundrak@v3.sk>, which re-add BuildRequires: hal-devel on
+  F-15
+
+* Fri Dec 23 2011 Sérgio Basto <sergio@serjux.com> - 4.1.8-1
+- New release.
+- remove backported patch, compile_fixes, for reference https://www.virtualbox.org/ticket/9743.
+
+* Mon Dec 12 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-7
+- complete list of commands of VBox command line based on
+  src/VBox/Installer/linux/rpm/VirtualBox.tmpl.spec, revert some cleanups.
+- add source vboxweb-service to package.
+
+* Sun Dec 11 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-6
+- added compile fixes for kernel 3.2, although guest client still not start with X, now I got a
+  segfault, but will help who want try guest client with rawhide.
+
+* Mon Dec 5 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-5
+- Now rawhide needs explicit BuildRequires libpng-devel
+
+* Mon Dec 5 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-4
+- revert change for "bug #1468, conflict symbols have been fixed upstream".
+
+* Sat Dec 3 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-3
+- increase one release number to override my external link.
+
+* Sat Dec 3 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-2
+- bug #1468, conflict symbols have been fixed upstream.
+- bug #2052, drop requirement of HAL in Fedora >= 16.
+- bug #2040, is also fixed (update to 4.1.6).
+
+* Fri Dec 2 2011 Sérgio Basto <sergio@serjux.com> - 4.1.6-1
 - New release
 - drop up streamed patch VirtualBox-OSE-4.1.2-vboxpci.patch
 - fix strings patch
 - add VirtualBox-OSE-add-VBoxExtPackHelperApp.patch bz #1656
 - redo xorg17 patch (still need some improvements, I will wait for a new change that break the patch)
 - redo noupdate patch.
-- disable java binding seems unmaintained.
+- disable java binding seems non maintained.
 - some cleanups.
-- bug #2052, drop requirement of HAL in Fedora >= 16.
-- bug #2040, is also fixed (update to 4.1.6).
-- Now rawhide needs explicit BuildRequires libpng-devel.
-- complete list of commands of VBox command line based on
-  src/VBox/Installer/linux/rpm/VirtualBox.tmpl.spec, revert some cleanups.
-- add source vboxweb-service to package.
-- merge spec 4.0.4 from Lubomir Rintel <lkundrak@v3.sk>, which re-add BuildRequires: hal-devel on F-15.
 
-* Sun Nov 27 2011 Sérgio Basto <sergio@serjux.com> - 4.1.2-1
-- fix bug #1877, the fix is update VirtualBox-OSE to 4.1.x
-- small fix for bug #1979.
-- from .f16 * Wed Sep 21 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.1.2-1
-  - New release
-  - Assign USB devices to vboxusers
-  - Add a web service
-  - Install MIME types for disk images
+* Wed Sep 21 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.1.2-1
+- New release
+- Assign USB devices to vboxusers
+- Add a web service
+- Install MIME types for disk images
 
 * Sun Apr 03 2011 Lubomir Rintel <lkundrak@v3.sk> - 4.0.4-1
 - New release
