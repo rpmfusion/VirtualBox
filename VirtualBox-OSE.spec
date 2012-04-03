@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.10
-Release:	1%{?prerel:.%{prerel}}%{?dist}
+Release:	2%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -503,6 +503,9 @@ fi
 
 
 %changelog
+* Tue Apr 3 2012 Sérgio Basto <sergio@serjux.com> - 4.1.10-2
+- do new tag build.
+
 * Fri Mar 23 2012 Sérgio Basto <sergio@serjux.com> - 4.1.10-1
 - New release.
 - Upsteam says that java stuff is fiexd , https://www.virtualbox.org/ticket/9848#comment:5
