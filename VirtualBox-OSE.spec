@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.12
-Release:	2%{?prerel:.%{prerel}}%{?dist}
+Release:	3%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -43,6 +43,7 @@ Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
 Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
 Patch22:	VirtualBox-OSE-4.1.12-gsoap.patch
+Patch23:	VirtualBox-OSE-4.1.10-mesa.patch
 
 %if 0%{?fedora} < 17
 BuildRequires:	kBuild >= 0.1.98
@@ -175,6 +176,7 @@ find -name '*.py[co]' -delete
 %if 0%{?fedora} < 16
 %patch22 -p1 -b .gsoap
 %endif
+%patch23 -p1 -b .mesa
 
 # Remove prebuilt binary tools
 %if 0%{?fedora} < 17
@@ -505,6 +507,9 @@ fi
 
 
 %changelog
+* Fri Apr 13 2012 Sérgio Basto <sergio@serjux.com> - 4.1.12-3
+- F17 mesa patch, fix compile fakedri and unbundle part of mesa sources, unbunble mesa source must be tested.
+
 * Fri Apr 13 2012 Sérgio Basto <sergio@serjux.com> - 4.1.12-2
 - F15 patch gsoap 2.7 which pkg-config gsoapssl++ --libs don't have -lssl -lcrypto
 - F17 kBuild workarround, but still not build in F17,
