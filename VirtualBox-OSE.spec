@@ -15,7 +15,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.12
-Release:	3%{?prerel:.%{prerel}}%{?dist}
+Release:	4%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -507,6 +507,9 @@ fi
 
 
 %changelog
+* Fri Apr 13 2012 Sérgio Basto <sergio@serjux.com> - 4.1.12-4
+- make a new release tag
+
 * Fri Apr 13 2012 Sérgio Basto <sergio@serjux.com> - 4.1.12-3
 - F17 mesa patch, fix compile fakedri and unbundle part of mesa sources, unbunble mesa source must be tested.
 
