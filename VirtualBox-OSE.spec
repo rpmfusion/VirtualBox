@@ -14,7 +14,7 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	4.1.10
+Version:	4.1.12
 Release:	2%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
@@ -42,15 +42,15 @@ Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
 Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
-Patch22:	VirtualBox-OSE-4.1.10-gsoap.patch
+Patch22:	VirtualBox-OSE-4.1.12-gsoap.patch
 
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-
+%if 0%{?fedora} < 17
 BuildRequires:	kBuild >= 0.1.98
-BuildRequires:	SDL-devel xalan-c-devel
+%endif
 %if 0%{?fedora} < 16
 BuildRequires: hal-devel
 %endif
+BuildRequires:	SDL-devel xalan-c-devel
 BuildRequires:	openssl-devel
 BuildRequires:	libcurl-devel
 BuildRequires:	dev86 iasl libxslt-devel xerces-c-devel libIDL-devel
@@ -90,8 +90,6 @@ ExclusiveArch:	i586 x86_64
 ExclusiveArch:	i386 x86_64
 %endif
 
-Requires(post): desktop-file-utils
-Requires(postun): desktop-file-utils
 Requires(post): systemd-units
 
 Requires:	%{name}-kmod = %{version}%{?prereltag}
@@ -174,10 +172,14 @@ find -name '*.py[co]' -delete
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
 %patch20 -p1 -b .testmangle
+%if 0%{?fedora} < 16
 %patch22 -p1 -b .gsoap
+%endif
 
 # Remove prebuilt binary tools
+%if 0%{?fedora} < 17
 rm -rf kBuild
+%endif
 rm -rf tools
 
 # CRLF->LF
@@ -503,8 +505,15 @@ fi
 
 
 %changelog
-* Tue Apr 3 2012 Sérgio Basto <sergio@serjux.com> - 4.1.10-2
-- do new tag build.
+* Fri Apr 13 2012 Sérgio Basto <sergio@serjux.com> - 4.1.12-2
+- F15 patch gsoap 2.7 which pkg-config gsoapssl++ --libs don't have -lssl -lcrypto
+- F17 kBuild workarround, but still not build in F17,
+  https://bugs.freedesktop.org/show_bug.cgi?id=47971 .
+
+* Tue Apr 3 2012 Sérgio Basto <sergio@serjux.com> - 4.1.12-1
+- New release.
+- drop buildroot
+- drop the backported patch.
 
 * Fri Mar 23 2012 Sérgio Basto <sergio@serjux.com> - 4.1.10-1
 - New release.
