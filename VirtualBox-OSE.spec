@@ -14,8 +14,8 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox-OSE
-Version:	4.1.12
-Release:	3%{?prerel:.%{prerel}}%{?dist}
+Version:	4.1.14
+Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -176,7 +176,9 @@ find -name '*.py[co]' -delete
 %if 0%{?fedora} < 16
 %patch22 -p1 -b .gsoap
 %endif
+%if 0%{?fedora} > 16
 %patch23 -p1 -b .mesa
+%endif
 
 # Remove prebuilt binary tools
 %if 0%{?fedora} < 17
@@ -507,6 +509,10 @@ fi
 
 
 %changelog
+* Thu Apr 26 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-1
+- new release
+- mesa patch only for F17 or higher
+
 * Fri Apr 13 2012 Sérgio Basto <sergio@serjux.com> - 4.1.12-3
 - F17 mesa patch, fix compile fakedri and unbundle part of mesa sources, unbunble mesa source must be tested.
 
