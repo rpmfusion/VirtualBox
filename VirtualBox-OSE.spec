@@ -1,5 +1,7 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
+%global systemd_dir /lib/systemd/system
+
 # Standard compiler flags, without:
 # -Wall	       -- VirtualBox-OSE takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
@@ -15,7 +17,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.14
-Release:	1%{?prerel:.%{prerel}}%{?dist}
+Release:	2%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -28,7 +30,8 @@ Source6:	VirtualBox-OSE.modules
 Source7:	VirtualBox-OSE-guest.modules
 Source8:	VirtualBox-OSE-vboxresize.desktop
 Source9:	VirtualBox-OSE-00-vboxvideo.conf
-Source10:	vboxweb-service
+Source10:	vboxweb.service
+Source11:	vboxservice.service
 Patch1:		VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:		VirtualBox-OSE-4.1.6-strings.patch
 Patch3:		VirtualBox-OSE-4.1.2-libcxx.patch
@@ -92,6 +95,8 @@ ExclusiveArch:	i386 x86_64
 %endif
 
 Requires(post): systemd-units
+Requires(preun): systemd-units
+Requires(postun): systemd-units
 
 Requires:	%{name}-kmod = %{version}%{?prereltag}
 Provides:	%{name}-kmod-common = %{version}%{?prereltag}
@@ -142,6 +147,7 @@ Requires:	%(xserver-sdk-abi-requires xinput)
 
 
 %description guest
+This is the same that Guest Additions, therefore should only be installed on a guest system.
 Tools that utilize kernel modules for supporting integration
 with the Host, including file sharing and tracking of mouse pointer
 movement and X.org X11 video and mouse driver.
@@ -337,7 +343,10 @@ install -m 0755 -D %{SOURCE9} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
 install -m 0755 -D %{SOURCE10} \
-	$RPM_BUILD_ROOT%{_initrddir}/vboxweb-service
+	$RPM_BUILD_ROOT%{systemd_dir}/vboxweb.service
+
+install -m 0755 -D %{SOURCE11} \
+	$RPM_BUILD_ROOT%{systemd_dir}/vboxservice.service
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
@@ -393,7 +402,9 @@ getent group vboxusers >/dev/null || groupadd -r vboxusers
 /usr/bin/update-mime-database %{_datadir}/mime &>/dev/null || :
 
 # Web service
-/sbin/chkconfig --add vboxweb-service >/dev/null 2>&1 || :
+# Run these because the SysV package being removed won't do them
+/sbin/chkconfig --del vboxweb-service >/dev/null 2>&1 || :
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
 # Assign USB devices
 if /sbin/udevadm control --reload-rules >/dev/null 2>&1
@@ -406,21 +417,44 @@ fi
 
 
 %preun
-[ $1 = 0 ] && /sbin/chkconfig --del vboxweb-service >/dev/null 2>&1 || :
+if [ $1 -eq 0 ] ; then
+    # Package removal, not upgrade
+    /bin/systemctl --no-reload disable vboxweb.service > /dev/null 2>&1 || :
+    /bin/systemctl stop vboxweb.service > /dev/null 2>&1 || :
+fi
 
 
 %postun
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+
 /usr/bin/update-desktop-database &>/dev/null || :
 /usr/bin/update-mime-database %{_datadir}/mime &>/dev/null || :
-
 
 %posttrans
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
 # Guest additions install the OGL libraries
-%post guest -p /sbin/ldconfig
-%postun guest -p /sbin/ldconfig
+%post guest 
+/sbin/ldconfig
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+/bin/systemctl enable vboxservice.service >/dev/null 2>&1 || :
+/bin/systemctl start vboxservice.service >/dev/null 2>&1 || :
+
+%preun guest
+if [ $1 -eq 0 ] ; then
+    # Package removal, not upgrade
+    /bin/systemctl --no-reload disable vboxservice.service > /dev/null 2>&1 || :
+    /bin/systemctl stop vboxservice.service > /dev/null 2>&1 || :
+fi
+
+%postun guest
+/sbin/ldconfig
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    /bin/systemctl try-restart vboxservice.service >/dev/null 2>&1 || :
+fi
 
 
 %files
@@ -470,7 +504,7 @@ fi
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
 %doc COPYING
-%attr(755,root,root) %{_initrddir}/vboxweb-service
+%attr(755,root,root) %{systemd_dir}/vboxweb.service
 
 
 %files devel
@@ -501,6 +535,7 @@ fi
 %config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
 %doc COPYING
+%attr(755,root,root) %{systemd_dir}/vboxservice.service
 
 
 %files kmodsrc
@@ -509,6 +544,10 @@ fi
 
 
 %changelog
+* Sun Apr 29 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-2
+- Migrating vboxweb-service to a systemd unit file from a SysV initscript 
+- Add vboxservice.service systemd unit file in guest package, rfbz #2274. 
+
 * Thu Apr 26 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-1
 - new release
 - mesa patch only for F17 or higher
