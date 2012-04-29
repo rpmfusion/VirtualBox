@@ -1,6 +1,7 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 %global systemd_dir /lib/systemd/system
+
 # Standard compiler flags, without:
 # -Wall	       -- VirtualBox-OSE takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
@@ -146,7 +147,7 @@ Requires:	%(xserver-sdk-abi-requires xinput)
 
 
 %description guest
-This is the same as Guest Additions, therefore should only be installed on a guest system.
+This is the same that Guest Additions, therefore should only be installed on a guest system.
 Tools that utilize kernel modules for supporting integration
 with the Host, including file sharing and tracking of mouse pointer
 movement and X.org X11 video and mouse driver.
