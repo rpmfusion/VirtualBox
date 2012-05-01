@@ -17,7 +17,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.14
-Release:	2%{?prerel:.%{prerel}}%{?dist}
+Release:	3%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
