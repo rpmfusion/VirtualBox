@@ -51,9 +51,6 @@ Patch23:	VirtualBox-OSE-4.1.10-mesa.patch
 %if 0%{?fedora} < 17
 BuildRequires:	kBuild >= 0.1.98
 %endif
-%if 0%{?fedora} < 16
-BuildRequires: hal-devel
-%endif
 BuildRequires:	SDL-devel xalan-c-devel
 BuildRequires:	openssl-devel
 BuildRequires:	libcurl-devel
@@ -131,9 +128,6 @@ Summary:	%{name} Guest Additions
 Group:		System Environment/Base
 Requires:	%{name}-kmod = %{version}
 Provides:	%{name}-kmod-common = %{version}
-%if 0%{?fedora} < 16
-Requires:	hal
-%endif 
 Requires:	xorg-x11-server-Xorg
 Requires:	xorg-x11-xinit
 Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
@@ -216,8 +210,6 @@ kmk %{_smp_mflags} \
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
-
 # The directory layout created below attempts to mimic the one of
 # the commercially supported version to minimize confusion
 
@@ -339,22 +331,22 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}	\
 	obj/bin/additions/VBoxControl
 
 # Ideally, Xorg should autodetect this, but for some reason it no longer does
-install -m 0755 -D %{SOURCE9} \
+install -m 0644 -D %{SOURCE9} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
-install -m 0755 -D %{SOURCE10} \
+install -m 0644 -D %{SOURCE10} \
 	$RPM_BUILD_ROOT%{systemd_dir}/vboxweb.service
 
-install -m 0755 -D %{SOURCE11} \
+install -m 0644 -D %{SOURCE11} \
 	$RPM_BUILD_ROOT%{systemd_dir}/vboxservice.service
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
-install -m 0755 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
+install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
 	$RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
-install -m 0755 -D %{SOURCE8} \
+install -m 0644 -D %{SOURCE8} \
 	$RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
@@ -439,7 +431,6 @@ fi
 /sbin/ldconfig
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 /bin/systemctl enable vboxservice.service >/dev/null 2>&1 || :
-/bin/systemctl start vboxservice.service >/dev/null 2>&1 || :
 
 %preun guest
 if [ $1 -eq 0 ] ; then
@@ -458,7 +449,6 @@ fi
 
 
 %files
-%defattr(-,root,root,-)
 %{_bindir}/VBox
 %{_bindir}/vboxballoonctrl
 %{_bindir}/VBoxBalloonCtrl
@@ -504,22 +494,19 @@ fi
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
 %doc COPYING
-%attr(755,root,root) %{systemd_dir}/vboxweb.service
+%{systemd_dir}/vboxweb.service
 
 
 %files devel
-%defattr(0644,root,root,0755)
 %{_libdir}/virtualbox/sdk
 
 
 %files -n python-%{name}
-%defattr(0644,root,root,0755)
 %{python_sitelib}/virtualbox
 %{python_sitelib}/vboxapi*
 
 
 %files guest
-%defattr(-,root,root,-)
 /%{_lib}/security/pam_vbox.so
 %{_bindir}/mount.vboxsf
 %{_bindir}/VBoxClient
@@ -535,15 +522,21 @@ fi
 %config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
 %doc COPYING
-%attr(755,root,root) %{systemd_dir}/vboxservice.service
+%{systemd_dir}/vboxservice.service
 
 
 %files kmodsrc
-%defattr(-,root,root,-)
 %{_datadir}/%{name}-kmod-%{version}
 
 
 %changelog
+* Tue May 1 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-3
+- Review spec with fedora-review 
+- Remove requirement for hal for F15
+- .desktop, .service and xorg.conf.d/vboxvideo.conf are text files, put chmod 644
+- don't try start vboxservice.service, because vboxservice.service depends on kmods, maybe start when
+  modules are loaded. 
+
 * Sun Apr 29 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-2
 - Migrating vboxweb-service to a systemd unit file from a SysV initscript 
 - Add vboxservice.service systemd unit file in guest package, rfbz #2274. 
