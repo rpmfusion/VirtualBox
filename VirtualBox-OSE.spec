@@ -1,5 +1,7 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
+%global systemd_dir /lib/systemd/system
+
 # Standard compiler flags, without:
 # -Wall	       -- VirtualBox-OSE takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
@@ -15,7 +17,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.14
-Release:	1%{?prerel:.%{prerel}}%{?dist}
+Release:	3%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -28,7 +30,8 @@ Source6:	VirtualBox-OSE.modules
 Source7:	VirtualBox-OSE-guest.modules
 Source8:	VirtualBox-OSE-vboxresize.desktop
 Source9:	VirtualBox-OSE-00-vboxvideo.conf
-Source10:	vboxweb-service
+Source10:	vboxweb.service
+Source11:	vboxservice.service
 Patch1:		VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:		VirtualBox-OSE-4.1.6-strings.patch
 Patch3:		VirtualBox-OSE-4.1.2-libcxx.patch
@@ -47,9 +50,6 @@ Patch23:	VirtualBox-OSE-4.1.10-mesa.patch
 
 %if 0%{?fedora} < 17
 BuildRequires:	kBuild >= 0.1.98
-%endif
-%if 0%{?fedora} < 16
-BuildRequires: hal-devel
 %endif
 BuildRequires:	SDL-devel xalan-c-devel
 BuildRequires:	openssl-devel
@@ -92,6 +92,8 @@ ExclusiveArch:	i386 x86_64
 %endif
 
 Requires(post): systemd-units
+Requires(preun): systemd-units
+Requires(postun): systemd-units
 
 Requires:	%{name}-kmod = %{version}%{?prereltag}
 Provides:	%{name}-kmod-common = %{version}%{?prereltag}
@@ -126,9 +128,6 @@ Summary:	%{name} Guest Additions
 Group:		System Environment/Base
 Requires:	%{name}-kmod = %{version}
 Provides:	%{name}-kmod-common = %{version}
-%if 0%{?fedora} < 16
-Requires:	hal
-%endif 
 Requires:	xorg-x11-server-Xorg
 Requires:	xorg-x11-xinit
 Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
@@ -142,6 +141,7 @@ Requires:	%(xserver-sdk-abi-requires xinput)
 
 
 %description guest
+This is the same that Guest Additions, therefore should only be installed on a guest system.
 Tools that utilize kernel modules for supporting integration
 with the Host, including file sharing and tracking of mouse pointer
 movement and X.org X11 video and mouse driver.
@@ -210,8 +210,6 @@ kmk %{_smp_mflags} \
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
-
 # The directory layout created below attempts to mimic the one of
 # the commercially supported version to minimize confusion
 
@@ -333,19 +331,22 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}	\
 	obj/bin/additions/VBoxControl
 
 # Ideally, Xorg should autodetect this, but for some reason it no longer does
-install -m 0755 -D %{SOURCE9} \
+install -m 0644 -D %{SOURCE9} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
-install -m 0755 -D %{SOURCE10} \
-	$RPM_BUILD_ROOT%{_initrddir}/vboxweb-service
+install -m 0644 -D %{SOURCE10} \
+	$RPM_BUILD_ROOT%{systemd_dir}/vboxweb.service
+
+install -m 0644 -D %{SOURCE11} \
+	$RPM_BUILD_ROOT%{systemd_dir}/vboxservice.service
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
-install -m 0755 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
+install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
 	$RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
-install -m 0755 -D %{SOURCE8} \
+install -m 0644 -D %{SOURCE8} \
 	$RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
@@ -393,7 +394,9 @@ getent group vboxusers >/dev/null || groupadd -r vboxusers
 /usr/bin/update-mime-database %{_datadir}/mime &>/dev/null || :
 
 # Web service
-/sbin/chkconfig --add vboxweb-service >/dev/null 2>&1 || :
+# Run these because the SysV package being removed won't do them
+/sbin/chkconfig --del vboxweb-service >/dev/null 2>&1 || :
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
 # Assign USB devices
 if /sbin/udevadm control --reload-rules >/dev/null 2>&1
@@ -406,25 +409,46 @@ fi
 
 
 %preun
-[ $1 = 0 ] && /sbin/chkconfig --del vboxweb-service >/dev/null 2>&1 || :
+if [ $1 -eq 0 ] ; then
+    # Package removal, not upgrade
+    /bin/systemctl --no-reload disable vboxweb.service > /dev/null 2>&1 || :
+    /bin/systemctl stop vboxweb.service > /dev/null 2>&1 || :
+fi
 
 
 %postun
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+
 /usr/bin/update-desktop-database &>/dev/null || :
 /usr/bin/update-mime-database %{_datadir}/mime &>/dev/null || :
-
 
 %posttrans
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
 # Guest additions install the OGL libraries
-%post guest -p /sbin/ldconfig
-%postun guest -p /sbin/ldconfig
+%post guest 
+/sbin/ldconfig
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+/bin/systemctl enable vboxservice.service >/dev/null 2>&1 || :
+
+%preun guest
+if [ $1 -eq 0 ] ; then
+    # Package removal, not upgrade
+    /bin/systemctl --no-reload disable vboxservice.service > /dev/null 2>&1 || :
+    /bin/systemctl stop vboxservice.service > /dev/null 2>&1 || :
+fi
+
+%postun guest
+/sbin/ldconfig
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    /bin/systemctl try-restart vboxservice.service >/dev/null 2>&1 || :
+fi
 
 
 %files
-%defattr(-,root,root,-)
 %{_bindir}/VBox
 %{_bindir}/vboxballoonctrl
 %{_bindir}/VBoxBalloonCtrl
@@ -470,22 +494,19 @@ fi
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
 %doc COPYING
-%attr(755,root,root) %{_initrddir}/vboxweb-service
+%{systemd_dir}/vboxweb.service
 
 
 %files devel
-%defattr(0644,root,root,0755)
 %{_libdir}/virtualbox/sdk
 
 
 %files -n python-%{name}
-%defattr(0644,root,root,0755)
 %{python_sitelib}/virtualbox
 %{python_sitelib}/vboxapi*
 
 
 %files guest
-%defattr(-,root,root,-)
 /%{_lib}/security/pam_vbox.so
 %{_bindir}/mount.vboxsf
 %{_bindir}/VBoxClient
@@ -501,14 +522,25 @@ fi
 %config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
 %doc COPYING
+%{systemd_dir}/vboxservice.service
 
 
 %files kmodsrc
-%defattr(-,root,root,-)
 %{_datadir}/%{name}-kmod-%{version}
 
 
 %changelog
+* Tue May 1 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-3
+- Review spec with fedora-review 
+- Remove requirement for hal for F15
+- .desktop, .service and xorg.conf.d/vboxvideo.conf are text files, put chmod 644
+- don't try start vboxservice.service, because vboxservice.service depends on kmods, maybe start when
+  modules are loaded. 
+
+* Sun Apr 29 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-2
+- Migrating vboxweb-service to a systemd unit file from a SysV initscript 
+- Add vboxservice.service systemd unit file in guest package, rfbz #2274. 
+
 * Thu Apr 26 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-1
 - new release
 - mesa patch only for F17 or higher
