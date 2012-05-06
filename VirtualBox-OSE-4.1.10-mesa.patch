@@ -1,0 +1,135 @@
+--- VirtualBox-4.1.10.orig/Config.kmk	2012-03-13 13:14:01.000000000 +0000
++++ VirtualBox-4.1.10/Config.kmk	2012-03-27 23:55:28.070630137 +0100
+@@ -2003,15 +2003,7 @@ ifdef VBOX_WITH_CROGL
+  endif
+ 
+  if1of ($(KBUILD_TARGET), freebsd linux solaris)
+- # VBOX_PATH_MESA_SOURCE = $(PATH_ROOT)/src/libs/mesa-7.2
+-  VBOX_PATH_MESA_SOURCE = $(VBOX_PATH_X11_ROOT)/mesa-7.2
+-  VBOX_MESA_INCS = \
+-        $(VBOX_PATH_MESA_SOURCE) \
+-        $(VBOX_PATH_MESA_SOURCE)/include \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/ \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/glapi \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/main \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/drivers/dri/common
++  VBOX_MESA_INCS = /usr/include/GL /usr/include/xorg /usr/include/pixman-1
+  endif
+ 
+  VBOX_DARWIN_OPENGL_INST     = obj/VBoxOGL/GL/
+diff -x x11include -Nurp VirtualBox-4.1.10.orig/src/VBox/Additions/common/crOpenGL/fakedri_drv.c VirtualBox-4.1.10/src/VBox/Additions/common/crOpenGL/fakedri_drv.c
+--- VirtualBox-4.1.10.orig/src/VBox/Additions/common/crOpenGL/fakedri_drv.c	2012-03-13 13:14:21.000000000 +0000
++++ VirtualBox-4.1.10/src/VBox/Additions/common/crOpenGL/fakedri_drv.c	2012-03-30 04:12:46.110584648 +0100
+@@ -17,7 +17,15 @@
+  */
+ 
+ #define _GNU_SOURCE 1
++#define HAVE_STRNDUP 1
+ 
++#include <dlfcn.h>
++#include <elf.h>
++#include <unistd.h>
++#include <xf86.h>
++#include <xf86drm.h>
++#include <GL/gl.h>
++#include <GL/glext.h>
+ #include "cr_error.h"
+ #include "cr_gl.h"
+ #include "cr_mem.h"
+@@ -26,10 +34,6 @@
+ #include "dri_glx.h"
+ #include "iprt/mem.h"
+ #include "iprt/err.h"
+-#include <dlfcn.h>
+-#include <elf.h>
+-#include <unistd.h>
+-#include "xf86.h"
+ 
+ #define VBOX_NO_MESA_PATCH_REPORTS
+ 
+@@ -104,8 +108,53 @@ static const __DRIswrastExtension *gpSwD
+ 
+ extern const __DRIextension * __driDriverExtensions[];
+ 
++//copy from /usr/share/xorg-x11-server-source/glx/dispatch.h
++#define SET_by_offset(disp, offset, fn) \
++    do { \
++        if ( (offset) < 0 ) { \
++            /* fprintf( stderr, "[%s:%u] SET_by_offset(%p, %d, %s)!\n", */ \
++            /*         __func__, __LINE__, disp, offset, # fn); */ \
++            /* abort(); */ \
++        } \
++        else { \
++            ( (_glapi_proc *) (disp) )[offset] = (_glapi_proc) fn; \
++        } \
++    } while(0)
++
++// copy from glx/glapi.c
++
++/**
++ * Search the table of static entrypoint functions for the named function
++ * and return the corresponding glprocs_table_t entry.
++ */
++static const glprocs_table_t * find_entry( const char * n )
++{
++   GLuint i;
++   for (i = 0; static_functions[i].Name_offset >= 0; i++) {
++      const char *testName = gl_string_table + static_functions[i].Name_offset;
++      if (strcmp(testName, n) == 0) {
++         return &static_functions[i];
++      }
++   }
++   return NULL;
++}
++
++/**
++ * Return dispatch table offset of the named static (built-in) function.
++ * Return -1 if function not found.
++ */
++static GLint
++get_static_proc_offset(const char *funcName)
++{
++   const glprocs_table_t * const f = find_entry( funcName );
++   if (f) {
++      return f->Offset;
++   }
++   return -1;
++}
++
+ #define VBOX_SET_MESA_FUNC(table, name, func) \
+-    if (_glapi_get_proc_offset(name)>=0) SET_by_offset(table, _glapi_get_proc_offset(name), func); \
++    if (get_static_proc_offset(name)>=0) SET_by_offset(table, get_static_proc_offset(name), func); \
+     else crWarning("%s not found in mesa table", name)
+ 
+ #define GLAPI_ENTRY(Func) VBOX_SET_MESA_FUNC(vbox_glapi_table, "gl"#Func, cr_gl##Func);
+diff -x x11include -Nurp VirtualBox-4.1.10.orig/src/VBox/Additions/common/crOpenGL/fakedri_drv.h VirtualBox-4.1.10/src/VBox/Additions/common/crOpenGL/fakedri_drv.h
+--- VirtualBox-4.1.10.orig/src/VBox/Additions/common/crOpenGL/fakedri_drv.h	2012-03-13 13:14:21.000000000 +0000
++++ VirtualBox-4.1.10/src/VBox/Additions/common/crOpenGL/fakedri_drv.h	2012-03-27 23:14:15.058370962 +0100
+@@ -20,13 +20,20 @@
+ #ifndef ___CROPENGL_FAKEDRIDRV_H
+ #define ___CROPENGL_FAKEDRIDRV_H
+ 
+-#include "src/mesa/main/mtypes.h"
+-#include "src/mesa/main/dd.h"
+-#include "src/mesa/glapi/dispatch.h"
+-#include "src/mesa/glapi/glapi.h"
+-#include "src/mesa/glapi/glapitable.h"
+-#include "src/mesa/glapi/glapioffsets.h"
+-#include "src/mesa/drivers/dri/common/dri_util.h"
++//#include "/usr/share/xorg-x11-server-source/glx/glapi.h"
++typedef void (*_glapi_proc)(void); /* generic function pointer */
++
++extern GLuint
++_glapi_get_dispatch_table_size(void);
++
++extern struct _glapi_table *
++_glapi_get_dispatch(void);
++
++extern void
++_glapi_set_dispatch(struct _glapi_table *dispatch);
++
++//#include "/usr/share/xorg-x11-server-source/glx/glapioffsets.h"
++#include "/usr/share/xorg-x11-server-source/glx/glprocs.h"
+ #include "GL/internal/dri_interface.h"
+ 
+ #include "glx_proto.h"

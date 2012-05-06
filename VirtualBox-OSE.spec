@@ -17,7 +17,7 @@
 
 Name:		VirtualBox-OSE
 Version:	4.1.14
-Release:	3%{?prerel:.%{prerel}}%{?dist}
+Release:	4%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -530,6 +530,9 @@ fi
 
 
 %changelog
+* Sun May 06 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-4
+- Bump a version to make a new tag.
+
 * Tue May 1 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-3
 - Review spec with fedora-review 
 - Remove requirement for hal for F15
