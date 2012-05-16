@@ -17,7 +17,7 @@
 
 Name:		VirtualBox
 Version:	4.1.14
-Release:	4%{?prerel:.%{prerel}}%{?dist}
+Release:	5%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -544,6 +544,9 @@ fi
 
 
 %changelog
+* Wed May 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-5
+- Bump a release, to build a new tag.
+
 * Wed May 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-4
 - Rename to VirtualBox, rfbz #1826
 
