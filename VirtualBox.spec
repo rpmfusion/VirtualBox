@@ -3,7 +3,7 @@
 %global systemd_dir /lib/systemd/system
 
 # Standard compiler flags, without:
-# -Wall	       -- VirtualBox-OSE takes care of reasonable warnings very well
+# -Wall	       -- VirtualBox takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
 # -fexceptions -- R0 code doesn't link against C++ library, no __gxx_personality_v0
 %global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
@@ -15,9 +15,9 @@
 #global prerel beta3
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-Name:		VirtualBox-OSE
+Name:		VirtualBox
 Version:	4.1.14
-Release:	4%{?prerel:.%{prerel}}%{?dist}
+Release:	6%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -95,8 +95,12 @@ Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 
+Provides:	%{name}-OSE = %{version}-%{release}
+Obsoletes:	%{name}-OSE < %{version}-%{release}
 Requires:	%{name}-kmod = %{version}%{?prereltag}
 Provides:	%{name}-kmod-common = %{version}%{?prereltag}
+Provides:	%{name}-OSE-kmod-common = %{version}%{?prereltag}
+Obsoletes:	%{name}-OSE-kmod-common < %{version}%{?prereltag}
 Conflicts:	%{name}-guest <= %{version}-%{release}
 
 %description
@@ -107,8 +111,10 @@ A general-purpose full virtualizer and emulator for 32-bit and
 %package devel
 Summary:	%{name} SDK
 Group:		Development/Libraries
-Requires:	VirtualBox-OSE = %{version}-%{release}
-Requires:	python-VirtualBox-OSE = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+Requires:	python-%{name} = %{version}-%{release}
+Provides:	%{name}-OSE-devel = %{version}-%{release}
+Obsoletes:	%{name}-OSE-devel < %{version}-%{release}
 
 %description devel
 %{name} Software Development Kit.
@@ -117,7 +123,9 @@ Requires:	python-VirtualBox-OSE = %{version}-%{release}
 %package -n python-%{name}
 Summary:	Python bindings for %{name}
 Group:		Development/Libraries
-Requires:	VirtualBox-OSE = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+Provides:	python-%{name}-OSE = %{version}-%{release}
+Obsoletes:	python-%{name}-OSE < %{version}-%{release}
 
 %description -n python-%{name}
 Python XPCOM bindings to %{name}.
@@ -126,18 +134,24 @@ Python XPCOM bindings to %{name}.
 %package guest
 Summary:	%{name} Guest Additions
 Group:		System Environment/Base
+Provides:	%{name}-OSE-guest = %{version}-%{release}
+Obsoletes:	%{name}-OSE-guest < %{version}-%{release}
 Requires:	%{name}-kmod = %{version}
 Provides:	%{name}-kmod-common = %{version}
+Provides:	%{name}-OSE-kmod-common = %{version}%{?prereltag}
+Obsoletes:	%{name}-OSE-kmod-common < %{version}%{?prereltag}
 Requires:	xorg-x11-server-Xorg
 Requires:	xorg-x11-xinit
+Provides:	xorg-x11-drv-VirtualBox = %{version}-%{release}
+Obsoletes:	xorg-x11-drv-VirtualBox < %{version}-%{release}
 Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
 Obsoletes:	xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
-Conflicts:	%{name} <= %{version}-%{release}
 %if "%(xserver-sdk-abi-requires 2>/dev/null)"
 Requires:	%(xserver-sdk-abi-requires ansic)
 Requires:	%(xserver-sdk-abi-requires videodrv)
 Requires:	%(xserver-sdk-abi-requires xinput)
 %endif
+Conflicts:	%{name} <= %{version}-%{release}
 
 
 %description guest
@@ -157,7 +171,7 @@ which is generated during the build of main package.
 
 
 %prep
-%setup -q -n VirtualBox-%{version}
+%setup -q
 find -name '*.py[co]' -delete
 
 %patch1 -p1 -b .noupdates
@@ -530,8 +544,14 @@ fi
 
 
 %changelog
-* Sun May 06 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-4
-- Bump a version to make a new tag.
+* Wed May 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-6
+- Bump a release, to build a new tag, one more try.
+
+* Wed May 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-5
+- Bump a release, to build a new tag.
+
+* Wed May 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-4
+- Rename to VirtualBox, rfbz #1826
 
 * Tue May 1 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-3
 - Review spec with fedora-review 
