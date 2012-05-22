@@ -17,7 +17,7 @@
 
 Name:		VirtualBox
 Version:	4.1.14
-Release:	6%{?prerel:.%{prerel}}%{?dist}
+Release:	7%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -220,7 +220,9 @@ kmk %{_smp_mflags} \
 	VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"	\
 	VBOX_GCC_R0_OPT="%{optflags}" VBOX_GCC_WERR=""			\
 	VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"				\
-	VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java
+	VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
+    VBOX_BUILD_PUBLISHER=_%{?vendor:%(echo %{vendor} \
+    | sed -e 's/ //g' | cut -c 1-9)}%{?!vendor:custom}
 
 
 %install
@@ -544,6 +546,9 @@ fi
 
 
 %changelog
+* Mon May 21 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-7 
+- Customize VBOX_VERSION_STRING. 
+
 * Wed May 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-6
 - Bump a release, to build a new tag, one more try.
 
