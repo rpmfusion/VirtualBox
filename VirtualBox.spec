@@ -16,8 +16,8 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox
-Version:	4.1.14
-Release:	7%{?prerel:.%{prerel}}%{?dist}
+Version:	4.1.16
+Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -546,6 +546,9 @@ fi
 
 
 %changelog
+* Tue May 22 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-1
+- New upstream release.
+
 * Mon May 21 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-7 
 - Customize VBOX_VERSION_STRING. 
 
