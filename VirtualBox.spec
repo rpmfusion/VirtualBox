@@ -164,6 +164,8 @@ movement and X.org X11 video and mouse driver.
 %package kmodsrc
 Summary:	%{name} kernel module source code
 Group:		System Environment/Kernel
+Provides:   %{name}-OSE-kmodsrc = %{version}-%{release}
+Obsoletes:  %{name}-OSE-kmodsrc < %{version}-%{release}
 
 %description kmodsrc
 Source tree used for building kernel module packages (%{name}-kmod)
@@ -546,6 +548,9 @@ fi
 
 
 %changelog
+* Wed May 23 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-2
+- Obsolete also VirtualBox-OSE-kmodsrc.
+
 * Tue May 22 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-1
 - New upstream release.
 
