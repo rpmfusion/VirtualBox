@@ -16,8 +16,8 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox
-Version:	4.1.14
-Release:	7%{?prerel:.%{prerel}}%{?dist}
+Version:	4.1.16
+Release:	2%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -164,6 +164,8 @@ movement and X.org X11 video and mouse driver.
 %package kmodsrc
 Summary:	%{name} kernel module source code
 Group:		System Environment/Kernel
+Provides:   %{name}-OSE-kmodsrc = %{version}-%{release}
+Obsoletes:  %{name}-OSE-kmodsrc < %{version}-%{release}
 
 %description kmodsrc
 Source tree used for building kernel module packages (%{name}-kmod)
@@ -546,6 +548,12 @@ fi
 
 
 %changelog
+* Wed May 23 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-2
+- Obsolete also VirtualBox-OSE-kmodsrc.
+
+* Tue May 22 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-1
+- New upstream release.
+
 * Mon May 21 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-7 
 - Customize VBOX_VERSION_STRING. 
 
