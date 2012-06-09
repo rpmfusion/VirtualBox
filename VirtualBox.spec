@@ -1,7 +1,5 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-%global systemd_dir /lib/systemd/system
-
 # Standard compiler flags, without:
 # -Wall	       -- VirtualBox takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
@@ -17,7 +15,7 @@
 
 Name:		VirtualBox
 Version:	4.1.16
-Release:	2%{?prerel:.%{prerel}}%{?dist}
+Release:	3%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -82,6 +80,11 @@ BuildRequires:	libXcursor-devel
 BuildRequires:	libXcomposite-devel
 BuildRequires:	libXmu-devel
 
+BuildRequires: systemd-units
+Requires(post): systemd-units
+Requires(preun): systemd-units
+Requires(postun): systemd-units
+
 # Plague-specific weirdness
 %if 0%{?fedora} > 11 || 0%{?rhel} > 5
 ExclusiveArch:	i686 x86_64
@@ -90,10 +93,6 @@ ExclusiveArch:	i586 x86_64
 %else
 ExclusiveArch:	i386 x86_64
 %endif
-
-Requires(post): systemd-units
-Requires(preun): systemd-units
-Requires(postun): systemd-units
 
 Provides:	%{name}-OSE = %{version}-%{release}
 Obsoletes:	%{name}-OSE < %{version}-%{release}
@@ -353,10 +352,13 @@ install -m 0644 -D %{SOURCE9} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
 install -m 0644 -D %{SOURCE10} \
-	$RPM_BUILD_ROOT%{systemd_dir}/vboxweb.service
+	$RPM_BUILD_ROOT%{_unitdir}/vboxweb.service
 
 install -m 0644 -D %{SOURCE11} \
-	$RPM_BUILD_ROOT%{systemd_dir}/vboxservice.service
+	$RPM_BUILD_ROOT%{_unitdir}/vboxservice.service
+
+install -m 0755 -D src/VBox/Installer/linux/VBoxCreateUSBNode.sh \
+	$RPM_BUILD_ROOT/lib/udev/VBoxCreateUSBNode.sh
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
@@ -512,7 +514,8 @@ fi
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
 %doc COPYING
-%{systemd_dir}/vboxweb.service
+%{_unitdir}/vboxweb.service
+/lib/udev/VBoxCreateUSBNode.sh
 
 
 %files devel
@@ -540,7 +543,7 @@ fi
 %config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
 %doc COPYING
-%{systemd_dir}/vboxservice.service
+%{_unitdir}/vboxservice.service
 
 
 %files kmodsrc
@@ -548,6 +551,11 @@ fi
 
 
 %changelog
+* Sat Jun 09 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-3
+- From Packaging Guidelines, https://fedoraproject.org/wiki/Packaging:Systemd, Packages with systemd
+  unit files must put them into %{_unitdir}.
+- Install VBoxCreateUSBNode.sh in /lib/udev, and udev rules from upstream.
+
 * Wed May 23 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-2
 - Obsolete also VirtualBox-OSE-kmodsrc.
 
