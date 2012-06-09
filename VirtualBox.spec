@@ -357,6 +357,9 @@ install -m 0644 -D %{SOURCE10} \
 install -m 0644 -D %{SOURCE11} \
 	$RPM_BUILD_ROOT%{_unitdir}/vboxservice.service
 
+install -m 0755 -D src/VBox/Installer/linux/VBoxCreateUSBNode.sh \
+	$RPM_BUILD_ROOT/lib/udev/VBoxCreateUSBNode.sh
+
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
 	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
@@ -512,6 +515,7 @@ fi
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
 %doc COPYING
 %{_unitdir}/vboxweb.service
+/lib/udev/VBoxCreateUSBNode.sh
 
 
 %files devel
@@ -547,9 +551,10 @@ fi
 
 
 %changelog
-* Sérgio Basto <sergio@serjux.com> - 4.1.16-3
+* Sat Jun 09 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-3
 - From Packaging Guidelines, https://fedoraproject.org/wiki/Packaging:Systemd, Packages with systemd
   unit files must put them into %{_unitdir}.
+- Install VBoxCreateUSBNode.sh in /lib/udev, and udev rules from upstream.
 
 * Wed May 23 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-2
 - Obsolete also VirtualBox-OSE-kmodsrc.
