@@ -15,7 +15,7 @@
 
 Name:		VirtualBox
 Version:	4.1.16
-Release:	3%{?prerel:.%{prerel}}%{?dist}
+Release:	4%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -45,6 +45,11 @@ Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
 Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
 Patch22:	VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:	VirtualBox-OSE-4.1.10-mesa.patch
+
+###
+#Upstream patches
+Patch100:   VirtualBox-changeset_41660.patch
+Patch101:   VirtualBox-changeset_41577.patch
 
 %if 0%{?fedora} < 17
 BuildRequires:	kBuild >= 0.1.98
@@ -174,6 +179,10 @@ which is generated during the build of main package.
 %prep
 %setup -q
 find -name '*.py[co]' -delete
+
+# upstream patches first 
+%patch100 -p1 -b .kernel35
+%patch101 -p1 -b .kernel35.2
 
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
@@ -551,6 +560,9 @@ fi
 
 
 %changelog
+* Wed Jun 13 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-4
+- Upstreamed patches to fix compiles with 3.5 kernels, kindly alerted by virtualbox team.
+
 * Sat Jun 09 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-3
 - From Packaging Guidelines, https://fedoraproject.org/wiki/Packaging:Systemd, Packages with systemd
   unit files must put them into %{_unitdir}.

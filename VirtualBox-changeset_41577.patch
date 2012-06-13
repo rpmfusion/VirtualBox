@@ -1,0 +1,14 @@
+Index: /trunk/src/VBox/Additions/linux/sharedfolders/vfsmod.c
+===================================================================
+--- trunk/src/VBox/Additions/linux/sharedfolders/vfsmod.c	(revision 41450)
++++ trunk/src/VBox/Additions/linux/sharedfolders/vfsmod.c	(revision 41577)
+@@ -375,5 +375,9 @@
+     TRACE();
+     truncate_inode_pages(&inode->i_data, 0);
++# if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 5, 0)
++    clear_inode(inode);
++# else
+     end_writeback(inode);
++# endif
+ 
+     sf_i = GET_INODE_INFO(inode);
