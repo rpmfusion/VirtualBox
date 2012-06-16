@@ -48,8 +48,10 @@ Patch23:	VirtualBox-OSE-4.1.10-mesa.patch
 
 ###
 #Upstream patches
+%if 0%{?fedora} > 17
 Patch100:   VirtualBox-changeset_41660.patch
 Patch101:   VirtualBox-changeset_41577.patch
+%endif
 
 %if 0%{?fedora} < 17
 BuildRequires:	kBuild >= 0.1.98
