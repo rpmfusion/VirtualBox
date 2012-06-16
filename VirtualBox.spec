@@ -15,7 +15,7 @@
 
 Name:		VirtualBox
 Version:	4.1.16
-Release:	4%{?prerel:.%{prerel}}%{?dist}
+Release:	5%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -181,8 +181,10 @@ which is generated during the build of main package.
 find -name '*.py[co]' -delete
 
 # upstream patches first 
+%if 0%{?fedora} > 17
 %patch100 -p1 -b .kernel35
 %patch101 -p1 -b .kernel35.2
+%endif
 
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
@@ -560,6 +562,10 @@ fi
 
 
 %changelog
+* Sat Jun 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-5
+- Kernel patches just for rawhide, so we don't need recompile kmods.
+- Update strings.
+
 * Wed Jun 13 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-4
 - Upstreamed patches to fix compiles with 3.5 kernels, kindly alerted by virtualbox team.
 
