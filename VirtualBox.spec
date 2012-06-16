@@ -15,7 +15,7 @@
 
 Name:		VirtualBox
 Version:	4.1.16
-Release:	5%{?prerel:.%{prerel}}%{?dist}
+Release:	6%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -48,8 +48,10 @@ Patch23:	VirtualBox-OSE-4.1.10-mesa.patch
 
 ###
 #Upstream patches
+%if 0%{?fedora} > 17
 Patch100:   VirtualBox-changeset_41660.patch
 Patch101:   VirtualBox-changeset_41577.patch
+%endif
 
 %if 0%{?fedora} < 17
 BuildRequires:	kBuild >= 0.1.98
@@ -562,6 +564,9 @@ fi
 
 
 %changelog
+* Sat Jun 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-6
+- Don't need patch10x in F17 or minor relverisons.
+
 * Sat Jun 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-5
 - Kernel patches just for rawhide, so we don't need recompile kmods.
 - Update strings.
