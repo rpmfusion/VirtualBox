@@ -14,8 +14,8 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox
-Version:	4.1.16
-Release:	6%{?prerel:.%{prerel}}%{?dist}
+Version:	4.1.18
+Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -45,13 +45,6 @@ Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
 Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
 Patch22:	VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:	VirtualBox-OSE-4.1.10-mesa.patch
-
-###
-#Upstream patches
-%if 0%{?fedora} > 17
-Patch100:   VirtualBox-changeset_41660.patch
-Patch101:   VirtualBox-changeset_41577.patch
-%endif
 
 %if 0%{?fedora} < 17
 BuildRequires:	kBuild >= 0.1.98
@@ -181,12 +174,6 @@ which is generated during the build of main package.
 %prep
 %setup -q
 find -name '*.py[co]' -delete
-
-# upstream patches first 
-%if 0%{?fedora} > 17
-%patch100 -p1 -b .kernel35
-%patch101 -p1 -b .kernel35.2
-%endif
 
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
@@ -564,8 +551,8 @@ fi
 
 
 %changelog
-* Sat Jun 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-6
-- Don't need patch10x in F17 or minor relverisons.
+* Thu Jun 21 2012 Sérgio Basto <sergio@serjux.com> - 4.1.18-1
+- New upstream release.
 
 * Sat Jun 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-5
 - Kernel patches just for rawhide, so we don't need recompile kmods.
