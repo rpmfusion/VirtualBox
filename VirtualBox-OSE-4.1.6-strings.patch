@@ -1,8 +1,11 @@
-From: Sérgio Basto
-Subject: Rebased for 4.1.16
-Date: Sat Jun 16 2012
+* Mon Jul 09 2012 Sérgio Basto <sergio@serjux.com> 
+- rfbz #1826, last review of https://bugzilla.rpmfusion.org/attachment.cgi?id=888
+  by: Naveed Hasan <naveed@cs.columbia.edu>
 
-From 3a6d9a3d4f8d9084759fe871033b6b4a990aa761 Mon Sep 17 00:00:00 2001
+* Sat Jun 16 2012 Sérgio Basto <sergio@serjux.com>
+- Rebased for 4.1.16 (partial rfbz #1826)
+
+
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Mon, 10 May 2010 12:08:47 -0400
 Subject: [PATCH] Replace some strings
@@ -14,9 +17,10 @@ With ones that (sometimes) make more sense.
  src/VBox/VMM/VMMR3/VM.cpp                  |    8 ++++----
  3 files changed, 20 insertions(+), 19 deletions(-)
 
-diff -urp VirtualBox-4.1.16.orig/src/VBox/Frontends/VirtualBox/src/main.cpp VirtualBox-4.1.16/src/VBox/Frontends/VirtualBox/src/main.cpp
---- VirtualBox-4.1.16.orig/src/VBox/Frontends/VirtualBox/src/main.cpp	2012-05-22 14:11:30.000000000 +0100
-+++ VirtualBox-4.1.16/src/VBox/Frontends/VirtualBox/src/main.cpp	2012-06-16 10:13:57.881394005 +0100
+
+diff -Nurp VirtualBox-4.1.18/src/VBox/Frontends/VirtualBox/src/main.cpp VirtualBox-4.1.18.new2/src/VBox/Frontends/VirtualBox/src/main.cpp
+--- VirtualBox-4.1.18/src/VBox/Frontends/VirtualBox/src/main.cpp	2012-06-20 14:16:20.000000000 +0100
++++ VirtualBox-4.1.18.new2/src/VBox/Frontends/VirtualBox/src/main.cpp	2012-07-09 04:57:00.690645723 +0100
 @@ -72,13 +72,13 @@ QString g_QStrHintLinuxNoMemory = QAppli
    );
  
@@ -43,7 +47,7 @@ diff -urp VirtualBox-4.1.16.orig/src/VBox/Frontends/VirtualBox/src/main.cpp Virt
    "VirtualBox. The installation of VirtualBox was apparently not "
    "successful. Executing<br/><br/>"
 -  "  <font color=blue>'/etc/init.d/vboxdrv setup'</font><br/><br/>"
-+  "  <font color=blue>'/etc/sysconfig/modules/VirtualBox.modules'</font><br/><br/>"
++  "  <font color=blue>'/etc/sysconfig/modules/VirtualBox.modules'</font> as root<br/><br/>"
    "may correct this. Make sure that you do not mix the "
 -  "OSE version and the PUEL version of VirtualBox."
 +  "RPM Fusion version and the Oracle version of VirtualBox."
@@ -61,15 +65,15 @@ diff -urp VirtualBox-4.1.16.orig/src/VBox/Frontends/VirtualBox/src/main.cpp Virt
    );
  
  #if defined(DEBUG) && defined(Q_WS_X11) && defined(RT_OS_LINUX)
-diff -urp VirtualBox-4.1.16.orig/src/VBox/Installer/linux/VBox.sh VirtualBox-4.1.16/src/VBox/Installer/linux/VBox.sh
---- VirtualBox-4.1.16.orig/src/VBox/Installer/linux/VBox.sh	2012-05-22 14:11:56.000000000 +0100
-+++ VirtualBox-4.1.16/src/VBox/Installer/linux/VBox.sh	2012-06-16 10:23:36.793849025 +0100
+diff -Nurp VirtualBox-4.1.18/src/VBox/Installer/linux/VBox.sh VirtualBox-4.1.18.new2/src/VBox/Installer/linux/VBox.sh
+--- VirtualBox-4.1.18/src/VBox/Installer/linux/VBox.sh	2012-06-20 14:17:29.000000000 +0100
++++ VirtualBox-4.1.18.new2/src/VBox/Installer/linux/VBox.sh	2012-07-09 05:02:47.158108166 +0100
 @@ -32,19 +32,22 @@ elif ! lsmod|grep -q vboxdrv; then
      cat << EOF
  WARNING: The vboxdrv kernel module is not loaded. Either there is no module
           available for the current kernel (`uname -r`) or it failed to
 -         load. Please recompile the kernel module and install it by
-+         load. Reboot the computer, or insert the kernel module by executing
++         load. Reboot the computer or load the kernel module by executing
  
 -           sudo /etc/init.d/vboxdrv setup
 +           '/etc/sysconfig/modules/VirtualBox.modules' (as root)
@@ -79,7 +83,7 @@ diff -urp VirtualBox-4.1.16.orig/src/VBox/Installer/linux/VBox.sh VirtualBox-4.1
  elif [ ! -c /dev/vboxdrv ]; then
      cat << EOF
 -WARNING: The character device /dev/vboxdrv does not exist. Try
-+WARNING: The character device /dev/vboxdrv does not exist. Try running
++WARNING: The character device /dev/vboxdrv does not exist. Try executing
  
 -           sudo /etc/init.d/vboxdrv restart
 +           '/sbin/udevadm control --reload-rules' (as root)
@@ -92,16 +96,16 @@ diff -urp VirtualBox-4.1.16.orig/src/VBox/Installer/linux/VBox.sh VirtualBox-4.1
  
           You will not be able to start VMs until this problem is fixed.
  EOF
-diff -urp VirtualBox-4.1.16.orig/src/VBox/VMM/VMMR3/VM.cpp VirtualBox-4.1.16/src/VBox/VMM/VMMR3/VM.cpp
---- VirtualBox-4.1.16.orig/src/VBox/VMM/VMMR3/VM.cpp	2012-05-22 14:13:00.000000000 +0100
-+++ VirtualBox-4.1.16/src/VBox/VMM/VMMR3/VM.cpp	2012-06-16 10:10:39.047479661 +0100
+diff -Nurp VirtualBox-4.1.18/src/VBox/VMM/VMMR3/VM.cpp VirtualBox-4.1.18.new2/src/VBox/VMM/VMMR3/VM.cpp
+--- VirtualBox-4.1.18/src/VBox/VMM/VMMR3/VM.cpp	2012-06-20 14:18:34.000000000 +0100
++++ VirtualBox-4.1.18.new2/src/VBox/VMM/VMMR3/VM.cpp	2012-07-09 05:01:48.544521745 +0100
 @@ -375,8 +375,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not loaded. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv is not set up properly. "
 -                                  "Re-setup the kernel module by executing "
 -                                  "'/etc/init.d/vboxdrv setup' as root");
-+                                  "Reboot the computer, or insert the kernel module by executing "
++                                  "Reboot the computer or load the kernel module by executing "
 +                                  "'/etc/sysconfig/modules/VirtualBox.modules' as root");
  #else
                      pszError = N_("VirtualBox kernel driver not loaded");
@@ -112,9 +116,8 @@ diff -urp VirtualBox-4.1.16.orig/src/VBox/VMM/VMMR3/VM.cpp VirtualBox-4.1.16/src
                                    "was either not loaded or /dev/vboxdrv was not created for some "
 -                                  "reason. Re-setup the kernel module by executing "
 -                                  "'/etc/init.d/vboxdrv setup' as root");
-+                                  "reason. Insert the kernel module by executing "
++                                  "reason. Load the kernel module by executing "
 +                                  "'/etc/sysconfig/modules/VirtualBox.modules' as root");
  #else
                      pszError = N_("VirtualBox kernel driver not installed");
  #endif
-Only in VirtualBox-4.1.16/src/VBox/VMM/VMMR3: VM.cpp.orig
