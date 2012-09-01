@@ -1,3 +1,13 @@
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Fri, 14 May 2010 12:26:33 +0200
+Subject: [PATCH] If anyone finds out why did I remove those I owe him a beer.
+
+Seems like this patch could be safely left out.
+removes -g -pipe 
+---
+ Config.kmk |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
 From dd383911ef6a9a43c17b18d48b17cd82d6c8feb9 Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Fri, 18 Jun 2010 10:58:14 +0200
@@ -23,6 +33,7 @@ Static linking is not really supported anyways.
  src/libs/zlib-1.2.1/Makefile.kmk                   |    2 +-
  17 files changed, 23 insertions(+), 26 deletions(-)
 
+
 diff --git a/Config.kmk b/Config.kmk
 index 0ea34d8..2ec388c 100644
 --- a/Config.kmk
@@ -45,6 +56,15 @@ index 0ea34d8..2ec388c 100644
  TEMPLATE_VBoxR3Static_EXTENDS_BY    = appending
  ifeq ($(KBUILD_TARGET),win)
   TEMPLATE_VBoxR3Static_CFLAGS      += $(VBOX_VCC_WERR)
+@@ -4055,7 +4055,7 @@ ifdef VBOX_WITH_QTGUI
+ 	$(LIB_SDL_INC)
+   ## @todo Use VBOX_GCC_PEDANTIC_CXX?
+   TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS = \
+-	-g -pipe $(filter-out -Wno-unused,$(VBOX_GCC_WARN)) -frtti -fno-exceptions -Wno-non-virtual-dtor \
++ 	$(filter-out -Wno-unused,$(VBOX_GCC_WARN)) -frtti -fno-exceptions -Wno-non-virtual-dtor \
+ 	-Wno-long-long -fshort-wchar -fno-strict-aliasing \
+ 	$(VBOX_GCC_fvisibility-hidden) $(VBOX_GCC_fvisibility-inlines-hidden) \
+ 	$(VBOX_GCC_Wno-delete-non-virtual-dtor)
 diff --git a/configure b/configure
 index 987cf1b..75d556c 100755
 --- a/configure

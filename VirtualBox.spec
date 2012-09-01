@@ -14,30 +14,28 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox
-Version:	4.1.18
-Release:	2%{?prerel:.%{prerel}}%{?dist}
+Version:	4.1.20
+Release:	1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
 License:	GPLv2 or (GPLv2 and CDDL)
 URL:		http://www.virtualbox.org/wiki/VirtualBox
 Source0:	http://dlc.sun.com.edgesuite.net/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
-Source3:	VirtualBox-OSE-90-vboxdrv.rules
-Source5:	VirtualBox-OSE-60-vboxguest.rules
-Source6:	VirtualBox-OSE.modules
-Source7:	VirtualBox-OSE-guest.modules
-Source8:	VirtualBox-OSE-vboxresize.desktop
-Source9:	VirtualBox-OSE-00-vboxvideo.conf
+Source3:	VirtualBox-90-vboxdrv.rules
+Source5:	VirtualBox-60-vboxguest.rules
+Source6:	VirtualBox.modules
+Source7:	VirtualBox-guest.modules
+Source8:	VirtualBox-vboxresize.desktop
+Source9:	VirtualBox-00-vboxvideo.conf
 Source10:	vboxweb.service
 Source11:	vboxservice.service
 Patch1:		VirtualBox-OSE-4.1.4-noupdate.patch
-Patch2:		VirtualBox-OSE-4.1.6-strings.patch
-Patch3:		VirtualBox-OSE-4.1.2-libcxx.patch
+Patch2:		VirtualBox-4.1.18-strings.patch
+Patch3:		VirtualBox-4.1.20-libcxx.patch
 Patch5:		VirtualBox-OSE-4.1.4-xorg17.patch
-Patch9:		VirtualBox-OSE-3.2.4-optflags.patch
 Patch10:	VirtualBox-OSE-4.0.0-32bit.patch
-Patch11:	VirtualBox-OSE-3.2.0-visibility.patch
-Patch12:	VirtualBox-OSE-3.2.10-noansi.patch
+#Patch11:	VirtualBox-OSE-3.2.0-visibility.patch
 Patch15:	VirtualBox-OSE-4.0.0-makeself.patch
 Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
@@ -179,10 +177,8 @@ find -name '*.py[co]' -delete
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .libcxx
 %patch5 -p1 -b .xorg17
-%patch9 -p1 -b .optflags
 %patch10 -p1 -b .32bit
-%patch11 -p1 -b .visibility
-%patch12 -p1 -b .noansi
+#%patch11 -p1 -b .visibility
 %patch15 -p1 -b .makeself
 %patch16 -p1 -b .usblib
 %patch17 -p1 -b .beramono
@@ -233,6 +229,7 @@ kmk %{_smp_mflags} \
 # Directory structure
 install -d $RPM_BUILD_ROOT/%{_lib}/security
 install -d $RPM_BUILD_ROOT%{_bindir}
+install -d $RPM_BUILD_ROOT%{_sbindir}
 install -d $RPM_BUILD_ROOT%{_libdir}
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox
 install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/components
@@ -341,8 +338,10 @@ install -m 0755 -D obj/bin/additions/vboxvideo_drv_%{x11_api}.so \
 	$RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
 # Guest tools
+install -m 0755 -t $RPM_BUILD_ROOT%{_sbindir}	\
+	obj/bin/additions/mount.vboxsf
+
 install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}	\
-	obj/bin/additions/mount.vboxsf		\
 	obj/bin/additions/VBoxService		\
 	obj/bin/additions/VBoxClient		\
 	obj/bin/additions/VBoxControl
@@ -529,7 +528,7 @@ fi
 
 %files guest
 /%{_lib}/security/pam_vbox.so
-%{_bindir}/mount.vboxsf
+%{_sbindir}/mount.vboxsf
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
 %{_bindir}/VBoxService
@@ -551,6 +550,18 @@ fi
 
 
 %changelog
+* Sat Sep 01 2012 Sérgio Basto <sergio@serjux.com> - 4.1.20-1
+- New upstream release.
+- Redo VirtualBox-4.1.20-libcxx.patch
+- Patch9 (VirtualBox-OSE-3.2.4-optflags.patch) integrated in Patch3 (VirtualBox-4.1.20-libcxx.patch).
+- drop Patch12 (VirtualBox-OSE-3.2.10-noansi.patch) no need anymore.
+- drop Patch11 (VirtualBox-OSE-3.2.0-visibility.patch) no need anymore.
+- fix rfbz #2416 - /bin/mount.vboxsf must be moved to /sbin/mount.vboxsf
+- move files VirtualBox-OSE .rules .modules .desktop and .conf to VirtualBox
+
+* Mon Jul 09 2012 Sérgio Basto <sergio@serjux.com> 4.1.18-2
+- Improve some strings suggest on rfbz #1826
+
 * Thu Jun 21 2012 Sérgio Basto <sergio@serjux.com> - 4.1.18-1
 - New upstream release.
 
