@@ -1,7 +1,7 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 # Standard compiler flags, without:
-# -Wall	       -- VirtualBox takes care of reasonable warnings very well
+# -Wall        -- VirtualBox takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
 # -fexceptions -- R0 code doesn't link against C++ library, no __gxx_personality_v0
 %global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
@@ -13,71 +13,70 @@
 %global prerel RC3
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-Name:		VirtualBox
-Version:	4.2.0
-Release:	0.1%{?prerel:.%{prerel}}%{?dist}
-Summary:	A general-purpose full virtualizer for PC hardware
+Name:       VirtualBox
+Version:    4.2.0
+Release:    0.2%{?prerel:.%{prerel}}%{?dist}
+Summary:    A general-purpose full virtualizer for PC hardware
 
-Group:		Development/Tools
-License:	GPLv2 or (GPLv2 and CDDL)
-URL:		http://www.virtualbox.org/wiki/VirtualBox
-Source0:	http://dlc.sun.com.edgesuite.net/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
-Source3:	VirtualBox-90-vboxdrv.rules
-Source5:	VirtualBox-60-vboxguest.rules
-Source6:	VirtualBox.modules
-Source7:	VirtualBox-guest.modules
-Source8:	VirtualBox-vboxresize.desktop
-Source9:	VirtualBox-00-vboxvideo.conf
-Source10:	vboxweb.service
-Source11:	vboxservice.service
-Patch1:		VirtualBox-OSE-4.1.4-noupdate.patch
-Patch2:		VirtualBox-4.1.18-strings.patch
-Patch3:		VirtualBox-4.1.20-libcxx.patch
-Patch5:		VirtualBox-OSE-4.1.4-xorg17.patch
-Patch10:	VirtualBox-OSE-4.0.0-32bit.patch
-#Patch11:	VirtualBox-OSE-3.2.0-visibility.patch
-Patch15:	VirtualBox-OSE-4.0.0-makeself.patch
-#Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
-Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
-Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
-Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
-Patch22:	VirtualBox-OSE-4.1.12-gsoap.patch
-Patch23:	VirtualBox-OSE-4.1.10-mesa.patch
+Group:      Development/Tools
+License:    GPLv2 or (GPLv2 and CDDL)
+URL:        http://www.virtualbox.org/wiki/VirtualBox
+Source0:    http://dlc.sun.com.edgesuite.net/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
+Source3:    VirtualBox-90-vboxdrv.rules
+Source5:    VirtualBox-60-vboxguest.rules
+Source6:    VirtualBox.modules
+Source7:    VirtualBox-guest.modules
+Source8:    VirtualBox-vboxresize.desktop
+Source9:    VirtualBox-00-vboxvideo.conf
+Source10:   vboxweb.service
+Source11:   vboxservice.service
+Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
+Patch2:     VirtualBox-4.1.18-strings.patch
+Patch3:     VirtualBox-4.2.0-libcxx.patch
+Patch5:     VirtualBox-4.2.0-xorg17.patch
+Patch15:    VirtualBox-OSE-4.0.0-makeself.patch
+Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
+Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
+Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
+Patch23:    VirtualBox-OSE-4.1.10-mesa.patch
 #Patch24:    VirtualBox-4.1.20-x113.patch
 
 %if 0%{?fedora} < 17
-BuildRequires:	kBuild >= 0.1.98
+BuildRequires:  kBuild >= 0.1.98
 %endif
-BuildRequires:	SDL-devel xalan-c-devel
-BuildRequires:	openssl-devel
-BuildRequires:	libcurl-devel
-BuildRequires:	dev86 iasl libxslt-devel xerces-c-devel libIDL-devel
-BuildRequires:	yasm
-BuildRequires:	pulseaudio-libs-devel
-BuildRequires:	python-devel
-BuildRequires:	desktop-file-utils
-BuildRequires:	libcap-devel
-BuildRequires:	qt4-devel
-BuildRequires:	gsoap-devel
-BuildRequires:	xz
-BuildRequires:	pam-devel
-BuildRequires:	mkisofs
-BuildRequires:	java-devel >= 1.6
-BuildRequires:	/usr/bin/pdflatex
-BuildRequires:	libpng-devel
+BuildRequires:  SDL-devel xalan-c-devel
+BuildRequires:  openssl-devel
+BuildRequires:  libcurl-devel
+BuildRequires:  dev86 iasl libxslt-devel xerces-c-devel libIDL-devel
+BuildRequires:  yasm
+BuildRequires:  pulseaudio-libs-devel
+BuildRequires:  python-devel
+BuildRequires:  desktop-file-utils
+BuildRequires:  libcap-devel
+BuildRequires:  qt4-devel
+BuildRequires:  gsoap-devel
+BuildRequires:  xz
+BuildRequires:  pam-devel
+BuildRequires:  mkisofs
+BuildRequires:  java-devel >= 1.6
+BuildRequires:  /usr/bin/pdflatex
+BuildRequires:  libpng-devel
+# libstdc++.i686 and libc-devel.i686 for 32-bits
+BuildRequires:  /usr/lib/libc.so
+BuildRequires:  /usr/lib/libstdc++.so.6 /lib/libc.so.6 
 
 # For the X11 module
-BuildRequires:	libdrm-devel
-BuildRequires:	libpciaccess-devel
-BuildRequires:	mesa-libGL-devel
-BuildRequires:	mesa-libOSMesa-devel
-BuildRequires:	pixman-devel
-BuildRequires:	xorg-x11-proto-devel
-BuildRequires:	xorg-x11-server-source
-BuildRequires:	xorg-x11-server-devel
-BuildRequires:	libXcursor-devel
-BuildRequires:	libXcomposite-devel
-BuildRequires:	libXmu-devel
+BuildRequires:  libdrm-devel
+BuildRequires:  libpciaccess-devel
+BuildRequires:  mesa-libGL-devel
+BuildRequires:  mesa-libOSMesa-devel
+BuildRequires:  pixman-devel
+BuildRequires:  xorg-x11-proto-devel
+BuildRequires:  xorg-x11-server-source
+BuildRequires:  xorg-x11-server-devel
+BuildRequires:  libXcursor-devel
+BuildRequires:  libXcomposite-devel
+BuildRequires:  libXmu-devel
 
 BuildRequires: systemd-units
 Requires(post): systemd-units
@@ -86,20 +85,20 @@ Requires(postun): systemd-units
 
 # Plague-specific weirdness
 %if 0%{?fedora} > 11 || 0%{?rhel} > 5
-ExclusiveArch:	i686 x86_64
+ExclusiveArch:  i686 x86_64
 %else %if 0%{?fedora} > 10
-ExclusiveArch:	i586 x86_64
+ExclusiveArch:  i586 x86_64
 %else
-ExclusiveArch:	i386 x86_64
+ExclusiveArch:  i386 x86_64
 %endif
 
-Provides:	%{name}-OSE = %{version}-%{release}
-Obsoletes:	%{name}-OSE < %{version}-%{release}
-Requires:	%{name}-kmod = %{version}%{?prereltag}
-Provides:	%{name}-kmod-common = %{version}%{?prereltag}
-Provides:	%{name}-OSE-kmod-common = %{version}%{?prereltag}
-Obsoletes:	%{name}-OSE-kmod-common < %{version}%{?prereltag}
-Conflicts:	%{name}-guest <= %{version}-%{release}
+Provides:   %{name}-OSE = %{version}-%{release}
+Obsoletes:  %{name}-OSE < %{version}-%{release}
+Requires:   %{name}-kmod = %{version}%{?prereltag}
+Provides:   %{name}-kmod-common = %{version}%{?prereltag}
+Provides:   %{name}-OSE-kmod-common = %{version}%{?prereltag}
+Obsoletes:  %{name}-OSE-kmod-common < %{version}%{?prereltag}
+Conflicts:  %{name}-guest <= %{version}-%{release}
 
 %description
 A general-purpose full virtualizer and emulator for 32-bit and
@@ -107,49 +106,49 @@ A general-purpose full virtualizer and emulator for 32-bit and
 
 
 %package devel
-Summary:	%{name} SDK
-Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
-Requires:	python-%{name} = %{version}-%{release}
-Provides:	%{name}-OSE-devel = %{version}-%{release}
-Obsoletes:	%{name}-OSE-devel < %{version}-%{release}
+Summary:    %{name} SDK
+Group:      Development/Libraries
+Requires:   %{name} = %{version}-%{release}
+Requires:   python-%{name} = %{version}-%{release}
+Provides:   %{name}-OSE-devel = %{version}-%{release}
+Obsoletes:  %{name}-OSE-devel < %{version}-%{release}
 
 %description devel
 %{name} Software Development Kit.
 
 
 %package -n python-%{name}
-Summary:	Python bindings for %{name}
-Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
-Provides:	python-%{name}-OSE = %{version}-%{release}
-Obsoletes:	python-%{name}-OSE < %{version}-%{release}
+Summary:    Python bindings for %{name}
+Group:      Development/Libraries
+Requires:   %{name} = %{version}-%{release}
+Provides:   python-%{name}-OSE = %{version}-%{release}
+Obsoletes:  python-%{name}-OSE < %{version}-%{release}
 
 %description -n python-%{name}
 Python XPCOM bindings to %{name}.
 
 
 %package guest
-Summary:	%{name} Guest Additions
-Group:		System Environment/Base
-Provides:	%{name}-OSE-guest = %{version}-%{release}
-Obsoletes:	%{name}-OSE-guest < %{version}-%{release}
-Requires:	%{name}-kmod = %{version}
-Provides:	%{name}-kmod-common = %{version}
-Provides:	%{name}-OSE-kmod-common = %{version}%{?prereltag}
-Obsoletes:	%{name}-OSE-kmod-common < %{version}%{?prereltag}
-Requires:	xorg-x11-server-Xorg
-Requires:	xorg-x11-xinit
-Provides:	xorg-x11-drv-VirtualBox = %{version}-%{release}
-Obsoletes:	xorg-x11-drv-VirtualBox < %{version}-%{release}
-Provides:	xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
-Obsoletes:	xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
+Summary:    %{name} Guest Additions
+Group:      System Environment/Base
+Provides:   %{name}-OSE-guest = %{version}-%{release}
+Obsoletes:  %{name}-OSE-guest < %{version}-%{release}
+Requires:   %{name}-kmod = %{version}
+Provides:   %{name}-kmod-common = %{version}
+Provides:   %{name}-OSE-kmod-common = %{version}%{?prereltag}
+Obsoletes:  %{name}-OSE-kmod-common < %{version}%{?prereltag}
+Requires:   xorg-x11-server-Xorg
+Requires:   xorg-x11-xinit
+Provides:   xorg-x11-drv-VirtualBox = %{version}-%{release}
+Obsoletes:  xorg-x11-drv-VirtualBox < %{version}-%{release}
+Provides:   xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
+Obsoletes:  xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
 %if "%(xserver-sdk-abi-requires 2>/dev/null)"
-Requires:	%(xserver-sdk-abi-requires ansic)
-Requires:	%(xserver-sdk-abi-requires videodrv)
-Requires:	%(xserver-sdk-abi-requires xinput)
+Requires:   %(xserver-sdk-abi-requires ansic)
+Requires:   %(xserver-sdk-abi-requires videodrv)
+Requires:   %(xserver-sdk-abi-requires xinput)
 %endif
-Conflicts:	%{name} <= %{version}-%{release}
+Conflicts:  %{name} <= %{version}-%{release}
 
 
 %description guest
@@ -160,8 +159,8 @@ movement and X.org X11 video and mouse driver.
 
 
 %package kmodsrc
-Summary:	%{name} kernel module source code
-Group:		System Environment/Kernel
+Summary:    %{name} kernel module source code
+Group:      System Environment/Kernel
 Provides:   %{name}-OSE-kmodsrc = %{version}-%{release}
 Obsoletes:  %{name}-OSE-kmodsrc < %{version}-%{release}
 
@@ -178,13 +177,9 @@ find -name '*.py[co]' -delete
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .libcxx
 %patch5 -p1 -b .xorg17
-%patch10 -p1 -b .32bit
-#%patch11 -p1 -b .visibility
 %patch15 -p1 -b .makeself
-#%patch16 -p1 -b .usblib
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
-%patch20 -p1 -b .testmangle
 %if 0%{?fedora} < 16
 %patch22 -p1 -b .gsoap
 %endif
@@ -216,13 +211,13 @@ sed -i 's/\r//' COPYING
 # the installation paths, but install the tree with the default
 # layout under 'obj' and shuffle files around in %%install.
 kmk %{_smp_mflags} \
-	KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_OUT="$PWD/obj"		\
-	VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox			\
-	VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=	\
-	VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"	\
-	VBOX_GCC_R0_OPT="%{optflags}" VBOX_GCC_WERR=""			\
-	VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"				\
-	VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
+    KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_OUT="$PWD/obj"      \
+    VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox         \
+    VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=   \
+    VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"    \
+    VBOX_GCC_R0_OPT="%{optflags}" VBOX_GCC_WERR=""          \
+    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
+    VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
     VBOX_BUILD_PUBLISHER=_%{?vendor:%(echo %{vendor} \
     | sed -e 's/ //g' | cut -c 1-9)}%{?!vendor:custom}
 
@@ -266,68 +261,68 @@ ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBFE
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxbfe
 
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
-	obj/bin/VBoxTunctl	\
+    obj/bin/VBoxTunctl  \
 
 # Components
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/components \
-	obj/bin/components/*
+    obj/bin/components/*
 
 # Lib
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-	obj/bin/*.so
+    obj/bin/*.so
 
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-	obj/bin/V*.gc		\
-	obj/bin/V*.r0		\
-	obj/bin/VBoxEFI*.fd
+    obj/bin/V*.gc       \
+    obj/bin/V*.r0       \
+    obj/bin/VBoxEFI*.fd
 
 # Documentation
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-	obj/bin/UserManual.pdf
+    obj/bin/UserManual.pdf
 
 # Executables
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-	obj/bin/VBoxHeadless	\
-	obj/bin/VBoxSDL		\
-	obj/bin/VBoxNetDHCP	\
-	obj/bin/VBoxNetAdpCtl	\
-	obj/bin/VirtualBox	\
-	obj/bin/VBoxManage	\
-	obj/bin/VBoxSVC		\
-	obj/bin/VBoxXPCOMIPCD	\
-	obj/bin/VBoxSysInfo.sh	\
-	obj/bin/vboxshell.py	\
-	obj/bin/VBoxTestOGL	\
-	obj/bin/VBoxExtPackHelperApp \
-	obj/bin/vboxwebsrv	\
-	obj/bin/VBoxBalloonCtrl	\
-	obj/bin/webtest		\
-	obj/bin/VBoxBFE
+    obj/bin/VBoxHeadless    \
+    obj/bin/VBoxSDL     \
+    obj/bin/VBoxNetDHCP \
+    obj/bin/VBoxNetAdpCtl   \
+    obj/bin/VirtualBox  \
+    obj/bin/VBoxManage  \
+    obj/bin/VBoxSVC     \
+    obj/bin/VBoxXPCOMIPCD   \
+    obj/bin/VBoxSysInfo.sh  \
+    obj/bin/vboxshell.py    \
+    obj/bin/VBoxTestOGL \
+    obj/bin/VBoxExtPackHelperApp \
+    obj/bin/vboxwebsrv  \
+    obj/bin/VBoxBalloonCtrl \
+    obj/bin/webtest     \
+    obj/bin/VBoxBFE
 
 # Language files
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
-	obj/bin/nls/*
+    obj/bin/nls/*
 
 # SDK
 pushd obj/bin/sdk/installer
 VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
-	python vboxapisetup.py install --prefix %{_prefix} --root $RPM_BUILD_ROOT
+    python vboxapisetup.py install --prefix %{_prefix} --root $RPM_BUILD_ROOT
 popd
 cp -rp obj/bin/sdk/. $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk
 rm -rf $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk/installer
 
 # Icons
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
-	obj/bin/VBox.png
+    obj/bin/VBox.png
 #ln -f $RPM_BUILD_ROOT%{_datadir}/pixmaps/{VBox,virtualbox}.png
 for S in obj/bin/icons/*
 do
-	SIZE=$(basename $S)
-	install -d $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/{mimetypes,apps}
-	install -p -m 0644 $S/* $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes
-	[ -f $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png ] && mv \
-		$RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png \
-		$RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/apps/virtualbox.png
+    SIZE=$(basename $S)
+    install -d $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/{mimetypes,apps}
+    install -p -m 0644 $S/* $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes
+    [ -f $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png ] && mv \
+        $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png \
+        $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/apps/virtualbox.png
 done
 install -p -m 0644 obj/bin/virtualbox.xml $RPM_BUILD_ROOT%{_datadir}/mime/packages
 
@@ -338,51 +333,51 @@ install -p -m 0644 obj/bin/virtualbox.xml $RPM_BUILD_ROOT%{_datadir}/mime/packag
 %global x11_api 17
 
 install -m 0755 -D obj/bin/additions/vboxmouse_drv_%{x11_api}.so \
-	$RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxmouse_drv.so
+    $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxmouse_drv.so
 install -m 0755 -D obj/bin/additions/vboxvideo_drv_%{x11_api}.so \
-	$RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
+    $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
 # Guest tools
-install -m 0755 -t $RPM_BUILD_ROOT%{_sbindir}	\
-	obj/bin/additions/mount.vboxsf
+install -m 0755 -t $RPM_BUILD_ROOT%{_sbindir}   \
+    obj/bin/additions/mount.vboxsf
 
-install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}	\
-	obj/bin/additions/VBoxService		\
-	obj/bin/additions/VBoxClient		\
-	obj/bin/additions/VBoxControl
+install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}    \
+    obj/bin/additions/VBoxService       \
+    obj/bin/additions/VBoxClient        \
+    obj/bin/additions/VBoxControl
 
 # Ideally, Xorg should autodetect this, but for some reason it no longer does
 install -m 0644 -D %{SOURCE9} \
-	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
+    $RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
 install -m 0644 -D %{SOURCE10} \
-	$RPM_BUILD_ROOT%{_unitdir}/vboxweb.service
+    $RPM_BUILD_ROOT%{_unitdir}/vboxweb.service
 
 install -m 0644 -D %{SOURCE11} \
-	$RPM_BUILD_ROOT%{_unitdir}/vboxservice.service
+    $RPM_BUILD_ROOT%{_unitdir}/vboxservice.service
 
 install -m 0755 -D src/VBox/Installer/linux/VBoxCreateUSBNode.sh \
-	$RPM_BUILD_ROOT/lib/udev/VBoxCreateUSBNode.sh
+    $RPM_BUILD_ROOT/lib/udev/VBoxCreateUSBNode.sh
 
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
-	$RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
+    $RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
 install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
-	$RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+    $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
 install -m 0644 -D %{SOURCE8} \
-	$RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
+    $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 # Guest libraries
-install -m 0755 -t $RPM_BUILD_ROOT%{_libdir}	\
-	obj/bin/additions/VBoxOGL*.so
+install -m 0755 -t $RPM_BUILD_ROOT%{_libdir}    \
+    obj/bin/additions/VBoxOGL*.so
 ln -sf ../VBoxOGL.so $RPM_BUILD_ROOT%{_libdir}/dri/vboxvideo_dri.so
 
 install -m 0755 -t $RPM_BUILD_ROOT/%{_lib}/security \
-	obj/bin/additions/pam_vbox.so
+    obj/bin/additions/pam_vbox.so
 
 # Installation root configuration
 install -d $RPM_BUILD_ROOT/%{_sysconfdir}/vbox
@@ -401,12 +396,12 @@ mkdir -p %{name}-kmod-%{version}
 cp -al obj/bin/src/vbox* obj/bin/additions/src/vbox* %{name}-kmod-%{version}
 install -d $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{version}
 tar --use-compress-program xz -cf $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.xz \
-	%{name}-kmod-%{version}
+    %{name}-kmod-%{version}
 
 # Menu entry
 desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
-	--remove-key=DocPath --remove-category=X-MandrivaLinux-System \
-	--vendor='' obj/bin/virtualbox.desktop
+    --remove-key=DocPath --remove-category=X-MandrivaLinux-System \
+    --vendor='' obj/bin/virtualbox.desktop
 
 %post
 # Group for USB devices
@@ -425,8 +420,8 @@ getent group vboxusers >/dev/null || groupadd -r vboxusers
 # Assign USB devices
 if /sbin/udevadm control --reload-rules >/dev/null 2>&1
 then
-#	/sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
-#	/sbin/udevadm settle >/dev/null 2>&1 || :
+#   /sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
+#   /sbin/udevadm settle >/dev/null 2>&1 || :
     systemctl restart udev-trigger.service
     systemctl restart udev-settle.service
 fi
@@ -555,6 +550,23 @@ fi
 
 
 %changelog
+* Mon Sep 03 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.2.RC3
+- vim :retab, reformat all tabs.
+- add BR # libstdc++.i686 and libc-devel.i686 for 32-bits
+BuildRequires:  /usr/lib/libc.so
+BuildRequires:  /usr/lib/libstdc++.so.6 /lib/libc.so.6
+- drop 32-bit patch and testmangle patch, no fails. 
+- rename and remove some patches
+cvs diff: VirtualBox-4.1.20-libcxx.patch was removed, no comparison available
+cvs diff: VirtualBox-4.1.20-x113.patch is a new entry, no comparison available
+cvs diff: VirtualBox-4.2.0-libcxx.patch is a new entry, no comparison available
+cvs diff: VirtualBox-4.2.0-xorg17.patch is a new entry, no comparison available
+cvs diff: VirtualBox-OSE-3.2.0-visibility.patch was removed, no comparison available
+cvs diff: VirtualBox-OSE-4.0.0-32bit.patch was removed, no comparison available
+cvs diff: VirtualBox-OSE-4.1.2-testmangle.patch was removed, no comparison available
+cvs diff: VirtualBox-OSE-4.1.2-usblib.patch was removed, no comparison available
+cvs diff: VirtualBox-OSE-4.1.4-xorg17.patch was removed, no comparison available
+
 * Mon Sep 03 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.1.RC3
 - New major release, devel release of rpms  .
 - rebase patches VirtualBox-4.1.20-libcxx.patch, VirtualBox-OSE-4.1.4-xorg17.patch
