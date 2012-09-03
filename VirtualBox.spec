@@ -15,7 +15,7 @@
 
 Name:       VirtualBox
 Version:    4.2.0
-Release:    0.2%{?prerel:.%{prerel}}%{?dist}
+Release:    0.3%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -94,10 +94,10 @@ ExclusiveArch:  i386 x86_64
 
 Provides:   %{name}-OSE = %{version}-%{release}
 Obsoletes:  %{name}-OSE < %{version}-%{release}
-Requires:   %{name}-kmod = %{version}%{?prereltag}
-Provides:   %{name}-kmod-common = %{version}%{?prereltag}
-Provides:   %{name}-OSE-kmod-common = %{version}%{?prereltag}
-Obsoletes:  %{name}-OSE-kmod-common < %{version}%{?prereltag}
+Requires:   %{name}-kmod = %{version}
+Provides:   %{name}-kmod-common = %{version}-%{release}
+Provides:   %{name}-OSE-kmod-common = %{version}-%{release}
+Obsoletes:  %{name}-OSE-kmod-common < %{version}-%{release}
 Conflicts:  %{name}-guest <= %{version}-%{release}
 
 %description
@@ -134,9 +134,9 @@ Group:      System Environment/Base
 Provides:   %{name}-OSE-guest = %{version}-%{release}
 Obsoletes:  %{name}-OSE-guest < %{version}-%{release}
 Requires:   %{name}-kmod = %{version}
-Provides:   %{name}-kmod-common = %{version}
-Provides:   %{name}-OSE-kmod-common = %{version}%{?prereltag}
-Obsoletes:  %{name}-OSE-kmod-common < %{version}%{?prereltag}
+Provides:   %{name}-kmod-common = %{version}-%{release}
+Provides:   %{name}-OSE-kmod-common = %{version}-%{release}
+Obsoletes:  %{name}-OSE-kmod-common < %{version}-%{release}
 Requires:   xorg-x11-server-Xorg
 Requires:   xorg-x11-xinit
 Provides:   xorg-x11-drv-VirtualBox = %{version}-%{release}
@@ -550,6 +550,9 @@ fi
 
 
 %changelog
+* Mon Sep 03 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.3.RC3
+- fix requires kmod, with version with prerealeses.
+
 * Mon Sep 03 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.2.RC3
 - vim :retab, reformat all tabs.
 - add BR # libstdc++.i686 and libc-devel.i686 for 32-bits
