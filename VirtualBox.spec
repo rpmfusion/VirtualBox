@@ -10,12 +10,12 @@
 # major version number, while the kernel module abi is not guarranteed
 # to be stable. This is so that we force the module update in sync with
 # userspace.
-#global prerel beta3
+%global prerel RC3
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:		VirtualBox
-Version:	4.1.20
-Release:	1%{?prerel:.%{prerel}}%{?dist}
+Version:	4.2.0
+Release:	0.1%{?prerel:.%{prerel}}%{?dist}
 Summary:	A general-purpose full virtualizer for PC hardware
 
 Group:		Development/Tools
@@ -37,12 +37,13 @@ Patch5:		VirtualBox-OSE-4.1.4-xorg17.patch
 Patch10:	VirtualBox-OSE-4.0.0-32bit.patch
 #Patch11:	VirtualBox-OSE-3.2.0-visibility.patch
 Patch15:	VirtualBox-OSE-4.0.0-makeself.patch
-Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
+#Patch16:	VirtualBox-OSE-4.1.2-usblib.patch
 Patch17:	VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:	VirtualBox-OSE-4.0.2-aiobug.patch
 Patch20:	VirtualBox-OSE-4.1.2-testmangle.patch
 Patch22:	VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:	VirtualBox-OSE-4.1.10-mesa.patch
+#Patch24:    VirtualBox-4.1.20-x113.patch
 
 %if 0%{?fedora} < 17
 BuildRequires:	kBuild >= 0.1.98
@@ -170,7 +171,7 @@ which is generated during the build of main package.
 
 
 %prep
-%setup -q
+%setup -qn %{name}-%{version}%{prereltag}
 find -name '*.py[co]' -delete
 
 %patch1 -p1 -b .noupdates
@@ -180,7 +181,7 @@ find -name '*.py[co]' -delete
 %patch10 -p1 -b .32bit
 #%patch11 -p1 -b .visibility
 %patch15 -p1 -b .makeself
-%patch16 -p1 -b .usblib
+#%patch16 -p1 -b .usblib
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
 %patch20 -p1 -b .testmangle
@@ -190,6 +191,9 @@ find -name '*.py[co]' -delete
 %if 0%{?fedora} > 16
 %patch23 -p1 -b .mesa
 %endif
+#%if 0%{?fedora} > 17
+#%patch24 -p1 -b .x113
+#%endif
 
 # Remove prebuilt binary tools
 %if 0%{?fedora} < 17
@@ -202,7 +206,8 @@ sed -i 's/\r//' COPYING
 
 
 %build
-./configure --disable-kmods --enable-webservice 
+./configure --disable-kmods --enable-webservice
+#--disable-java
 . ./env.sh
 
 # VirtualBox build system installs and builds in the same step,
@@ -550,6 +555,11 @@ fi
 
 
 %changelog
+* Mon Sep 03 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.1.RC3
+- New major release, devel release of rpms  .
+- rebase patches VirtualBox-4.1.20-libcxx.patch, VirtualBox-OSE-4.1.4-xorg17.patch
+  and VirtualBox-OSE-4.0.0-32bit.patch
+
 * Sat Sep 01 2012 Sérgio Basto <sergio@serjux.com> - 4.1.20-1
 - New upstream release.
 - Redo VirtualBox-4.1.20-libcxx.patch

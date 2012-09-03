@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# User is advised to run this on upgrades
+/sbin/modprobe -r -b vboxnetflt &>/dev/null ||:
+/sbin/modprobe -r -b vboxnetadp &>/dev/null ||:
+/sbin/modprobe -r -b vboxdrv &>/dev/null ||:
+
+# Workaround for https://bugzilla.rpmfusion.org/show_bug.cgi?id=1083
+insert_module ()
+{
+	grep -qR "^[ \t]*blacklist[ \t][ \t]*$1[ \t]*" /etc/modprobe.d && return
+	modinfo $1 |awk '/filename:/ {print "insmod "$2}' |$SHELL
+}
+
+insert_module vboxdrv
+insert_module vboxnetflt
+insert_module vboxnetadp

@@ -67,26 +67,24 @@ index 4debf81..59dae0d 100644
  tstDeviceStructSize_TEMPLATE = VBOXR3AUTOTST
  tstDeviceStructSize_DEFS     = $(VBOX_DEVICES_TESTS_FEATURES)
  tstDeviceStructSize_INCS     = \
-diff --git a/src/VBox/VMM/testcase/Makefile.kmk b/src/VBox/VMM/testcase/Makefile.kmk
-index f947789..95882f1 100644
---- a/src/VBox/VMM/testcase/Makefile.kmk
-+++ b/src/VBox/VMM/testcase/Makefile.kmk
-@@ -21,10 +21,14 @@ include	$(KBUILD_PATH)/subheader.kmk
+--- a/src/VBox/VMM/testcase/Makefile.kmk.32bit	2012-07-18 09:58:08.000000000 +0100
++++ b/src/VBox/VMM/testcase/Makefile.kmk	2012-09-02 04:04:34.551296386 +0100
+@@ -21,9 +21,11 @@ include $(KBUILD_PATH)/subheader.kmk
  #
  # Target lists.
  #
+-PROGRAMS   += tstVMStructSize tstAsmStructs
+-ifdef VBOX_WITH_RAW_MODE
+- PROGRAMS  += tstVMStructRC tstAsmStructsRC
 +ifneq ($(KBUILD_HOST_ARCH),amd64)
- PROGRAMS   += tstVMStructSize tstAsmStructs
-+endif
- ifdef VBOX_WITH_RAW_MODE
-+ifneq ($(KBUILD_HOST_ARCH),amd64)
-  PROGRAMS  += tstVMStructRC tstAsmStructsRC
++ PROGRAMS   += tstVMStructSize tstAsmStructs
++ ifdef VBOX_WITH_RAW_MODE
++  PROGRAMS  += tstVMStructRC tstAsmStructsRC
++ endif
  endif
-+endif
- ifndef VBOX_ONLY_EXTPACKS_USE_IMPLIBS
-  PROGRAMS  += tstGlobalConfig tstInstrEmul
-  ifdef VBOX_WITH_RAW_MODE
-@@ -67,16 +71,21 @@ BLDDIRS += $(VBOX_VMM_TESTCASE_OUT_DIR)
+ if !defined(VBOX_ONLY_EXTPACKS) \
+  && (   defined(VBOX_WITH_DTRACE_R3) \
+@@ -77,16 +79,21 @@ BLDDIRS += $(VBOX_VMM_TESTCASE_OUT_DIR)
  #
  ifeq ($(KBUILD_TARGET),$(KBUILD_HOST))
   ifeq ($(filter-out x86.x86 amd64.amd64 x86.amd64, $(KBUILD_TARGET_ARCH).$(KBUILD_HOST_ARCH)),)
@@ -108,6 +106,3 @@ index f947789..95882f1 100644
  ifndef VBOX_ONLY_EXTPACKS_USE_IMPLIBS
   TESTING += \
  	$(VBOX_VMM_TESTCASE_OUT_DIR)/tstInstrEmul.run
--- 
-1.7.3.4
-
