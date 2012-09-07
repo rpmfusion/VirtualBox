@@ -15,7 +15,7 @@
 
 Name:       VirtualBox
 Version:    4.2.0
-Release:    0.4%{?prerel:.%{prerel}}%{?dist}
+Release:    0.5%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -34,6 +34,7 @@ Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-4.1.18-strings.patch
 Patch3:     VirtualBox-4.2.0-libcxx.patch
 Patch5:     VirtualBox-4.2.0-xorg17.patch
+Patch10:	VirtualBox-OSE-4.0.0-32bit.patch
 Patch15:    VirtualBox-OSE-4.0.0-makeself.patch
 Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
@@ -61,7 +62,7 @@ BuildRequires:  mkisofs
 BuildRequires:  java-devel >= 1.6
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  libpng-devel
-BuildRequires:  glibc.i686 glibc-devel.i686 libstdc++.i686
+#BuildRequires:  glibc.i686 glibc-devel.i686 libstdc++.i686
 #BuildRequires:  /usr/lib/libc.so
 #BuildRequires:  /usr/lib/libstdc++.so.6 /lib/libc.so.6 
 
@@ -177,6 +178,7 @@ find -name '*.py[co]' -delete
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .libcxx
 %patch5 -p1 -b .xorg17
+%patch10 -p1 -b .32bit
 %patch15 -p1 -b .makeself
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
@@ -551,6 +553,9 @@ fi
 
 
 %changelog
+* Fri Sep 07 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.5.RC3
+- not drop 32-bit patch, as a quick resolution.
+
 * Fri Sep 07 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.4.RC3
 - Also Compile guest drives vboxvideo_drv and vboxmouse_drv with X11 sources from system.
 - Fix ABI/API breakages in X11 1.13.
