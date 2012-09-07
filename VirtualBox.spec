@@ -15,7 +15,7 @@
 
 Name:       VirtualBox
 Version:    4.2.0
-Release:    0.3%{?prerel:.%{prerel}}%{?dist}
+Release:    0.4%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -39,9 +39,9 @@ Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-OSE-4.1.10-mesa.patch
-#Patch24:    VirtualBox-4.1.20-x113.patch
+Patch24:    VirtualBox-4.1.20-x113.patch
 
-%if 0%{?fedora} < 17
+%if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
 %endif
 BuildRequires:  SDL-devel xalan-c-devel
@@ -186,15 +186,16 @@ find -name '*.py[co]' -delete
 %if 0%{?fedora} > 16
 %patch23 -p1 -b .mesa
 %endif
-#%if 0%{?fedora} > 17
-#%patch24 -p1 -b .x113
-#%endif
+%if 0%{?fedora} > 17
+%patch24 -p1 -b .x113
+%endif
 
 # Remove prebuilt binary tools
-%if 0%{?fedora} < 17
+%if 0%{?fedora} < 16
 rm -rf kBuild
 %endif
 rm -rf tools
+#rm -rf src/VBox/Additions/x11/x11include
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -550,6 +551,10 @@ fi
 
 
 %changelog
+* Fri Sep 07 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.4.RC3
+- Also Compile guest drives vboxvideo_drv and vboxmouse_drv with X11 sources from system.
+- Fix ABI/API breakages in X11 1.13.
+
 * Mon Sep 03 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.3.RC3
 - fix requires kmod, with version with prerealeses.
 

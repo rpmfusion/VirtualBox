@@ -1,7 +1,78 @@
 X.org 1.13 patch 
---- a/src/VBox/Additions/x11/vboxvideo/vboxvideo.c.orig	2012-09-02 05:45:06.134994216 +0100
-+++ b/src/VBox/Additions/x11/vboxvideo/vboxvideo.c	2012-09-02 05:45:20.136137244 +0100
-@@ -709,7 +709,7 @@ vboxEnableDisableFBAccess(int scrnIndex,
+Reference: 
+http://www.mail-archive.com/xorg-devel@lists.x.org/msg30282.html
+ [PATCH 01/19] xserver: remove index from CloseScreen (API/ABI breakage) Dave Airlie
+ [PATCH 02/19] xserver: convert block/wakeup handlers to passing ScreenPtr (ABI/API break) Dave
+ Airlie
+ [PATCH 04/19] xf86: modify FreeScreen callback to take pScrn instead of index. (ABI/API) Dave
+     Airlie
+ [PATCH 03/19] xf86: change EnterVT/LeaveVT to take a ScrnInfoPtr (ABI/API break) Dave Airlie
+ [PATCH 07/19] xf86: migrate ValidMode callback to ScrnInfoPtr (ABI/API) Dave Airlie
+ [PATCH 05/19] xf86: move AdjustFrame to passing ScrnInfoPtr (ABI/API) Dave Airlie
+ [PATCH 06/19] xf86: migrate SwitchMode to taking ScrnInfoPtr (ABI/API) Dave Airlie
+ etc...
+--- VirtualBox-4.2.0_RC3/src/VBox/Additions/x11/vboxvideo/vboxvideo_dri.c.x113 	2012-08-29 20:10:30.000000000 +0100
++++ VirtualBox-4.2.0_RC3/src/VBox/Additions/x11/vboxvideo/vboxvideo_dri.c	2012-09-06 23:18:39.671510033 +0100
+@@ -156,11 +156,11 @@ VBOXDoBlockHandler(int screenNum, pointe
+ }
+ #endif
+ 
+-Bool VBOXDRIScreenInit(int scrnIndex, ScreenPtr pScreen, VBOXPtr pVBox)
++Bool VBOXDRIScreenInit(ScreenPtr pScreen, VBOXPtr pVBox)
+ {
+     DRIInfoPtr pDRIInfo = NULL;
+     Bool rc = TRUE;
+-    ScrnInfoPtr pScrn = xf86Screens[scrnIndex];
++    ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
+ 
+     TRACE_ENTRY();
+     pVBox->drmFD = -1;
+--- VirtualBox-4.2.0_RC3/src/VBox/Additions/x11/vboxvideo/vboxvideo.h.x113	2012-09-06 23:42:36.010456357 +0100
++++ VirtualBox-4.2.0_RC3/src/VBox/Additions/x11/vboxvideo/vboxvideo.h	2012-09-06 23:42:49.903562273 +0100
+@@ -234,7 +234,7 @@ extern void vboxAddModes(ScrnInfoPtr pSc
+                          uint32_t cyInit);
+ 
+ /* DRI stuff */
+-extern Bool VBOXDRIScreenInit(int scrnIndex, ScreenPtr pScreen, VBOXPtr pVBox);
++extern Bool VBOXDRIScreenInit(ScreenPtr pScreen, VBOXPtr pVBox);
+ extern Bool VBOXDRIFinishScreenInit(ScreenPtr pScreen);
+ extern void VBOXDRIUpdateStride(ScrnInfoPtr pScrn, VBOXPtr pVBox);
+ extern void VBOXDRICloseScreen(ScreenPtr pScreen, VBOXPtr pVBox);
+--- VirtualBox-4.2.0_RC3/src/VBox/Additions/x11/vboxvideo/vboxvideo.c.x113	2012-08-29 20:10:30.000000000 +0100
++++ VirtualBox-4.2.0_RC3/src/VBox/Additions/x11/vboxvideo/vboxvideo.c	2012-09-06 23:56:40.481894812 +0100
+@@ -108,15 +108,15 @@ static Bool VBOXPciProbe(DriverPtr drv,
+      struct pci_device *dev, intptr_t match_data);
+ #endif
+ static Bool VBOXPreInit(ScrnInfoPtr pScrn, int flags);
+-static Bool VBOXScreenInit(int Index, ScreenPtr pScreen, int argc,
++static Bool VBOXScreenInit(ScreenPtr pScrn, int argc,
+                            char **argv);
+-static Bool VBOXEnterVT(int scrnIndex, int flags);
+-static void VBOXLeaveVT(int scrnIndex, int flags);
++static Bool VBOXEnterVT(ScrnInfoPtr pScrn, int flags);
++static void VBOXLeaveVT(ScrnInfoPtr pScrn, int flags);
+ static Bool VBOXCloseScreen(int scrnIndex, ScreenPtr pScreen);
+ static Bool VBOXSaveScreen(ScreenPtr pScreen, int mode);
+-static Bool VBOXSwitchMode(int scrnIndex, DisplayModePtr pMode, int flags);
+-static void VBOXAdjustFrame(int scrnIndex, int x, int y, int flags);
+-static void VBOXFreeScreen(int scrnIndex, int flags);
++static Bool VBOXSwitchMode(ScrnInfoPtr pScrn, DisplayModePtr pMode, int flags);
++static void VBOXAdjustFrame(ScrnInfoPtr pScrn, int x, int y, int flags);
++static void VBOXFreeScreen(ScrnInfoPtr pScrn, int flags);
+ static void VBOXDisplayPowerManagementSet(ScrnInfoPtr pScrn, int mode,
+                                           int flags);
+ 
+@@ -700,16 +700,14 @@ VBOXProbe(DriverPtr drv, int flags)
+  * restore it or not afterwards.
+  */
+ static void
+-vboxEnableDisableFBAccess(int scrnIndex, Bool enable)
++vboxEnableDisableFBAccess(ScrnInfoPtr pScrn, Bool enable)
+ {
+-    ScrnInfoPtr pScrn = xf86Screens[scrnIndex];
+-    
+     VBOXPtr pVBox = VBOXGetRec(pScrn);
+ 
      TRACE_LOG("enable=%s\n", enable ? "TRUE" : "FALSE");
      VBOXSetRec(pScrn);
      pVBox->accessEnabled = enable;
@@ -10,7 +81,77 @@ X.org 1.13 patch
      TRACE_EXIT();
  }
  
-@@ -1198,7 +1198,7 @@ VBOXCloseScreen(int scrnIndex, ScreenPtr
+@@ -936,9 +934,9 @@ vboxLoadPalette(ScrnInfoPtr pScrn, int n
+  * End QUOTE.
+  */
+ static Bool
+-VBOXScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
++VBOXScreenInit(ScreenPtr pScreen, int argc, char **argv)
+ {
+-    ScrnInfoPtr pScrn = xf86Screens[scrnIndex];
++    ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
+     VBOXPtr pVBox = VBOXGetRec(pScrn);
+     VisualPtr visual;
+     unsigned flags;
+@@ -960,7 +958,7 @@ VBOXScreenInit(int scrnIndex, ScreenPtr
+         return (FALSE);
+ 
+ #ifdef VBOX_DRI
+-    pVBox->useDRI = VBOXDRIScreenInit(scrnIndex, pScreen, pVBox);
++    pVBox->useDRI = VBOXDRIScreenInit(pScreen, pVBox);
+ #endif
+ 
+     if (!fbScreenInit(pScreen, pVBox->base,
+@@ -1113,7 +1111,7 @@ VBOXScreenInit(int scrnIndex, ScreenPtr
+         xf86ShowUnusedOptions(pScrn->scrnIndex, pScrn->options);
+ 
+     if (vbox_cursor_init(pScreen) != TRUE)
+-        xf86DrvMsg(scrnIndex, X_ERROR,
++        xf86DrvMsg(pScrn->scrnIndex, X_ERROR,
+                    "Unable to start the VirtualBox mouse pointer integration with the host system.\n");
+ 
+ #ifdef VBOX_DRI
+@@ -1124,9 +1122,8 @@ VBOXScreenInit(int scrnIndex, ScreenPtr
+ }
+ 
+ static Bool
+-VBOXEnterVT(int scrnIndex, int flags)
++VBOXEnterVT(ScrnInfoPtr pScrn, int flags)
+ {
+-    ScrnInfoPtr pScrn = xf86Screens[scrnIndex];
+     VBOXPtr pVBox = VBOXGetRec(pScrn);
+ 
+     TRACE_ENTRY();
+@@ -1136,7 +1133,7 @@ VBOXEnterVT(int scrnIndex, int flags)
+     pVBox->vtSwitch = FALSE;
+ #ifdef VBOX_DRI
+     if (pVBox->useDRI)
+-        DRIUnlock(screenInfo.screens[scrnIndex]);
++        DRIUnlock(xf86ScrnToScreen(pScrn));
+ #endif
+ #ifdef VBOXVIDEO_13
+     if (!xf86SetDesiredModes(pScrn))
+@@ -1151,9 +1148,8 @@ VBOXEnterVT(int scrnIndex, int flags)
+ }
+ 
+ static void
+-VBOXLeaveVT(int scrnIndex, int flags)
++VBOXLeaveVT(ScrnInfoPtr pScrn, int flags)
+ {
+-    ScrnInfoPtr pScrn = xf86Screens[scrnIndex];
+     VBOXPtr pVBox = VBOXGetRec(pScrn);
+ 
+     TRACE_ENTRY();
+@@ -1165,7 +1161,7 @@ VBOXLeaveVT(int scrnIndex, int flags)
+     vboxDisableGraphicsCap(pVBox);
+ #ifdef VBOX_DRI
+     if (pVBox->useDRI)
+-        DRILock(screenInfo.screens[scrnIndex], 0);
++        DRILock(xf86ScrnToScreen(pScrn), 0);
+ #endif
+     TRACE_EXIT();
+ }
+@@ -1198,23 +1194,21 @@ VBOXCloseScreen(int scrnIndex, ScreenPtr
      /* Remove our observer functions from the X server call chains. */
      pScrn->EnableDisableFBAccess = pVBox->EnableDisableFBAccess;
      pScreen->CloseScreen = pVBox->CloseScreen;
@@ -19,7 +160,16 @@ X.org 1.13 patch
  }
  
  static Bool
-@@ -1214,7 +1214,7 @@ VBOXSwitchMode(int scrnIndex, DisplayMod
+-VBOXSwitchMode(int scrnIndex, DisplayModePtr pMode, int flags)
++VBOXSwitchMode(ScrnInfoPtr pScrn, DisplayModePtr pMode, int flags)
+ {
+-    ScrnInfoPtr pScrn;
+     VBOXPtr pVBox;
+     Bool rc;
+ 
+     TRACE_LOG("HDisplay=%d, VDisplay=%d\n", pMode->HDisplay, pMode->VDisplay);
+-    pScrn = xf86Screens[scrnIndex];  /* Why does X have three ways of referring to the screen? */
+     pVBox = VBOXGetRec(pScrn);
      /* We want to disable access to the framebuffer before switching mode.
       * After doing the switch, we allow access if it was allowed before. */
      if (pVBox->accessEnabled)
@@ -28,7 +178,7 @@ X.org 1.13 patch
  #ifdef VBOXVIDEO_13
      rc = xf86SetSingleMode(pScrn, pMode, 0);
  #else
-@@ -1231,7 +1231,7 @@ VBOXSwitchMode(int scrnIndex, DisplayMod
+@@ -1231,16 +1225,15 @@ VBOXSwitchMode(int scrnIndex, DisplayMod
                            pScrn->bitsPerPixel);
  #endif
      if (pVBox->accessEnabled)
@@ -37,118 +187,26 @@ X.org 1.13 patch
      TRACE_LOG("returning %s\n", rc ? "TRUE" : "FALSE");
      return rc;
  }
---- a/Config.kmk.x113 2012-09-02 17:55:59.642186269 +0100
-+++ b/Config.kmk  2012-09-02 18:30:18.743236550 +0100
-@@ -546,9 +546,9 @@ VBOX_WITH_MULTIVERSION_PYTHON ?= 1
- # Enable the kchmviewer.
- VBOX_WITH_KCHMVIEWER = 1
- # Build the testsuite.
--VBOX_WITH_TESTSUITE = 1
-+VBOX_WITH_TESTSUITE = 0
- # Build the testcases.
--VBOX_WITH_TESTCASES = 1
-+VBOX_WITH_TESTCASES = 0
- # Enables the ffmpeg module for recording test runs.
- # TODO: Enable this for normal build server builds?
- #if1of ($(KBUILD_TARGET), linux)
-@@ -4977,30 +4977,30 @@ endif
- # Guest additions libraries (all static).
- #   The _MINI and _SHARED are both compiled as PIC and intended for linking into a .so/.dll/.dylib.
- #
--VBOX_LIB_IPRT_GUEST_R3           = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR3$(VBOX_SUFF_LIB)
--VBOX_LIB_IPRT_GUEST_R3_MINI      = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR3Mini$(VBOX_SUFF_LIB)
--VBOX_LIB_IPRT_GUEST_R3_SHARED    = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR3Shared$(VBOX_SUFF_LIB)
--VBOX_LIB_IPRT_GUEST_R0           = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR0$(VBOX_SUFF_LIB)
-+VBOX_LIB_IPRT_GUEST_R3           = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR3$(VBOX_SUFF_LIB)
-+VBOX_LIB_IPRT_GUEST_R3_MINI      = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR3Mini$(VBOX_SUFF_LIB)
-+VBOX_LIB_IPRT_GUEST_R3_SHARED    = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR3Shared$(VBOX_SUFF_LIB)
-+VBOX_LIB_IPRT_GUEST_R0           = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR0$(VBOX_SUFF_DLL)
- ifeq ($(KBUILD_TARGET_ARCH),x86)
-- VBOX_LIB_IPRT_GUEST_R0_NT4      = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR0NT4$(VBOX_SUFF_LIB)
-+ VBOX_LIB_IPRT_GUEST_R0_NT4      = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR0NT4$(VBOX_SUFF_DLL)
- else
-  VBOX_LIB_IPRT_GUEST_R0_NT4      = $(VBOX_LIB_IPRT_GUEST_R0)
- endif
--VBOX_LIB_VBGL_R3                 = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR3Lib$(VBOX_SUFF_LIB)
--VBOX_LIB_VBGL_R3_XFREE86         = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR3LibXFree86$(VBOX_SUFF_LIB)
--VBOX_LIB_VBGL_R3_SHARED          = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR3LibShared$(VBOX_SUFF_LIB)
--VBOX_LIB_VBGL_R0BASE             = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR0LibBase$(VBOX_SUFF_LIB)
--VBOX_LIB_VBGL_R0                 = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR0Lib$(VBOX_SUFF_LIB)
-+VBOX_LIB_VBGL_R3                 = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR3Lib$(VBOX_SUFF_LIB)
-+VBOX_LIB_VBGL_R3_XFREE86         = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR3LibXFree86$(VBOX_SUFF_DLL)
-+VBOX_LIB_VBGL_R3_SHARED          = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR3LibShared$(VBOX_SUFF_LIB)
-+VBOX_LIB_VBGL_R0BASE             = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR0LibBase$(VBOX_SUFF_DLL)
-+VBOX_LIB_VBGL_R0                 = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR0Lib$(VBOX_SUFF_DLL)
- ifeq ($(KBUILD_TARGET),x86)
-  VBOX_LIB_IPRT_GUEST_R3_X86      = $(VBOX_LIB_IPRT_GUEST_R3)
-  VBOX_LIB_IPRT_GUEST_R3_SHARED_X86 = $(VBOX_LIB_IPRT_GUEST_R3_SHARED)
-  VBOX_LIB_VBGL_R3_X86            = $(VBOX_LIB_VBGL_R3)
-  VBOX_LIB_VBGL_R3_SHARED_X86     = $(VBOX_LIB_VBGL_R3_SHARED)
- else
-- VBOX_LIB_IPRT_GUEST_R3_X86      = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR3-x86$(VBOX_SUFF_LIB)
-- VBOX_LIB_IPRT_GUEST_R3_SHARED_X86 = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR3Shared-x86$(VBOX_SUFF_LIB)
-- VBOX_LIB_VBGL_R3_X86            = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR3Lib-x86$(VBOX_SUFF_LIB)
-- VBOX_LIB_VBGL_R3_SHARED_X86     = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR3LibShared-x86$(VBOX_SUFF_LIB)
-+ VBOX_LIB_IPRT_GUEST_R3_X86      = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR3-x86$(VBOX_SUFF_DLL)
-+ VBOX_LIB_IPRT_GUEST_R3_SHARED_X86 = $(VBOX_PATH_ADDITIONS_LIB)/RuntimeGuestR3Shared-x86$(VBOX_SUFF_DLL)
-+ VBOX_LIB_VBGL_R3_X86            = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR3Lib-x86$(VBOX_SUFF_DLL)
-+ VBOX_LIB_VBGL_R3_SHARED_X86     = $(VBOX_PATH_ADDITIONS_LIB)/VBoxGuestR3LibShared-x86$(VBOX_SUFF_DLL)
- endif
  
+ static void
+-VBOXAdjustFrame(int scrnIndex, int x, int y, int flags)
++VBOXAdjustFrame(ScrnInfoPtr pScrn, int x, int y, int flags)
+ {
+-    VBOXPtr pVBox = VBOXGetRec(xf86Screens[scrnIndex]);
+-    ScrnInfoPtr pScrn = xf86Screens[scrnIndex];
++    VBOXPtr pVBox = VBOXGetRec(pScrn);
  
---- VirtualBox-4.2.0_RC3/src/VBox/HostServices/SharedFolders/testcase/Makefile.kmk.orig	2012-09-02 18:32:05.119324113 +0100
-+++ VirtualBox-4.2.0_RC3/src/VBox/HostServices/SharedFolders/testcase/Makefile.kmk	2012-05-30 11:38:10.000000000 +0100
-@@ -21,7 +21,9 @@ include $(KBUILD_PATH)/subheader.kmk
- #
- # Structure size testcase.
- #
-+ifneq ($(KBUILD_HOST_ARCH),amd64)
- PROGRAMS += tstShflSizes
-+endif
- TESTING  += $(tstShflSizes_0_OUTDIR)/tstShflSizes.run
- ifndef VBOX_ONLY_SDK
-  ifeq ($(KBUILD_TARGET),$(KBUILD_HOST))
-@@ -44,7 +46,9 @@ ifdef VBOX_WITH_TESTCASES
- #
- # Case conversion testcase.
- #
-+ifneq ($(KBUILD_HOST_ARCH),amd64)
- PROGRAMS += tstShflCase
-+endif
- tstShflCase_TEMPLATE = VBOXR3TSTEXE
- tstShflCase_DEFS     = VBOX_WITH_HGCM
- tstShflCase_SOURCES  = tstShflCase.cpp
-@@ -56,9 +60,11 @@ tstShflCase_LIBS     = $(LIB_RUNTIME)
+     TRACE_ENTRY();
+     /* Don't fiddle with the hardware if we are switched
+@@ -1251,10 +1244,8 @@ VBOXAdjustFrame(int scrnIndex, int x, in
+ }
  
- # As there are differences between the Windows build of the service and others,
- # we do an additional build with RT_OS_WINDOWS defined on non-Windows targets.
-+ifneq ($(KBUILD_HOST_ARCH),amd64)
- PROGRAMS += \
-     tstSharedFolderService \
-     $(if $(eq $(KBUILD_TARGET),win),,tstSharedFolderService-win)
-+endif
- 
- tstSharedFolderService_TEMPLATE = VBOXR3TSTEXE
- tstSharedFolderService_DEFS     = VBOX_WITH_HGCM UNITTEST
---- a/src/VBox/Main/Makefile.kmk	2012-08-29 15:13:36.000000000 +0100
-+++ b/src/VBox/Main/Makefile.kmk	2012-09-02 19:09:49.250454117 +0100
-@@ -705,7 +705,7 @@ $$(VBoxC_0_OUTDIR)/VBoxC.rgs: $(VBOX_PAT
- # VBoxCOM - COM Abstraction Layer library
- #
- LIBRARIES += VBoxCOM
--VBoxCOM_TEMPLATE        = VBOXMAINLIB
-+VBoxCOM_TEMPLATE        = VBOXMAINDLL
- VBoxCOM_INTERMEDIATES   = $(VBOX_MAIN_PREREQS)
- VBoxCOM_SOURCES         = \
- 	glue/com.cpp \
---- a/src/VBox/Runtime/Makefile.kmk.testmangle	2012-08-29 15:13:34.000000000 +0100
-+++ b/src/VBox/Runtime/Makefile.kmk	2012-09-02 19:30:41.688859884 +0100
-@@ -211,7 +211,7 @@ endif
- #
- # RuntimeR3 - Static Runtime for Ring-3 executables.
- #
--RuntimeR3_TEMPLATE      = VBoxR3Static
-+RuntimeR3_TEMPLATE      = VBOXR3DLLNOXCPT
- RuntimeR3_SDKS          = VBOX_LIBXML2 VBOX_OPENSSL VBOX_BOOST ## @todo why is BOOST and XML2 here? r3/xml.cpp is not in this lib...
- RuntimeR3_SDKS.win      = $(VBOX_WINPSDK) $(VBOX_WINDDK)
- RuntimeR3_DEFS          = IN_RT_R3 IN_SUP_R3 LDR_WITH_NATIVE LDR_WITH_ELF32 LDR_WITH_PE RT_WITH_VBOX RT_NO_GIP
+ static void
+-VBOXFreeScreen(int scrnIndex, int flags)
++VBOXFreeScreen(ScrnInfoPtr pScrn, int flags)
+ {
+-    ScrnInfoPtr pScrn = xf86Screens[scrnIndex];
+-
+     /* Destroy the VGA hardware record */
+     vgaHWFreeHWRec(pScrn);
+     /* And our private record */
