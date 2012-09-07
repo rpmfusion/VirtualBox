@@ -61,9 +61,9 @@ BuildRequires:  mkisofs
 BuildRequires:  java-devel >= 1.6
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  libpng-devel
-# libstdc++.i686 and libc-devel.i686 for 32-bits
-BuildRequires:  /usr/lib/libc.so
-BuildRequires:  /usr/lib/libstdc++.so.6 /lib/libc.so.6 
+BuildRequires:  libc.i686 libc-devel.i686 libstdc++.i686
+#BuildRequires:  /usr/lib/libc.so
+#BuildRequires:  /usr/lib/libstdc++.so.6 /lib/libc.so.6 
 
 # For the X11 module
 BuildRequires:  libdrm-devel
