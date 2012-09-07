@@ -61,7 +61,7 @@ BuildRequires:  mkisofs
 BuildRequires:  java-devel >= 1.6
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  libpng-devel
-BuildRequires:  libc.i686 libc-devel.i686 libstdc++.i686
+BuildRequires:  glibc.i686 glibc-devel.i686 libstdc++.i686
 #BuildRequires:  /usr/lib/libc.so
 #BuildRequires:  /usr/lib/libstdc++.so.6 /lib/libc.so.6 
 
