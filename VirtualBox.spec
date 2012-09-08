@@ -34,7 +34,9 @@ Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-4.1.18-strings.patch
 Patch3:     VirtualBox-4.2.0-libcxx.patch
 Patch5:     VirtualBox-4.2.0-xorg17.patch
+%ifarch x86_64
 Patch10:	VirtualBox-OSE-4.0.0-32bit.patch
+%endif
 Patch15:    VirtualBox-OSE-4.0.0-makeself.patch
 Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
@@ -178,8 +180,10 @@ find -name '*.py[co]' -delete
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .libcxx
 %patch5 -p1 -b .xorg17
-%patch10 -p1 -b .32bit
 %patch15 -p1 -b .makeself
+%ifarch x86_64
+%patch10 -p1 -b .32bit
+%endif
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
 %if 0%{?fedora} < 16
@@ -554,7 +558,7 @@ fi
 
 %changelog
 * Fri Sep 07 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.5.RC3
-- not drop 32-bit patch, as a quick resolution.
+- not drop 32-bit patch, on x86_64 as quick resolution of not have glic-devel.i686 on x86_64.
 
 * Fri Sep 07 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.4.RC3
 - Also Compile guest drives vboxvideo_drv and vboxmouse_drv with X11 sources from system.
