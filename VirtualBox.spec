@@ -10,12 +10,12 @@
 # major version number, while the kernel module abi is not guarranteed
 # to be stable. This is so that we force the module update in sync with
 # userspace.
-%global prerel RC3
+%global prerel RC4
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:       VirtualBox
 Version:    4.2.0
-Release:    0.5%{?prerel:.%{prerel}}%{?dist}
+Release:    0.6%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -35,7 +35,7 @@ Patch2:     VirtualBox-4.1.18-strings.patch
 Patch3:     VirtualBox-4.2.0-libcxx.patch
 Patch5:     VirtualBox-4.2.0-xorg17.patch
 %ifarch x86_64
-Patch10:	VirtualBox-OSE-4.0.0-32bit.patch
+Patch10:	VirtualBox-4.2.0-32bit.patch
 %endif
 Patch15:    VirtualBox-OSE-4.0.0-makeself.patch
 Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
@@ -192,16 +192,16 @@ find -name '*.py[co]' -delete
 %if 0%{?fedora} > 16
 %patch23 -p1 -b .mesa
 %endif
-%if 0%{?fedora} > 17
-%patch24 -p1 -b .x113
-%endif
+#if 0%{?fedora} > 17
+#patch24 -p1 -b .x113
+#endif
 
 # Remove prebuilt binary tools
 %if 0%{?fedora} < 16
 rm -rf kBuild
 %endif
 rm -rf tools
-#rm -rf src/VBox/Additions/x11/x11include
+rm -rf src/VBox/Additions/x11/x11include
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -557,6 +557,13 @@ fi
 
 
 %changelog
+* Sun Sep 09 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.6.RC4
+- Update to RC4. 
+- Rename 32-bits patch to VirtualBox-4.2.0-32bit.patch
+- Drop patch23 to fix ABI/API breakages in X11 1.13, appears fixed in RC4 !
+- Compile VBoxGuestLib with X11 sources from system and fix VBoxGuestR3LibRuntimeXF86.cpp. 
+- Removes X11 includes from sources (src/VBox/Additions/x11/x11include).
+
 * Fri Sep 07 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.5.RC3
 - not drop 32-bit patch, on x86_64 as quick resolution of not have glic-devel.i686 on x86_64.
 
