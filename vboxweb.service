@@ -1,5 +1,5 @@
 [Unit]
-Description=VirtualBox OSE Web Service
+Description=VirtualBox Web Service
 After=network.target
 
 [Service]
