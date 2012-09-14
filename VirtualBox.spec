@@ -61,7 +61,7 @@ BuildRequires:  mkisofs
 BuildRequires:  java-devel >= 1.6
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  libpng-devel
-BuildRequires:  glibc(x86-32) glibc-devel(x86-32) libstdc++(x86-32)
+BuildRequires:  glibc-devel(x86-32) libstdc++(x86-32)
 
 # For the X11 module
 BuildRequires:  libdrm-devel
