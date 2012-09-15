@@ -10,12 +10,12 @@
 # major version number, while the kernel module abi is not guarranteed
 # to be stable. This is so that we force the module update in sync with
 # userspace.
-%global prerel RC4
+#global prerel RC4
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:       VirtualBox
 Version:    4.2.0
-Release:    0.7%{?prerel:.%{prerel}}%{?dist}
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -34,12 +34,14 @@ Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-4.1.18-strings.patch
 Patch3:     VirtualBox-4.2.0-libcxx.patch
 Patch5:     VirtualBox-4.2.0-xorg17.patch
+%ifarch x86_64
+Patch10:     VirtualBox-4.2.0-32bit.patch
+%endif
 Patch15:    VirtualBox-OSE-4.0.0-makeself.patch
 Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
-Patch23:    VirtualBox-OSE-4.1.10-mesa.patch
-Patch24:    VirtualBox-4.1.20-x113.patch
+Patch23:    VirtualBox-4.2.0-mesa.patch
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -61,7 +63,10 @@ BuildRequires:  mkisofs
 BuildRequires:  java-devel >= 1.6
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  libpng-devel
-BuildRequires:  glibc(x86-32) glibc-devel(x86-32) libstdc++(x86-32)
+#BuildRequires:  glibc(x86-32) glibc-devel(x86-32) libstdc++(x86-32)
+#BuildRequires:  glibc.i686 glibc-devel.i686 libstdc++.i686
+#BuildRequires:  /usr/lib/libc.so
+#BuildRequires:  /usr/lib/libstdc++.so.6 /lib/libc.so.6 
 
 # For the X11 module
 BuildRequires:  libdrm-devel
@@ -176,15 +181,15 @@ find -name '*.py[co]' -delete
 %patch3 -p1 -b .libcxx
 %patch5 -p1 -b .xorg17
 %patch15 -p1 -b .makeself
+%ifarch x86_64
+%patch10 -p1 -b .32bit
+%endif
 %patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
 %if 0%{?fedora} < 16
 %patch22 -p1 -b .gsoap
 %endif
 %patch23 -p1 -b .mesa
-#if 0%{?fedora} > 17
-#patch24 -p1 -b .x113
-#endif
 
 # Remove prebuilt binary tools
 %if 0%{?fedora} < 16
@@ -549,6 +554,13 @@ fi
 
 
 %changelog
+* Thu Sep 13 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-1
+- 4.2.0 released
+- Rebase and rework VirtualBox-4.2.0-xorg17.patch, add 2 new Definitions: XSERVER_LIBPCIACCESS XORG_VERSION_CURRENT=101300000
+- Rename and rework VirtualBox-OSE-4.1.10-mesa.patch 
+- Reorganize last 2 patches.
+- Revert attempt to remove 32-bits patch.
+
 * Thu Sep 13 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.7.RC4 
 - Another try to compile with 32-bits suport on x86_64.
 

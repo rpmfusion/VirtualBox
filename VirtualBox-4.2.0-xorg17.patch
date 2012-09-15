@@ -2,68 +2,31 @@ Build the X.Org driver only for the selected system X Server version.
 Author: Sérgio Basto <sergio@serjux.com>
 Based on scripts by Michael Meskes <meskes@debian.org>, Felix Geyer <debfx-pkg@fobos.de>
 
-diff --git a/src/VBox/Additions/common/crOpenGL/Makefile.kmk b/src/VBox/Additions/common/crOpenGL/Makefile.kmk
---- a/src/VBox/Additions/common/crOpenGL/Makefile.kmk
-+++ b/src/VBox/Additions/common/crOpenGL/Makefile.kmk
-@@ -63,16 +63,12 @@ VBoxOGL_TEMPLATE       = VBOXCROGLR3GUESTDLL
- VBoxOGL_INCS           = .
- if1of ($(KBUILD_TARGET), linux solaris freebsd)
-  VBoxOGL_INCS     += \
--	$(VBOX_PATH_X11_ROOT)/libXdamage-1.1 \
--	$(VBOX_PATH_X11_ROOT)/libXcomposite-0.4.0 \
--	$(VBOX_PATH_X11_ROOT)/libXfixes-4.0.3 \
--	$(VBOX_PATH_X11_ROOT)/damageproto-1.1.0 \
--	$(VBOX_PATH_X11_ROOT)/compositeproto-0.4 \
--	$(VBOX_PATH_X11_ROOT)/fixesproto-4.0 \
--	$(VBOX_PATH_X11_ROOT)/libx11-1.1.5-other \
--	$(VBOX_PATH_X11_ROOT)/1.3/xorg \
-+	/usr/include/x11 \
-+	/usr/include/xorg \
-+	/usr/include/pixman-1 \
- 	$(VBOX_MESA_INCS) \
--	$(PATH_ROOT)/src/VBox/Additions/x11/x11include/libdrm-2.4.13
-+	/usr/include/drm \
-+	/usr/include/libdrm
-  VBoxOGL_DEFS     += VBOX_NO_NATIVEGL
- endif
+VBoxGuestR3LibRuntimeXF86.cpp:
+Inspired from http://opensource.apple.com/source/X11server/X11server-85/kdrive/xorg-server-1.6.0/hw/xfree86/dummylib/
+xalloc.c and verrorf.c
+
+--- ./Config.kmk	2012-03-13 13:14:01.000000000 +0000
++++ ./Config.kmk	2012-03-27 23:55:28.070630137 +0100
+@@ -2003,15 +2003,7 @@ ifdef VBOX_WITH_CROGL
+  endif
  
---- a/src/VBox/Additions/x11/vboxvideo/testcase/Makefile.kmk	2012-01-12 19:57:53.762613198 +0000
-+++ b/src/VBox/Additions/x11/vboxvideo/testcase/Makefile.kmk	2012-01-12 20:01:17.296596446 +0000
-@@ -36,11 +36,11 @@ endif # !VBOX_ONLY_SDK
- #
- tstSetModeXOrg_TEMPLATE = VBOXR3TSTEXE
- tstSetModeXOrg_CFLAGS += -std=c99
--tstSetModeXOrg_DEFS = $(filter-out IN_RT_STATIC,$(vboxvideo_drv_15_DEFS)) TESTCASE
-+tstSetModeXOrg_DEFS = $(filter-out IN_RT_STATIC,$(vboxvideo_drv_17_DEFS)) TESTCASE
- tstSetModeXOrg_SOURCES  = \
- 	tstSetModeXOrg.c \
- 	../setmode.c
--tstSetModeXOrg_INCS = $(vboxvideo_drv_15_INCS)
-+tstSetModeXOrg_INCS = $(vboxvideo_drv_17_INCS)
+  if1of ($(KBUILD_TARGET), freebsd linux solaris)
+- # VBOX_PATH_MESA_SOURCE = $(PATH_ROOT)/src/libs/mesa-7.2
+-  VBOX_PATH_MESA_SOURCE = $(VBOX_PATH_X11_ROOT)/mesa-7.2
+-  VBOX_MESA_INCS = \
+-        $(VBOX_PATH_MESA_SOURCE) \
+-        $(VBOX_PATH_MESA_SOURCE)/include \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/ \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/glapi \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/main \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/drivers/dri/common
++  VBOX_MESA_INCS = /usr/include/GL /usr/include/xorg /usr/include/pixman-1
+  endif
  
- 
- # generate rules.
---- ./src/VBox/Additions/x11/vboxmouse/vboxmouse.c.xorg17	2012-03-13 14:52:26.000000000 +0000
-+++ ./src/VBox/Additions/x11/vboxmouse/vboxmouse.c	2012-09-09 01:12:19.440114469 +0100
-@@ -54,12 +54,12 @@
- 
- #ifdef VBOX_GUESTR3XF86MOD
- # define _X_EXPORT
--#else
--# include <errno.h>
--# include <fcntl.h>
--# include <unistd.h>
- #endif
- 
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+
- #include "product-generated.h"
- 
- static void
---- VirtualBox-4.2.0_RC3/src/VBox/Additions/x11/vboxmouse/Makefile.kmk.xorg17	2012-08-03 13:28:42.000000000 +0100
-+++ VirtualBox-4.2.0_RC3/src/VBox/Additions/x11/vboxmouse/Makefile.kmk	2012-09-07 03:18:17.460463185 +0100
+  VBOX_DARWIN_OPENGL_INST     = obj/VBoxOGL/GL/
+--- ./src/VBox/Additions/x11/vboxmouse/Makefile.kmk.xorg17	2012-08-03 13:28:42.000000000 +0100
++++ ./src/VBox/Additions/x11/vboxmouse/Makefile.kmk	2012-09-07 03:18:17.460463185 +0100
 @@ -30,25 +30,12 @@ if1of ($(KBUILD_TARGET), linux)
   # This one has to be defined when building server code on systems where
   # unsigned long is 64bits
@@ -125,8 +88,27 @@ diff --git a/src/VBox/Additions/common/crOpenGL/Makefile.kmk b/src/VBox/Addition
 +
  include $(FILE_KBUILD_SUB_FOOTER)
  
---- VirtualBox-4.2.0_RC3/src/VBox/Additions/x11/vboxvideo/Makefile.kmk.xorg17	2012-05-30 11:39:29.000000000 +0100
-+++ VirtualBox-4.2.0_RC3/src/VBox/Additions/x11/vboxvideo/Makefile.kmk	2012-09-07 03:24:32.187238932 +0100
+--- ./src/VBox/Additions/x11/vboxmouse/vboxmouse.c.xorg17	2012-03-13 14:52:26.000000000 +0000
++++ ./src/VBox/Additions/x11/vboxmouse/vboxmouse.c	2012-09-09 01:12:19.440114469 +0100
+@@ -54,12 +54,12 @@
+ 
+ #ifdef VBOX_GUESTR3XF86MOD
+ # define _X_EXPORT
+-#else
+-# include <errno.h>
+-# include <fcntl.h>
+-# include <unistd.h>
+ #endif
+ 
++#include <errno.h>
++#include <fcntl.h>
++#include <unistd.h>
++
+ #include "product-generated.h"
+ 
+ static void
+--- ./src/VBox/Additions/x11/vboxvideo/Makefile.kmk.xorg17	2012-05-30 11:39:29.000000000 +0100
++++ ./src/VBox/Additions/x11/vboxvideo/Makefile.kmk	2012-09-07 03:24:32.187238932 +0100
 @@ -35,45 +35,35 @@ vboxvideo_drv_DEFS.x86 = __i386__
  # This one has to be defined when building server code on systems where
  # unsigned long is 64bits
@@ -141,7 +123,7 @@ diff --git a/src/VBox/Additions/common/crOpenGL/Makefile.kmk b/src/VBox/Addition
 -	IN_MODULE XFree86Module IN_XF86_MODULE IN_RT_STATIC
 -vboxvideo_drv_DEFS += memset=xf86memset memcpy=xf86memcpy
 +vboxvideo_drv_DEFS := XFree86Server IN_MODULE XFree86Module XFree86LOADER IN_XF86_MODULE XORG_7X RENDER=1 \
-+   IN_RT_STATIC VBOXVIDEO_13 NO_ANSIC PCIACCESS VBOX_NO_LOW_COLOUR VBOX_DRI
++   IN_RT_STATIC VBOXVIDEO_13 NO_ANSIC PCIACCESS VBOX_NO_LOW_COLOUR VBOX_DRI XSERVER_LIBPCIACCESS XORG_VERSION_CURRENT=101300000
  vboxvideo_drv_INCS = \
 -	$(VBOX_PATH_X11_XFREE_4_3)/include \
 -	$(VBOX_PATH_X11_XFREE_4_3)/include/X11 \
@@ -218,7 +200,7 @@ diff --git a/src/VBox/Additions/common/crOpenGL/Makefile.kmk b/src/VBox/Addition
 +vboxvideo_drv_17_TEMPLATE = VBOXGUESTR3XORGMOD
 +vboxvideo_drv_17_CFLAGS += -Wno-conversion -Wno-unused-parameter $(VBOX_GCC_Wno-variadic-macros) # template?
 +vboxvideo_drv_17_DEFS := XFree86Server IN_MODULE XFree86Module XFree86LOADER XORG_7X RENDER=1 \
-+	IN_XF86_MODULE IN_RT_STATIC VBOXVIDEO_13 NO_ANSIC PCIACCESS VBOX_NO_LOW_COLOUR VBOX_DRI
++	IN_XF86_MODULE IN_RT_STATIC VBOXVIDEO_13 NO_ANSIC PCIACCESS VBOX_NO_LOW_COLOUR VBOX_DRI XSERVER_LIBPCIACCESS XORG_VERSION_CURRENT=101300000
 +vboxvideo_drv_17_INCS = \
 +	/usr/include/drm \
 +	/usr/include/X11/dri \
@@ -262,6 +244,22 @@ diff --git a/src/VBox/Additions/common/crOpenGL/Makefile.kmk b/src/VBox/Addition
 +endif # NOT_FEDORA
 +
  include $(FILE_KBUILD_SUB_FOOTER)
+--- ./src/VBox/Additions/x11/vboxvideo/testcase/Makefile.kmk	2012-01-12 19:57:53.762613198 +0000
++++ ./src/VBox/Additions/x11/vboxvideo/testcase/Makefile.kmk	2012-01-12 20:01:17.296596446 +0000
+@@ -36,11 +36,11 @@ endif # !VBOX_ONLY_SDK
+ #
+ tstSetModeXOrg_TEMPLATE = VBOXR3TSTEXE
+ tstSetModeXOrg_CFLAGS += -std=c99
+-tstSetModeXOrg_DEFS = $(filter-out IN_RT_STATIC,$(vboxvideo_drv_15_DEFS)) TESTCASE
++tstSetModeXOrg_DEFS = $(filter-out IN_RT_STATIC,$(vboxvideo_drv_17_DEFS)) TESTCASE
+ tstSetModeXOrg_SOURCES  = \
+ 	tstSetModeXOrg.c \
+ 	../setmode.c
+-tstSetModeXOrg_INCS = $(vboxvideo_drv_15_INCS)
++tstSetModeXOrg_INCS = $(vboxvideo_drv_17_INCS)
+ 
+ 
+ # generate rules.
 --- ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk.xorg17	2012-08-03 13:28:42.000000000 +0100
 +++ ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk	2012-09-09 01:05:45.271905105 +0100
 @@ -187,11 +187,9 @@ VBoxGuestR3LibXFree86_SOURCES  = \
@@ -279,8 +277,6 @@ diff --git a/src/VBox/Additions/common/crOpenGL/Makefile.kmk b/src/VBox/Addition
  
  VBoxGuestR3LibRuntimeXF86.cpp_CXXFLAGS = -Wno-shadow
  
-# inspired from http://opensource.apple.com/source/X11server/X11server-85/kdrive/xorg-server-1.6.0/hw/xfree86/dummylib/
-#xalloc.c and verrorf.c
 --- ./src/VBox/Additions/common/VBoxGuestLib/VBoxGuestR3LibRuntimeXF86.cpp.xorg17	2011-01-14 20:15:34.000000000 +0000
 +++ ./src/VBox/Additions/common/VBoxGuestLib/VBoxGuestR3LibRuntimeXF86.cpp	2012-09-09 01:04:03.198818717 +0100
 @@ -34,20 +34,55 @@

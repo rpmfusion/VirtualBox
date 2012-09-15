@@ -1,25 +1,31 @@
---- VirtualBox-4.1.10.orig/Config.kmk	2012-03-13 13:14:01.000000000 +0000
-+++ VirtualBox-4.1.10/Config.kmk	2012-03-27 23:55:28.070630137 +0100
-@@ -2003,15 +2003,7 @@ ifdef VBOX_WITH_CROGL
-  endif
+--- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.xorg17	2012-09-13 09:26:18.000000000 +0100
++++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2012-09-13 23:52:52.309227273 +0100
+@@ -63,18 +63,12 @@ VBoxOGL_TEMPLATE       = VBOXCROGLR3GUES
+ VBoxOGL_INCS           = .
+ if1of ($(KBUILD_TARGET), linux solaris freebsd)
+  VBoxOGL_INCS     += \
+-	$(VBOX_PATH_X11_ROOT)/libXdamage-1.1 \
+-	$(VBOX_PATH_X11_ROOT)/libXcomposite-0.4.0 \
+-	$(VBOX_PATH_X11_ROOT)/libXext-1.3.1 \
+-	$(VBOX_PATH_X11_ROOT)/libXfixes-4.0.3 \
+-	$(VBOX_PATH_X11_ROOT)/damageproto-1.1.0 \
+-	$(VBOX_PATH_X11_ROOT)/compositeproto-0.4 \
+-	$(VBOX_PATH_X11_ROOT)/fixesproto-4.0 \
+-	$(VBOX_PATH_X11_ROOT)/libx11-1.1.5-other \
+-	$(VBOX_PATH_X11_ROOT)/xextproto-7.1.1 \
+-	$(VBOX_PATH_X11_ROOT)/xproto-7.0.18 \
++	/usr/include/x11 \
++	/usr/include/xorg \
++	/usr/include/pixman-1 \
+ 	$(VBOX_MESA_INCS) \
+-	$(PATH_ROOT)/src/VBox/Additions/x11/x11include/libdrm-2.4.13
++	/usr/include/drm \
++	/usr/include/libdrm
+  VBoxOGL_DEFS     += VBOX_NO_NATIVEGL
+ endif
  
-  if1of ($(KBUILD_TARGET), freebsd linux solaris)
-- # VBOX_PATH_MESA_SOURCE = $(PATH_ROOT)/src/libs/mesa-7.2
--  VBOX_PATH_MESA_SOURCE = $(VBOX_PATH_X11_ROOT)/mesa-7.2
--  VBOX_MESA_INCS = \
--        $(VBOX_PATH_MESA_SOURCE) \
--        $(VBOX_PATH_MESA_SOURCE)/include \
--        $(VBOX_PATH_MESA_SOURCE)/src/mesa/ \
--        $(VBOX_PATH_MESA_SOURCE)/src/mesa/glapi \
--        $(VBOX_PATH_MESA_SOURCE)/src/mesa/main \
--        $(VBOX_PATH_MESA_SOURCE)/src/mesa/drivers/dri/common
-+  VBOX_MESA_INCS = /usr/include/GL /usr/include/xorg /usr/include/pixman-1
-  endif
- 
-  VBOX_DARWIN_OPENGL_INST     = obj/VBoxOGL/GL/
-diff -x x11include -Nurp VirtualBox-4.1.10.orig/src/VBox/Additions/common/crOpenGL/fakedri_drv.c VirtualBox-4.1.10/src/VBox/Additions/common/crOpenGL/fakedri_drv.c
---- VirtualBox-4.1.10.orig/src/VBox/Additions/common/crOpenGL/fakedri_drv.c	2012-03-13 13:14:21.000000000 +0000
-+++ VirtualBox-4.1.10/src/VBox/Additions/common/crOpenGL/fakedri_drv.c	2012-03-30 04:12:46.110584648 +0100
+--- ./src/VBox/Additions/common/crOpenGL/fakedri_drv.c.mesa	2012-09-13 09:26:18.000000000 +0100
++++ ./src/VBox/Additions/common/crOpenGL/fakedri_drv.c	2012-09-14 23:53:17.013381550 +0100
 @@ -17,7 +17,15 @@
   */
  
@@ -36,14 +42,27 @@ diff -x x11include -Nurp VirtualBox-4.1.10.orig/src/VBox/Additions/common/crOpen
  #include "cr_error.h"
  #include "cr_gl.h"
  #include "cr_mem.h"
-@@ -26,10 +34,6 @@
+@@ -26,23 +34,6 @@
  #include "dri_glx.h"
  #include "iprt/mem.h"
  #include "iprt/err.h"
 -#include <dlfcn.h>
 -#include <elf.h>
 -#include <unistd.h>
--#include "xf86.h"
+-/** X server message type definitions. */
+-typedef enum {
+-    X_PROBED,			/* Value was probed */
+-    X_CONFIG,			/* Value was given in the config file */
+-    X_DEFAULT,			/* Value is a default */
+-    X_CMDLINE,			/* Value was given on the command line */
+-    X_NOTICE,			/* Notice */
+-    X_ERROR,			/* Error message */
+-    X_WARNING,			/* Warning message */
+-    X_INFO,			/* Informational message */
+-    X_NONE,			/* No prefix */
+-    X_NOT_IMPLEMENTED,		/* Not implemented */
+-    X_UNKNOWN = -1		/* unknown -- this must always be last */
+-} MessageType;
  
  #define VBOX_NO_MESA_PATCH_REPORTS
  
@@ -102,9 +121,8 @@ diff -x x11include -Nurp VirtualBox-4.1.10.orig/src/VBox/Additions/common/crOpen
      else crWarning("%s not found in mesa table", name)
  
  #define GLAPI_ENTRY(Func) VBOX_SET_MESA_FUNC(vbox_glapi_table, "gl"#Func, cr_gl##Func);
-diff -x x11include -Nurp VirtualBox-4.1.10.orig/src/VBox/Additions/common/crOpenGL/fakedri_drv.h VirtualBox-4.1.10/src/VBox/Additions/common/crOpenGL/fakedri_drv.h
---- VirtualBox-4.1.10.orig/src/VBox/Additions/common/crOpenGL/fakedri_drv.h	2012-03-13 13:14:21.000000000 +0000
-+++ VirtualBox-4.1.10/src/VBox/Additions/common/crOpenGL/fakedri_drv.h	2012-03-27 23:14:15.058370962 +0100
+--- ./src/VBox/Additions/common/crOpenGL/fakedri_drv.h	2012-03-13 13:14:21.000000000 +0000
++++ ./src/VBox/Additions/common/crOpenGL/fakedri_drv.h	2012-03-27 23:14:15.058370962 +0100
 @@ -20,13 +20,20 @@
  #ifndef ___CROPENGL_FAKEDRIDRV_H
  #define ___CROPENGL_FAKEDRIDRV_H
