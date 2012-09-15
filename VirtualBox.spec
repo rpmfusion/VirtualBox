@@ -15,7 +15,7 @@
 
 Name:       VirtualBox
 Version:    4.2.0
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Release:    2%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -205,8 +205,10 @@ sed -i 's/\r//' COPYING
 
 
 %build
-./configure --disable-kmods --enable-webservice
+./configure --disable-kmods 
 #--disable-java
+#--enable-webservice
+#--disable-xpcom
 . ./env.sh
 
 # VirtualBox build system installs and builds in the same step,
@@ -260,7 +262,7 @@ ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxHeadless
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxheadless
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBalloonCtrl
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxballoonctrl
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
+#ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBFE
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxbfe
 
@@ -298,11 +300,11 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
     obj/bin/vboxshell.py    \
     obj/bin/VBoxTestOGL \
     obj/bin/VBoxExtPackHelperApp \
-    obj/bin/vboxwebsrv  \
     obj/bin/VBoxBalloonCtrl \
-    obj/bin/webtest     \
     obj/bin/VBoxBFE
 
+#    obj/bin/vboxwebsrv  \
+#    obj/bin/webtest     \
 # Language files
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
     obj/bin/nls/*
@@ -486,7 +488,7 @@ fi
 %{_bindir}/VBoxTunctl
 %{_bindir}/virtualbox
 %{_bindir}/VirtualBox
-%{_bindir}/vboxwebsrv
+#{_bindir}/vboxwebsrv
 %{_bindir}/VBoxVRDP
 %dir %{_libdir}/virtualbox
 %doc %{_libdir}/virtualbox/*.pdf
@@ -500,8 +502,8 @@ fi
 %{_libdir}/virtualbox/VBoxTestOGL
 %{_libdir}/virtualbox/VBoxXPCOMIPCD
 %{_libdir}/virtualbox/VBoxBalloonCtrl
-%{_libdir}/virtualbox/vboxwebsrv
-%{_libdir}/virtualbox/webtest
+#{_libdir}/virtualbox/vboxwebsrv
+#{_libdir}/virtualbox/webtest
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxHeadless
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxSDL
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxBFE
@@ -554,6 +556,9 @@ fi
 
 
 %changelog
+* Sat Sep 15 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-2
+- Disable websrv because fails to build on rawhide, temporarily I hope.
+
 * Thu Sep 13 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-1
 - 4.2.0 released
 - Rebase and rework VirtualBox-4.2.0-xorg17.patch, add 2 new Definitions: XSERVER_LIBPCIACCESS XORG_VERSION_CURRENT=101300000
