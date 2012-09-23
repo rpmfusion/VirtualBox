@@ -15,7 +15,7 @@
 
 Name:       VirtualBox
 Version:    4.2.0
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Release:    3%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -42,6 +42,7 @@ Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.2.0-mesa.patch
+Patch24:    VirtualBox-4.2.0-VBoxGuestLib.patch
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -190,6 +191,7 @@ find -name '*.py[co]' -delete
 %patch22 -p1 -b .gsoap
 %endif
 %patch23 -p1 -b .mesa
+%patch24 -p1 -b .guestlib
 
 # Remove prebuilt binary tools
 %if 0%{?fedora} < 16
@@ -197,8 +199,9 @@ rm -rf kBuild
 %endif
 rm -rf tools
 
-# Remove x11 source code.
+# Remove some bundle X11 sources.
 rm -rf src/VBox/Additions/x11/x11include
+rm -rf src/VBox/Additions/x11/x11stubs
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -556,6 +559,10 @@ fi
 
 
 %changelog
+* Sun Sep 23 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-3
+- Another clean X11 bundle sources (src/VBox/Additions/x11/x11stubs), minor improve on 
+VirtualBox-4.2.0-xorg17.patch and split VBoxGuestLib part into VirtualBox-4.2.0-VBoxGuestLib.patch 
+
 * Sat Sep 15 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-2
 - Disable websrv because fails to build on rawhide, temporarily I hope.
 

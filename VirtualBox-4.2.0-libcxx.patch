@@ -1,29 +1,12 @@
-From dd383911ef6a9a43c17b18d48b17cd82d6c8feb9 Mon Sep 17 00:00:00 2001
-From: Lubomir Rintel <lkundrak@v3.sk>
-Date: Fri, 18 Jun 2010 10:58:14 +0200
-Subject: [PATCH 2/3] Do not include statically linked libstdc++
+Do not include statically linked libstdc++
 
 Not a good idea if we don't need to be binary-compatible across exotic
 distribution. Doesn't work with trunk glibc heading towards 2.11 anyways.
 Static linking is not really supported anyways.
----
- Config.kmk                                         |    4 ++--
- configure                                          |    2 +-
- .../WINNT/Graphics/Video/disp/Makefile.kmk         |    2 +-
- src/VBox/Additions/x11/VBoxClient/Makefile.kmk     |    5 +----
- src/VBox/Frontends/VirtualBox/Makefile.kmk         |    2 +-
- src/VBox/HostDrivers/Support/Makefile.kmk          |    2 +-
- src/VBox/HostDrivers/VBoxNetFlt/Makefile.kmk       |   12 ++++++------
- src/VBox/HostDrivers/win/Makefile.kmk              |    2 +-
- src/VBox/Installer/win/InstallHelper/Makefile.kmk  |    2 +-
- src/VBox/Installer/win/Resources/Makefile.kmk      |    2 +-
- src/VBox/Installer/win/Stub/Makefile.kmk           |    2 +-
- src/VBox/Storage/testcase/Makefile.kmk             |    2 +-
- src/libs/liblzf-3.4/Makefile.kmk                   |    2 +-
- src/libs/zlib-1.2.1/Makefile.kmk                   |    2 +-
- 17 files changed, 23 insertions(+), 26 deletions(-)
 
-
+Was From dd383911ef6a9a43c17b18d48b17cd82d6c8feb9 Mon Sep 17 00:00:00 2001
+From: Lubomir Rintel <lkundrak@v3.sk>
+Date: Fri, 18 Jun 2010 10:58:14 +0200
 diff --git a/Config.kmk b/Config.kmk
 index 0ea34d8..2ec388c 100644
 --- a/Config.kmk
@@ -37,15 +20,6 @@ index 0ea34d8..2ec388c 100644
  	$(L4_LIBDIR)/libdl.s.so \
  	$(L4_LIBDIR)/libuc.0.s.so
   else ifeq ($(KBUILD_TARGET),os2)
-@@ -3311,7 +3311,7 @@ endif
- # Temporary: Renaming the template and warnings will be errors (soon).
- #
- TEMPLATE_VBoxR3Static               = New name for VBOXR3STATIC
--TEMPLATE_VBoxR3Static_EXTENDS       = VBOXR3STATIC
-+TEMPLATE_VBoxR3Static_EXTENDS       = VBOXR3EXE
- TEMPLATE_VBoxR3Static_EXTENDS_BY    = appending
- ifeq ($(KBUILD_TARGET),win)
-  TEMPLATE_VBoxR3Static_CFLAGS      += $(VBOX_VCC_WERR)
 diff --git a/configure b/configure
 index 987cf1b..75d556c 100755
 --- a/configure
