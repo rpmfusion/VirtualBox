@@ -1,5 +1,18 @@
---- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.xorg17	2012-09-13 09:26:18.000000000 +0100
-+++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2012-09-13 23:52:52.309227273 +0100
+fakedri_drv.c,h:
+Just compile with X11 system source and we may remove bundle X11 source code.
+
+--- ./src/VBox/Additions/x11/Makefile.kmk.orig	2012-09-23 01:00:38.301286632 +0100
++++ ./src/VBox/Additions/x11/Makefile.kmk	2012-09-23 01:00:45.135370696 +0100
+@@ -24,7 +24,6 @@ if1of ($(KBUILD_TARGET), freebsd linux n
+  ifneq ($(KBUILD_TARGET), solaris)
+   include $(PATH_SUB_CURRENT)/vboxmouse/Makefile.kmk
+  endif
+- include $(PATH_SUB_CURRENT)/x11stubs/Makefile.kmk
+ endif
+ 
+ include $(FILE_KBUILD_SUB_FOOTER)
+--- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.mesa	2012-09-13 09:26:18.000000000 +0100
++++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2012-09-23 01:08:36.032101751 +0100
 @@ -63,18 +63,12 @@ VBoxOGL_TEMPLATE       = VBOXCROGLR3GUES
  VBoxOGL_INCS           = .
  if1of ($(KBUILD_TARGET), linux solaris freebsd)
@@ -24,6 +37,18 @@
   VBoxOGL_DEFS     += VBOX_NO_NATIVEGL
  endif
  
+@@ -203,11 +197,6 @@ VBoxOGL_LIBS = \
+ 	$(VBOX_LIB_OGL_CRUTIL) \
+ 	$(PATH_STAGE_LIB)/additions/VBoxOGLspuload$(VBOX_SUFF_LIB)
+ if1of ($(KBUILD_TARGET), linux solaris freebsd)
+- VBoxOGL_LIBS += \
+- 	$(PATH_STAGE_LIB)/libXcomposite.so \
+- 	$(PATH_STAGE_LIB)/libXdamage.so \
+- 	$(PATH_STAGE_LIB)/libXfixes.so \
+- 	$(PATH_STAGE_LIB)/libXext.so
+  ifdef VBoxOGL_FAKEDRI
+   VBoxOGL_LIBS += \
+   	dl
 --- ./src/VBox/Additions/common/crOpenGL/fakedri_drv.c.mesa	2012-09-13 09:26:18.000000000 +0100
 +++ ./src/VBox/Additions/common/crOpenGL/fakedri_drv.c	2012-09-14 23:53:17.013381550 +0100
 @@ -17,7 +17,15 @@
