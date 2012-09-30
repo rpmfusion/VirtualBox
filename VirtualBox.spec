@@ -15,7 +15,7 @@
 
 Name:       VirtualBox
 Version:    4.2.0
-Release:    3%{?prerel:.%{prerel}}%{?dist}
+Release:    4%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -43,6 +43,7 @@ Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.2.0-mesa.patch
 Patch24:    VirtualBox-4.2.0-VBoxGuestLib.patch
+Patch25:    VirtualBox-4.2.0-xorg111.patch
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -192,6 +193,9 @@ find -name '*.py[co]' -delete
 %endif
 %patch23 -p1 -b .mesa
 %patch24 -p1 -b .guestlib
+%if 0%{?fedora} < 17
+%patch25 -p1 -b .xorg111
+%endif
 
 # Remove prebuilt binary tools
 %if 0%{?fedora} < 16
@@ -559,6 +563,9 @@ fi
 
 
 %changelog
+* Sun Sep 30 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-4
+- On F16, need add one xorg header for xorg-x11-server 1.11.x
+
 * Sun Sep 23 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-3
 - Another clean X11 bundle sources (src/VBox/Additions/x11/x11stubs), minor improve on 
 VirtualBox-4.2.0-xorg17.patch and split VBoxGuestLib part into VirtualBox-4.2.0-VBoxGuestLib.patch 
