@@ -1,0 +1,258 @@
+Build the X.Org driver only for the selected system X Server version.
+Based on scripts by Michael Meskes <meskes@debian.org>, Felix Geyer <debfx-pkg@fobos.de>
+Author: Sérgio Basto <sergio@serjux.com>
+
+--- ./Config.kmk	2012-03-13 13:14:01.000000000 +0000
++++ ./Config.kmk	2012-03-27 23:55:28.070630137 +0100
+@@ -2003,15 +2003,7 @@ ifdef VBOX_WITH_CROGL
+  endif
+ 
+  if1of ($(KBUILD_TARGET), freebsd linux solaris)
+- # VBOX_PATH_MESA_SOURCE = $(PATH_ROOT)/src/libs/mesa-7.2
+-  VBOX_PATH_MESA_SOURCE = $(VBOX_PATH_X11_ROOT)/mesa-7.2
+-  VBOX_MESA_INCS = \
+-        $(VBOX_PATH_MESA_SOURCE) \
+-        $(VBOX_PATH_MESA_SOURCE)/include \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/ \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/glapi \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/main \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/drivers/dri/common
++  VBOX_MESA_INCS = /usr/include/GL /usr/include/xorg /usr/include/pixman-1
+  endif
+ 
+  VBOX_DARWIN_OPENGL_INST     = obj/VBoxOGL/GL/
+--- ./src/VBox/Additions/x11/vboxmouse/Makefile.kmk.xorg17	2012-08-03 13:28:42.000000000 +0100
++++ ./src/VBox/Additions/x11/vboxmouse/Makefile.kmk	2012-09-07 03:18:17.460463185 +0100
+@@ -30,25 +30,12 @@ if1of ($(KBUILD_TARGET), linux)
+  # This one has to be defined when building server code on systems where
+  # unsigned long is 64bits
+  vboxmouse_drv_DEFS.amd64 += _XSERVER64
+- vboxmouse_drv_DEFS += \
+-        _POSIX_C_SOURCE=199309L _POSIX_SOURCE _XOPEN_SOURCE \
+-	_BSD_SOURCE _SVID_SOURCE _GNU_SOURCE SHAPE XINPUT XKB LBX XAPPGROUP \
+-	XCSECURITY TOGCUP XF86BIGFONT DPMSExtension PIXPRIV PANORAMIX RENDER \
+-	GCCUSESGAS AVOID_GLYPHBLT PIXPRIV SINGLEDEPTH XFreeXDGA XvExtension \
+-	XFree86LOADER XFree86Server XF86VIDMODE XvMCExtension SMART_SCHEDULE \
+-	BUILDDEBUG X_BYTE_ORDER=X_LITTLE_ENDIAN DNDEBUG FUNCPROTO=15 NARROWPROTO \
+-	IN_MODULE XFree86Module PNP_MOUSE IN_XF86_MODULE
+- vboxmouse_drv_INCS := \
+-	$(VBOX_PATH_X11_XFREE_4_3)/include \
+-	$(VBOX_PATH_X11_XFREE_4_3)/include/extensions \
+-	$(VBOX_PATH_X11_XFREE_4_3)/include/X11 \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86 \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/common \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/os-support \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/os-support/bus \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/mi \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/include \
+-	$(PATH_SUB_CURRENT)
++vboxmouse_drv_DEFS += XFree86Server IN_MODULE XFree86Module XFree86LOADER XINPUT XORG_7X \
++	IN_XF86_MODULE DONT_DEFINE_WRAPPERS NO_ANSIC
++vboxmouse_drv_INCS := \
++   /usr/include/x11 \
++   /usr/include/xorg \
++   /usr/include/pixman-1
+  vboxmouse_drv_SOURCES = \
+ 	vboxmouse.c
+  # Any global symbols in the driver object files will be added to XFree86's
+@@ -57,9 +44,18 @@ if1of ($(KBUILD_TARGET), linux)
+  vboxmouse_drv_POST_CMDS = \
+ 	objcopy --keep-global-symbol vboxmouseModuleData $(out) $(out)-objcopy$$(NLTAB) \
+ 	$(MV) -f $(out)-objcopy $(out)
+-endif
+-
+ 
++DLLS += vboxmouse_drv_17
++vboxmouse_drv_17_TEMPLATE = VBOXGUESTR3XORGMOD
++vboxmouse_drv_17_DEFS = XFree86Server IN_MODULE XFree86Module XFree86LOADER XINPUT XORG_7X IN_XF86_MODULE \
++		DONT_DEFINE_WRAPPERS NO_ANSIC
++vboxmouse_drv_17_INCS := \
++   /usr/include/x11 \
++   /usr/include/xorg \
++   /usr/include/pixman-1
++vboxmouse_drv_17_SOURCES = \
++   vboxmouse.c 
++else
+ #
+ # vboxmouse_drv_70
+ #
+@@ -391,5 +387,7 @@ endif # neq ($(KBUILD_TARGET),linux)
+ # endif # ! VBOX_ONLY_ADDITIONS
+ endif # VBOX_WITH_TESTCASES
+ 
++endif # neq ($(KBUILD_TARGET),linux)
++
+ include $(FILE_KBUILD_SUB_FOOTER)
+ 
+--- ./src/VBox/Additions/x11/vboxmouse/vboxmouse.c.xorg17	2012-03-13 14:52:26.000000000 +0000
++++ ./src/VBox/Additions/x11/vboxmouse/vboxmouse.c	2012-09-23 00:33:57.939600191 +0100
+@@ -52,13 +52,9 @@
+ 
+ #include <xf86Module.h>
+ 
+-#ifdef VBOX_GUESTR3XF86MOD
+-# define _X_EXPORT
+-#else
+-# include <errno.h>
+-# include <fcntl.h>
+-# include <unistd.h>
+-#endif
++#include <errno.h>
++#include <fcntl.h>
++#include <unistd.h>
+ 
+ #include "product-generated.h"
+ 
+--- ./src/VBox/Additions/x11/vboxvideo/Makefile.kmk.xorg17	2012-05-30 11:39:29.000000000 +0100
++++ ./src/VBox/Additions/x11/vboxvideo/Makefile.kmk	2012-09-07 03:24:32.187238932 +0100
+@@ -35,45 +35,35 @@ vboxvideo_drv_DEFS.x86 = __i386__
+ # This one has to be defined when building server code on systems where
+ # unsigned long is 64bits
+ vboxvideo_drv_DEFS.amd64 += _XSERVER64
+-vboxvideo_drv_DEFS = \
+-	_POSIX_C_SOURCE=199309L _POSIX_SOURCE _XOPEN_SOURCE \
+-	_BSD_SOURCE _SVID_SOURCE _GNU_SOURCE SHAPE XINPUT XKB LBX XAPPGROUP \
+-	XCSECURITY TOGCUP XF86BIGFONT DPMSExtension PIXPRIV PANORAMIX RENDER \
+-	GCCUSESGAS AVOID_GLYPHBLT PIXPRIV SINGLEDEPTH XFreeXDGA XvExtension \
+-	XFree86LOADER XFree86Server XF86VIDMODE XvMCExtension SMART_SCHEDULE \
+-	BUILDDEBUG X_BYTE_ORDER=X_LITTLE_ENDIAN DNDEBUG FUNCPROTO=15 NARROWPROTO \
+-	IN_MODULE XFree86Module IN_XF86_MODULE IN_RT_STATIC
+-vboxvideo_drv_DEFS += memset=xf86memset memcpy=xf86memcpy
++vboxvideo_drv_DEFS := XFree86Server IN_MODULE XFree86Module XFree86LOADER IN_XF86_MODULE XORG_7X RENDER=1 \
++   IN_RT_STATIC VBOXVIDEO_13 NO_ANSIC PCIACCESS VBOX_NO_LOW_COLOUR VBOX_DRI XSERVER_LIBPCIACCESS XORG_VERSION_CURRENT=101300000
+ vboxvideo_drv_INCS = \
+-	$(VBOX_PATH_X11_XFREE_4_3)/include \
+-	$(VBOX_PATH_X11_XFREE_4_3)/include/X11 \
+-	$(VBOX_PATH_X11_XFREE_4_3)/include/X11/extensions \
+-	$(VBOX_PATH_X11_XFREE_4_3)/include/extensions \
+-	$(VBOX_PATH_X11_XFREE_4_3)/include/fonts \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/afb \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/include \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/fb \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86 \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/common \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/ddc \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/int10 \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/i2c \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/os-support \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/vbe \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/os-support/bus \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/rac \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/ramdac \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/shadowfb \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/vgahw \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/xf1bpp \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/xf24_32bpp \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/hw/xfree86/xf4bpp \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/mfb \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/mi \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/miext/shadow \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/render \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/randr \
+-	$(VBOX_PATH_X11_XFREE_4_3)/programs/Xserver/Xext
++   /usr/include/drm \
++   /usr/include/X11/dri \
++   /usr/include/pixman-1 \
++   /usr/share/xorg-x11-server-source \
++   /usr/share/xorg-x11-server-source/fb \
++   /usr/share/xorg-x11-server-source/hw/xfree86/common \
++   /usr/share/xorg-x11-server-source/hw/xfree86/ddc \
++   /usr/share/xorg-x11-server-source/hw/xfree86/dixmods/extmod \
++   /usr/share/xorg-x11-server-source/hw/xfree86/dri \
++   /usr/share/xorg-x11-server-source/hw/xfree86/i2c \
++   /usr/share/xorg-x11-server-source/hw/xfree86/int10 \
++   /usr/share/xorg-x11-server-source/hw/xfree86/modes \
++   /usr/share/xorg-x11-server-source/hw/xfree86/os-support \
++   /usr/share/xorg-x11-server-source/hw/xfree86/os-support/bus \
++   /usr/share/xorg-x11-server-source/hw/xfree86/ramdac \
++   /usr/share/xorg-x11-server-source/hw/xfree86/shadowfb \
++   /usr/share/xorg-x11-server-source/hw/xfree86/vbe \
++   /usr/share/xorg-x11-server-source/hw/xfree86/vgahw \
++   /usr/share/xorg-x11-server-source/hw/xquartz/xpr \
++   /usr/share/xorg-x11-server-source/include \
++   /usr/share/xorg-x11-server-source/mi \
++   /usr/share/xorg-x11-server-source/miext/damage \
++   /usr/share/xorg-x11-server-source/randr \
++   /usr/share/xorg-x11-server-source/Xext \
++   /usr/share/xorg-x11-server-source/render \
++   /usr/share/xorg-x11-server-source/hw/xfree86/parser
+ vboxvideo_drv_INCS += $(PATH_ROOT)/src/VBox/Runtime/include
+ vboxvideo_drv_SOURCES = \
+ 	pointer.c \
+@@ -86,7 +76,7 @@ vboxvideo_drv_SOURCES = \
+ 	$(PATH_ROOT)/src/VBox/Additions/common/VBoxVideo/VBVABase.cpp \
+ 	$(PATH_ROOT)/src/VBox/GuestHost/HGSMI/HGSMICommon.cpp \
+ 	$(PATH_ROOT)/src/VBox/Runtime/common/alloc/heapsimple.cpp \
+-	$(PATH_ROOT)/src/VBox/Runtime/common/alloc/heapoffset.cpp
++	$(PATH_ROOT)/src/VBox/Runtime/common/alloc/heapoffset.cpp edid.c vboxvideo_dri.c
+  # Any global symbols in the driver object files will be added to XFree86's
+  # symbol table, which can cause problems if we e.g. define a symbol in two
+  # modules.
+@@ -94,6 +84,44 @@ vboxvideo_drv_SOURCES = \
+ 	objcopy --keep-global-symbol vboxvideoModuleData $(out) $(out)-objcopy$$(NLTAB) \
+ 	$(MV) -f $(out)-objcopy $(out)
+ 
++DLLS += vboxvideo_drv_17
++vboxvideo_drv_17_TEMPLATE = VBOXGUESTR3XORGMOD
++vboxvideo_drv_17_CFLAGS += -Wno-conversion -Wno-unused-parameter $(VBOX_GCC_Wno-variadic-macros) # template?
++vboxvideo_drv_17_DEFS := XFree86Server IN_MODULE XFree86Module XFree86LOADER XORG_7X RENDER=1 \
++	IN_XF86_MODULE IN_RT_STATIC VBOXVIDEO_13 NO_ANSIC PCIACCESS VBOX_NO_LOW_COLOUR VBOX_DRI XSERVER_LIBPCIACCESS XORG_VERSION_CURRENT=101300000
++vboxvideo_drv_17_INCS = \
++	/usr/include/drm \
++	/usr/include/X11/dri \
++	/usr/include/pixman-1 \
++	/usr/share/xorg-x11-server-source \
++	/usr/share/xorg-x11-server-source/fb \
++	/usr/share/xorg-x11-server-source/hw/xfree86/common \
++	/usr/share/xorg-x11-server-source/hw/xfree86/ddc \
++	/usr/share/xorg-x11-server-source/hw/xfree86/dixmods/extmod \
++	/usr/share/xorg-x11-server-source/hw/xfree86/dri \
++	/usr/share/xorg-x11-server-source/hw/xfree86/i2c \
++	/usr/share/xorg-x11-server-source/hw/xfree86/int10 \
++	/usr/share/xorg-x11-server-source/hw/xfree86/modes \
++	/usr/share/xorg-x11-server-source/hw/xfree86/os-support \
++	/usr/share/xorg-x11-server-source/hw/xfree86/os-support/bus \
++	/usr/share/xorg-x11-server-source/hw/xfree86/ramdac \
++	/usr/share/xorg-x11-server-source/hw/xfree86/shadowfb \
++	/usr/share/xorg-x11-server-source/hw/xfree86/vbe \
++	/usr/share/xorg-x11-server-source/hw/xfree86/vgahw \
++	/usr/share/xorg-x11-server-source/hw/xquartz/xpr \
++	/usr/share/xorg-x11-server-source/include \
++	/usr/share/xorg-x11-server-source/mi \
++	/usr/share/xorg-x11-server-source/miext/damage \
++	/usr/share/xorg-x11-server-source/randr \
++	/usr/share/xorg-x11-server-source/Xext \
++	/usr/share/xorg-x11-server-source/render \
++	/usr/share/xorg-x11-server-source/hw/xfree86/parser
++vboxvideo_drv_17_INCS += $(PATH_ROOT)/src/VBox/Runtime/include
++vboxvideo_drv_17_SOURCES = $(vboxvideo_drv_SOURCES)
++
++ifdef NOT_FEDORA
++
++
+ #
+ # vboxvideo_drv_70
+ #
+@@ -505,4 +533,6 @@ $$(vboxvideo_drv_112_0_OUTDIR)/tstvboxvi
+ # endif # ! VBOX_ONLY_ADDITIONS
+ endif # VBOX_WITH_TESTCASES
+ 
++endif # NOT_FEDORA
++
+ include $(FILE_KBUILD_SUB_FOOTER)
+--- ./src/VBox/Additions/x11/vboxvideo/testcase/Makefile.kmk	2012-01-12 19:57:53.762613198 +0000
++++ ./src/VBox/Additions/x11/vboxvideo/testcase/Makefile.kmk	2012-01-12 20:01:17.296596446 +0000
+@@ -36,11 +36,11 @@ endif # !VBOX_ONLY_SDK
+ #
+ tstSetModeXOrg_TEMPLATE = VBOXR3TSTEXE
+ tstSetModeXOrg_CFLAGS += -std=c99
+-tstSetModeXOrg_DEFS = $(filter-out IN_RT_STATIC,$(vboxvideo_drv_15_DEFS)) TESTCASE
++tstSetModeXOrg_DEFS = $(filter-out IN_RT_STATIC,$(vboxvideo_drv_17_DEFS)) TESTCASE
+ tstSetModeXOrg_SOURCES  = \
+ 	tstSetModeXOrg.c \
+ 	../setmode.c
+-tstSetModeXOrg_INCS = $(vboxvideo_drv_15_INCS)
++tstSetModeXOrg_INCS = $(vboxvideo_drv_17_INCS)
+ 
+ 
+ # generate rules.
