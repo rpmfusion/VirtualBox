@@ -14,7 +14,7 @@ index 0932637..d365e48 100755
 +++ b/configure
 @@ -2527,7 +2527,7 @@ if [ "$OS" = "linux" ]; then
    check_compiler_h
-   #[ "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
+   [ "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
    # tools/common/makeself*
 -  [ $OSE -ge 1 ] && check_makeself
 +  #[ $OSE -ge 1 ] && check_makeself
