@@ -2,25 +2,6 @@ Build the X.Org driver only for the selected system X Server version.
 Based on scripts by Michael Meskes <meskes@debian.org>, Felix Geyer <debfx-pkg@fobos.de>
 Author: Sérgio Basto <sergio@serjux.com>
 
---- ./Config.kmk	2012-03-13 13:14:01.000000000 +0000
-+++ ./Config.kmk	2012-03-27 23:55:28.070630137 +0100
-@@ -2003,15 +2003,7 @@ ifdef VBOX_WITH_CROGL
-  endif
- 
-  if1of ($(KBUILD_TARGET), freebsd linux solaris)
-- # VBOX_PATH_MESA_SOURCE = $(PATH_ROOT)/src/libs/mesa-7.2
--  VBOX_PATH_MESA_SOURCE = $(VBOX_PATH_X11_ROOT)/mesa-7.2
--  VBOX_MESA_INCS = \
--        $(VBOX_PATH_MESA_SOURCE) \
--        $(VBOX_PATH_MESA_SOURCE)/include \
--        $(VBOX_PATH_MESA_SOURCE)/src/mesa/ \
--        $(VBOX_PATH_MESA_SOURCE)/src/mesa/glapi \
--        $(VBOX_PATH_MESA_SOURCE)/src/mesa/main \
--        $(VBOX_PATH_MESA_SOURCE)/src/mesa/drivers/dri/common
-+  VBOX_MESA_INCS = /usr/include/GL /usr/include/xorg /usr/include/pixman-1
-  endif
- 
-  VBOX_DARWIN_OPENGL_INST     = obj/VBoxOGL/GL/
 --- ./src/VBox/Additions/x11/vboxmouse/Makefile.kmk.xorg17	2012-08-03 13:28:42.000000000 +0100
 +++ ./src/VBox/Additions/x11/vboxmouse/Makefile.kmk	2012-09-07 03:18:17.460463185 +0100
 @@ -30,25 +30,12 @@ if1of ($(KBUILD_TARGET), linux)

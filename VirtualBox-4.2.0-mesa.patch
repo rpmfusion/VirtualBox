@@ -1,6 +1,25 @@
 fakedri_drv.c,h:
 Just compile with X11 system source and we may remove bundle X11 source code.
 
+--- ./Config.kmk	2012-03-13 13:14:01.000000000 +0000
++++ ./Config.kmk	2012-03-27 23:55:28.070630137 +0100
+@@ -2003,15 +2003,7 @@ ifdef VBOX_WITH_CROGL
+  endif
+ 
+  if1of ($(KBUILD_TARGET), freebsd linux solaris)
+- # VBOX_PATH_MESA_SOURCE = $(PATH_ROOT)/src/libs/mesa-7.2
+-  VBOX_PATH_MESA_SOURCE = $(VBOX_PATH_X11_ROOT)/mesa-7.2
+-  VBOX_MESA_INCS = \
+-        $(VBOX_PATH_MESA_SOURCE) \
+-        $(VBOX_PATH_MESA_SOURCE)/include \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/ \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/glapi \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/main \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/drivers/dri/common
++  VBOX_MESA_INCS = /usr/include/GL /usr/include/xorg /usr/include/pixman-1
+  endif
+ 
+  VBOX_DARWIN_OPENGL_INST     = obj/VBoxOGL/GL/
 --- ./src/VBox/Additions/x11/Makefile.kmk.orig	2012-09-23 01:00:38.301286632 +0100
 +++ ./src/VBox/Additions/x11/Makefile.kmk	2012-09-23 01:00:45.135370696 +0100
 @@ -24,7 +24,6 @@ if1of ($(KBUILD_TARGET), freebsd linux n
