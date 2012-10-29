@@ -15,7 +15,7 @@
 
 Name:       VirtualBox
 Version:    4.2.4
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Release:    2%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -440,11 +440,6 @@ getent group vboxusers >/dev/null || groupadd -r vboxusers
 /usr/bin/update-desktop-database &>/dev/null || :
 /usr/bin/update-mime-database %{_datadir}/mime &>/dev/null || :
 
-# Web service
-# Run these because the SysV package being removed won't do them
-/sbin/chkconfig --del vboxweb-service >/dev/null 2>&1 || :
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-
 # Assign USB devices
 if /sbin/udevadm control --reload-rules >/dev/null 2>&1
 then
@@ -453,7 +448,7 @@ then
     systemctl restart udev-trigger.service
     systemctl restart udev-settle.service
 fi
-
+/bin/systemctl try-restart fedora-loadmodules.service >/dev/null 2>&1 || :
 
 %preun
 if [ $1 -eq 0 ] ; then
@@ -462,8 +457,14 @@ if [ $1 -eq 0 ] ; then
     /bin/systemctl stop vboxweb.service > /dev/null 2>&1 || :
 fi
 
-
 %postun
+if [ $1 -eq 0 ] ; then
+    # Package upgrade, not uninstall
+    # Web service
+    # Run these because the SysV package being removed won't do them
+    /sbin/chkconfig --del vboxweb-service >/dev/null 2>&1 || :
+fi
+
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
 /usr/bin/update-desktop-database &>/dev/null || :
@@ -472,12 +473,13 @@ fi
 %posttrans
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
-
-# Guest additions install the OGL libraries
+# Guest additions install
 %post guest 
 /sbin/ldconfig
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+/bin/systemctl try-restart fedora-loadmodules.service >/dev/null 2>&1 || :
 /bin/systemctl enable vboxservice.service >/dev/null 2>&1 || :
+/bin/systemctl restart vboxservice.service >/dev/null 2>&1 || :
 
 %preun guest
 if [ $1 -eq 0 ] ; then
@@ -489,11 +491,6 @@ fi
 %postun guest
 /sbin/ldconfig
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
-if [ $1 -ge 1 ] ; then
-    # Package upgrade, not uninstall
-    /bin/systemctl try-restart vboxservice.service >/dev/null 2>&1 || :
-fi
-
 
 %files
 %{_bindir}/VBox
@@ -584,6 +581,11 @@ fi
 
 
 %changelog
+* Mon Oct 29 2012 Sérgio Basto <sergio@serjux.com> - 4.2.4-2
+- Try load new vbox modules right after install or upgrade.
+- Try better reload of vboxservice.service when as guest system.
+- Minor improves on systemd upgrade.
+
 * Sat Oct 27 2012 Sérgio Basto <sergio@serjux.com> - 4.2.4-1
 - New upstream release.
 - Drop patch VirtualBox-4.2.0-xorg17.patch and add VBOX_USE_SYSTEM_XORG_HEADERS=1. Changeset r43588, 
