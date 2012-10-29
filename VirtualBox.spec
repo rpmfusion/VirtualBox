@@ -14,8 +14,8 @@
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 Name:       VirtualBox
-Version:    4.2.0
-Release:    4%{?prerel:.%{prerel}}%{?dist}
+Version:    4.2.4
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -33,7 +33,6 @@ Source11:   vboxservice.service
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-4.1.18-strings.patch
 Patch3:     VirtualBox-4.2.0-libcxx.patch
-Patch5:     VirtualBox-4.2.0-xorg17.patch
 %ifarch x86_64
 Patch10:     VirtualBox-4.2.0-32bit.patch
 %endif
@@ -181,7 +180,6 @@ find -name '*.py[co]' -delete
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .libcxx
-%patch5 -p1 -b .xorg17
 %patch15 -p1 -b .makeself
 %ifarch x86_64
 %patch10 -p1 -b .32bit
@@ -212,9 +210,15 @@ sed -i 's/\r//' COPYING
 
 
 %build
-./configure --disable-kmods 
+./configure --disable-kmods \
+%if 0%{?fedora} > 17
+  --disable-docs
+%endif
+%if 0%{?fedora} < 18
+ --enable-webservice
+%endif
+
 #--disable-java
-#--enable-webservice
 #--disable-xpcom
 . ./env.sh
 
@@ -230,6 +234,7 @@ kmk %{_smp_mflags} \
     VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"    \
     VBOX_GCC_R0_OPT="%{optflags}" VBOX_GCC_WERR=""          \
     VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
+    VBOX_USE_SYSTEM_XORG_HEADERS=1 \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
     VBOX_BUILD_PUBLISHER=_%{?vendor:%(echo %{vendor} \
     | sed -e 's/ //g' | cut -c 1-9)}%{?!vendor:custom}
@@ -269,7 +274,9 @@ ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxHeadless
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxheadless
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBalloonCtrl
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxballoonctrl
-#ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
+%if 0%{?fedora} < 18
+ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
+%endif
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBFE
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxbfe
 
@@ -290,8 +297,11 @@ install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
     obj/bin/VBoxEFI*.fd
 
 # Documentation
+%if 0%{?fedora} < 18
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
     obj/bin/UserManual.pdf
+%endif
+
 
 # Executables
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
@@ -308,10 +318,12 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
     obj/bin/VBoxTestOGL \
     obj/bin/VBoxExtPackHelperApp \
     obj/bin/VBoxBalloonCtrl \
+%if 0%{?fedora} < 18
+    obj/bin/vboxwebsrv  \
+    obj/bin/webtest     \
+%endif
     obj/bin/VBoxBFE
 
-#    obj/bin/vboxwebsrv  \
-#    obj/bin/webtest     \
 # Language files
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
     obj/bin/nls/*
@@ -327,7 +339,6 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk/installer
 # Icons
 install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
     obj/bin/VBox.png
-#ln -f $RPM_BUILD_ROOT%{_datadir}/pixmaps/{VBox,virtualbox}.png
 for S in obj/bin/icons/*
 do
     SIZE=$(basename $S)
@@ -340,14 +351,18 @@ done
 install -p -m 0644 obj/bin/virtualbox.xml $RPM_BUILD_ROOT%{_datadir}/mime/packages
 
 # Guest X.Org drivers
-# With the xorg17 patch, the _17 driver builds against what's
-# actually available for the system, so would probably be a 1.6
-# driver when compiled on Fedora 10, despite its name
-%global x11_api 17
+# Michael Thayer from Oracle wrote: I have applied the patch [1] I posted so that you 
+# can build with VBOX_USE_SYSTEM_XORG_HEADERS=1 set in future to only 
+# build the X.Org drivers against the installed system headers.
+# also wrote:
+# As vboxmouse_drv is not needed at all for X.Org Server 1.7 and later do not
+# build it in this case.
+# and
+# Build using local X.Org headers.  We assume X.Org Server 1.7 or later.
+# 
+# [1] https://www.virtualbox.org/changeset/43588/vbox
 
-install -m 0755 -D obj/bin/additions/vboxmouse_drv_%{x11_api}.so \
-    $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxmouse_drv.so
-install -m 0755 -D obj/bin/additions/vboxvideo_drv_%{x11_api}.so \
+install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
     $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
 # Guest tools
@@ -495,10 +510,14 @@ fi
 %{_bindir}/VBoxTunctl
 %{_bindir}/virtualbox
 %{_bindir}/VirtualBox
-#{_bindir}/vboxwebsrv
+%if 0%{?fedora} < 18
+%{_bindir}/vboxwebsrv
+%endif
 %{_bindir}/VBoxVRDP
+%if 0%{?fedora} < 18
 %dir %{_libdir}/virtualbox
 %doc %{_libdir}/virtualbox/*.pdf
+%endif
 %{_libdir}/virtualbox/*.[^p]*
 %{_libdir}/virtualbox/*.py*
 %{_libdir}/virtualbox/components
@@ -509,8 +528,10 @@ fi
 %{_libdir}/virtualbox/VBoxTestOGL
 %{_libdir}/virtualbox/VBoxXPCOMIPCD
 %{_libdir}/virtualbox/VBoxBalloonCtrl
-#{_libdir}/virtualbox/vboxwebsrv
-#{_libdir}/virtualbox/webtest
+%if 0%{?fedora} < 18
+%{_libdir}/virtualbox/vboxwebsrv
+%{_libdir}/virtualbox/webtest
+%endif
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxHeadless
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxSDL
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxBFE
@@ -563,6 +584,14 @@ fi
 
 
 %changelog
+* Sat Oct 27 2012 Sérgio Basto <sergio@serjux.com> - 4.2.4-1
+- New upstream release.
+- Drop patch VirtualBox-4.2.0-xorg17.patch and add VBOX_USE_SYSTEM_XORG_HEADERS=1. Changeset r43588, 
+https://www.virtualbox.org/changeset/43588/vbox , allow compile vboxvideo with system headers, and
+"As vboxmouse_drv is not needed at all for X.Org Server 1.7 and later do not build it".
+- enable-webservice on F17 and lower (stables) and disable-docs on F18 and rawhide, can't buid it
+ on F18 and rawhide, new libxslt and new pdflatex problems.
+
 * Sun Sep 30 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-4
 - On F16, need add one xorg header for xorg-x11-server 1.11.x
 
