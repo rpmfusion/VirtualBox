@@ -13,9 +13,21 @@
 #global prerel RC4
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
+%if 0%{?fedora} < 18
+%global enable_webservice 1
+%else
+%global enable_webservice 0
+%endif
+
+%if 0%{?fedora} < 18
+%global enable_docs 1
+%else
+%global enable_docs 0
+%endif
+
 Name:       VirtualBox
 Version:    4.2.4
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Release:    3%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -43,6 +55,7 @@ Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.2.0-mesa.patch
 Patch24:    VirtualBox-4.2.0-VBoxGuestLib.patch
 Patch25:    VirtualBox-4.2.0-xorg111.patch
+Patch26:    VirtualBox-4.2.4-no-bundles.patch
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -63,7 +76,11 @@ BuildRequires:  pam-devel
 BuildRequires:  mkisofs
 BuildRequires:  java-devel >= 1.6
 BuildRequires:  /usr/bin/pdflatex
+BuildRequires:  boost-devel
+#BuildRequires:  liblzf-devel
+BuildRequires:  libxml2-devel
 BuildRequires:  libpng-devel
+BuildRequires:  zlib-devel
 #BuildRequires:  glibc(x86-32) glibc-devel(x86-32) libstdc++(x86-32)
 #BuildRequires:  glibc.i686 glibc-devel.i686 libstdc++.i686
 #BuildRequires:  /usr/lib/libc.so
@@ -195,6 +212,8 @@ find -name '*.py[co]' -delete
 %patch25 -p1 -b .xorg111
 %endif
 
+%patch26 -p1 -b .nobundles
+
 # Remove prebuilt binary tools
 %if 0%{?fedora} < 16
 rm -rf kBuild
@@ -204,18 +223,29 @@ rm -rf tools
 # Remove some bundle X11 sources.
 rm -rf src/VBox/Additions/x11/x11include
 rm -rf src/VBox/Additions/x11/x11stubs
+rm -rf src/libs/boost-1.37.0/   
+#rm -rf src/libs/liblzf-3.4/     
+rm -rf src/libs/libxml2-2.6.31/ 
+rm -rf src/libs/libpng-1.2.8/   
+rm -rf src/libs/zlib-1.2.6/ 
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
 
+# Testings 
+#for S in doc/manual/fr_FR/*xml
+#do
+#    sed -i 's/[&][a-zA-Z0-9]\{2,5\}[;]/ /g' $S
+#done
 
 %build
 ./configure --disable-kmods \
-%if 0%{?fedora} > 17
-  --disable-docs
+%if %{enable_webservice}
+  --enable-webservice \
 %endif
-%if 0%{?fedora} < 18
- --enable-webservice
+%if %{enable_docs}
+%else
+  --disable-docs \
 %endif
 
 #--disable-java
@@ -274,7 +304,7 @@ ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxHeadless
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxheadless
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBalloonCtrl
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxballoonctrl
-%if 0%{?fedora} < 18
+%if %{enable_webservice}
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
 %endif
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBFE
@@ -296,13 +326,6 @@ install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
     obj/bin/V*.r0       \
     obj/bin/VBoxEFI*.fd
 
-# Documentation
-%if 0%{?fedora} < 18
-install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-    obj/bin/UserManual.pdf
-%endif
-
-
 # Executables
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
     obj/bin/VBoxHeadless    \
@@ -318,7 +341,7 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
     obj/bin/VBoxTestOGL \
     obj/bin/VBoxExtPackHelperApp \
     obj/bin/VBoxBalloonCtrl \
-%if 0%{?fedora} < 18
+%if %{enable_webservice}
     obj/bin/vboxwebsrv  \
     obj/bin/webtest     \
 %endif
@@ -448,6 +471,7 @@ then
     systemctl restart udev-trigger.service
     systemctl restart udev-settle.service
 fi
+# should be in kmod package, not here
 /bin/systemctl try-restart fedora-loadmodules.service >/dev/null 2>&1 || :
 
 %preun
@@ -477,6 +501,7 @@ fi
 %post guest 
 /sbin/ldconfig
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+# should be in kmod package, not here
 /bin/systemctl try-restart fedora-loadmodules.service >/dev/null 2>&1 || :
 /bin/systemctl enable vboxservice.service >/dev/null 2>&1 || :
 /bin/systemctl restart vboxservice.service >/dev/null 2>&1 || :
@@ -507,14 +532,11 @@ fi
 %{_bindir}/VBoxTunctl
 %{_bindir}/virtualbox
 %{_bindir}/VirtualBox
-%if 0%{?fedora} < 18
+%if %{enable_webservice}
 %{_bindir}/vboxwebsrv
 %endif
 %{_bindir}/VBoxVRDP
-%if 0%{?fedora} < 18
 %dir %{_libdir}/virtualbox
-%doc %{_libdir}/virtualbox/*.pdf
-%endif
 %{_libdir}/virtualbox/*.[^p]*
 %{_libdir}/virtualbox/*.py*
 %{_libdir}/virtualbox/components
@@ -525,7 +547,7 @@ fi
 %{_libdir}/virtualbox/VBoxTestOGL
 %{_libdir}/virtualbox/VBoxXPCOMIPCD
 %{_libdir}/virtualbox/VBoxBalloonCtrl
-%if 0%{?fedora} < 18
+%if %{enable_webservice}
 %{_libdir}/virtualbox/vboxwebsrv
 %{_libdir}/virtualbox/webtest
 %endif
@@ -543,7 +565,11 @@ fi
 %config %{_sysconfdir}/vbox/vbox.cfg
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
 %config %{_sysconfdir}/sysconfig/modules/%{name}.modules
-%doc COPYING
+%doc COPYING*
+%doc doc/*.*
+%if %{enable_docs}
+%doc obj/bin/UserManual*.pdf
+%endif
 %{_unitdir}/vboxweb.service
 /lib/udev/VBoxCreateUSBNode.sh
 
@@ -581,6 +607,11 @@ fi
 
 
 %changelog
+* Sun Dec 02 2012 Sérgio Basto <sergio@serjux.com> - 4.2.4-3
+- Use global variables enable_webservice and enable_docs to deal better with enable and disable that.
+- Include fr UserManual.pdf and put this docs in /usr/share/docs (the right place) .
+- Unbundle sources that aren't used.
+
 * Mon Oct 29 2012 Sérgio Basto <sergio@serjux.com> - 4.2.4-2
 - Try load new vbox modules right after install or upgrade.
 - Try better reload of vboxservice.service when as guest system.
