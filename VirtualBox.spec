@@ -13,11 +13,11 @@
 #global prerel RC4
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%if 0%{?fedora} < 18
+#if 0%{?fedora} < 20
 %global enable_webservice 1
-%else
-%global enable_webservice 0
-%endif
+#else
+#global enable_webservice 0
+#endif
 
 %if 0%{?fedora} < 18
 %global enable_docs 1
@@ -26,8 +26,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    4.2.4
-Release:    3%{?prerel:.%{prerel}}%{?dist}
+Version:    4.2.6
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -81,6 +81,7 @@ BuildRequires:  boost-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libpng-devel
 BuildRequires:  zlib-devel
+BuildRequires:  device-mapper-devel
 #BuildRequires:  glibc(x86-32) glibc-devel(x86-32) libstdc++(x86-32)
 #BuildRequires:  glibc.i686 glibc-devel.i686 libstdc++.i686
 #BuildRequires:  /usr/lib/libc.so
@@ -607,6 +608,10 @@ fi
 
 
 %changelog
+* Mon Dec 24 2012 Sérgio Basto <sergio@serjux.com> - 4.2.4-1
+- New upstream release.
+- Fix some changelog dates.
+
 * Sun Dec 02 2012 Sérgio Basto <sergio@serjux.com> - 4.2.4-3
 - Use global variables enable_webservice and enable_docs to deal better with enable and disable that.
 - Include fr UserManual.pdf and put this docs in /usr/share/docs (the right place) .
@@ -766,7 +771,7 @@ cvs diff: VirtualBox-OSE-4.1.4-xorg17.patch was removed, no comparison available
   apply these fixes to VBox 4.1.10 as well." and add -lssl and -lcrypto by my self.
 - drop Patch to allow to build with GCC 4.7
 
-* Tue Jan 15 2012 Sérgio Basto <sergio@serjux.com> - 4.1.8-4
+* Sun Jan 15 2012 Sérgio Basto <sergio@serjux.com> - 4.1.8-4
 - Patch to allow to build with GCC 4.7
 - Try fix usb/udev problem on updates without reboot computer.
 - Improves on xorg17 patch, which is the xorg on guest part, we try build with our sources!.
@@ -925,18 +930,18 @@ cvs diff: VirtualBox-OSE-4.1.4-xorg17.patch was removed, no comparison available
 - Exchange hardening for filesystem capabilities
 - Enable web services
 
-* Sun Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-3
+* Sat Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-3
 - Include VBoxRandR
 - Add dri module to guest
 - Resize attempts in GDM make SELinux unhappy
 - Fix HAL policy file location
 
-* Sun Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-2
+* Sat Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-2
 - Don't quote INSTALL_DIR in vbox.cfg so that we don't confuse vboxgtk
 - Add python- subpackage
 - Correct permissions on SDK directories (#754)
 
-* Sun Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-1
+* Sat Aug 08 2009 Lubomir Rintel <lkundrak@v3.sk> - 3.0.4-1
 - Update to later upstream release
 - Re-enable DRI again, fix drm_release crash
 
@@ -1092,7 +1097,7 @@ cvs diff: VirtualBox-OSE-4.1.4-xorg17.patch was removed, no comparison available
 - Update to new version
 - Adapt to new kBuild version, which seems to be needed
 
-* Wed Apr 21 2007 Till Maas <opensource till name> - 1.3.8-2
+* Sat Apr 21 2007 Till Maas <opensource till name> - 1.3.8-2
 - minor bugfixes in the wrapper script
 - rename to VirtualBox-OSE
 
