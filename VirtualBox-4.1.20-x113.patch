@@ -1,4 +1,4 @@
-X.org 1.13 patch 
+X.org 1.13 patch , not in use, just stay for references.
 Reference: 
 http://www.mail-archive.com/xorg-devel@lists.x.org/msg30282.html
  [PATCH 01/19] xserver: remove index from CloseScreen (API/ABI breakage) Dave Airlie
