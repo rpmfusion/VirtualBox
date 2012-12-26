@@ -608,7 +608,7 @@ fi
 
 
 %changelog
-* Mon Dec 24 2012 Sérgio Basto <sergio@serjux.com> - 4.2.4-1
+* Mon Dec 24 2012 Sérgio Basto <sergio@serjux.com> - 4.2.6-1
 - New upstream release.
 - Fix some changelog dates.
 
