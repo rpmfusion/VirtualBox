@@ -19,15 +19,15 @@
 #global enable_webservice 0
 #endif
 
-%if 0%{?fedora} < 18
+#if 0%{?fedora} < 18
 %global enable_docs 1
-%else
-%global enable_docs 0
-%endif
+#else
+#global enable_docs 0
+#endif
 
 Name:       VirtualBox
 Version:    4.2.6
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Release:    2%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -76,6 +76,14 @@ BuildRequires:  pam-devel
 BuildRequires:  mkisofs
 BuildRequires:  java-devel >= 1.6
 BuildRequires:  /usr/bin/pdflatex
+%if 0%{?fedora} >= 18
+BuildRequires:  doxygen-latex
+BuildRequires:  texlive-collection-fontsrecommended
+BuildRequires:  texlive-ec
+BuildRequires:  texlive-ucs
+BuildRequires:  texlive-tabulary
+BuildRequires:  texlive-fancybox
+%endif
 BuildRequires:  boost-devel
 #BuildRequires:  liblzf-devel
 BuildRequires:  libxml2-devel
@@ -195,6 +203,20 @@ which is generated during the build of main package.
 %setup -qn %{name}-%{version}%{prereltag}
 find -name '*.py[co]' -delete
 
+# Remove prebuilt binary tools 
+%if 0%{?fedora} < 16
+rm -rf kBuild
+%endif
+rm -rf tools
+# Remove bundle X11 sources and some lib sources, before patching.
+rm -rf src/VBox/Additions/x11/x11include
+rm -rf src/VBox/Additions/x11/x11stubs
+rm -rf src/libs/boost-1.37.0/   
+#rm -rf src/libs/liblzf-3.4/     
+rm -rf src/libs/libxml2-2.6.31/ 
+rm -rf src/libs/libpng-1.2.8/   
+rm -rf src/libs/zlib-1.2.6/ 
+
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .libcxx
@@ -212,23 +234,7 @@ find -name '*.py[co]' -delete
 %if 0%{?fedora} < 17
 %patch25 -p1 -b .xorg111
 %endif
-
 %patch26 -p1 -b .nobundles
-
-# Remove prebuilt binary tools
-%if 0%{?fedora} < 16
-rm -rf kBuild
-%endif
-rm -rf tools
-
-# Remove some bundle X11 sources.
-rm -rf src/VBox/Additions/x11/x11include
-rm -rf src/VBox/Additions/x11/x11stubs
-rm -rf src/libs/boost-1.37.0/   
-#rm -rf src/libs/liblzf-3.4/     
-rm -rf src/libs/libxml2-2.6.31/ 
-rm -rf src/libs/libpng-1.2.8/   
-rm -rf src/libs/zlib-1.2.6/ 
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -608,6 +614,13 @@ fi
 
 
 %changelog
+* Tue Jan 15 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-2
+- Re enable_docs after add some BuildRequires of new texlive.
+- VBoxGuestLib is not need for new X11-xorg, so no compile instead patch source to
+  build with system sources.
+- Delete source bundles before patching sources and adjustments on the corresponding patches.
+- VirtualBox-4.2.0-libcxx.patch minor imporvements.
+
 * Mon Dec 24 2012 Sérgio Basto <sergio@serjux.com> - 4.2.6-1
 - New upstream release.
 - Fix some changelog dates.
