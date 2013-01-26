@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.2.6
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Release:    3%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -471,13 +471,22 @@ getent group vboxusers >/dev/null || groupadd -r vboxusers
 /usr/bin/update-mime-database %{_datadir}/mime &>/dev/null || :
 
 # Assign USB devices
-if /sbin/udevadm control --reload-rules >/dev/null 2>&1
-then
+# reference for non-systemd OS
+#if /sbin/udevadm control --reload-rules >/dev/null 2>&1
+#then
 #   /sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
 #   /sbin/udevadm settle >/dev/null 2>&1 || :
+#fi
+%if 0%{?fedora} < 18
+    systemctl restart udev.service
     systemctl restart udev-trigger.service
     systemctl restart udev-settle.service
-fi
+%else
+    systemctl restart systemd-udevd.service
+    systemctl restart systemd-udev-trigger.service
+    systemctl restart systemd-udev-settle.service
+%endif
+
 # should be in kmod package, not here
 /bin/systemctl try-restart fedora-loadmodules.service >/dev/null 2>&1 || :
 
@@ -614,6 +623,9 @@ fi
 
 
 %changelog
+* Sat Jan 26 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-3
+- fix for rfbz #2662, systemd of F18 changed names of udev services.
+
 * Tue Jan 15 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-2
 - Re enable_docs after add some BuildRequires of new texlive.
 - VBoxGuestLib is not need for new X11-xorg, so no compile instead patch source to
