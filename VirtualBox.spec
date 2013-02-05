@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.2.6
-Release:    3%{?prerel:.%{prerel}}%{?dist}
+Release:    4%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -408,8 +408,10 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}    \
 install -m 0644 -D %{SOURCE9} \
     $RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
+%if %{enable_webservice}
 install -m 0644 -D %{SOURCE10} \
     $RPM_BUILD_ROOT%{_unitdir}/vboxweb.service
+%endif
 
 install -m 0644 -D %{SOURCE11} \
     $RPM_BUILD_ROOT%{_unitdir}/vboxservice.service
@@ -465,27 +467,21 @@ desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
 # Group for USB devices
 getent group vboxusers >/dev/null || groupadd -r vboxusers
 
+%if %{enable_webservice}
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%endif
+
 # Desktop databases
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 /usr/bin/update-desktop-database &>/dev/null || :
 /usr/bin/update-mime-database %{_datadir}/mime &>/dev/null || :
 
 # Assign USB devices
-# reference for non-systemd OS
-#if /sbin/udevadm control --reload-rules >/dev/null 2>&1
-#then
-#   /sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
-#   /sbin/udevadm settle >/dev/null 2>&1 || :
-#fi
-%if 0%{?fedora} < 18
-    systemctl restart udev.service
-    systemctl restart udev-trigger.service
-    systemctl restart udev-settle.service
-%else
-    systemctl restart systemd-udevd.service
-    systemctl restart systemd-udev-trigger.service
-    systemctl restart systemd-udev-settle.service
-%endif
+if /sbin/udevadm control --reload-rules >/dev/null 2>&1
+then
+   /sbin/udevadm trigger --subsystem-match=usb --action=add >/dev/null 2>&1 || :
+   /sbin/udevadm settle >/dev/null 2>&1 || :
+fi
 
 # should be in kmod package, not here
 /bin/systemctl try-restart fedora-loadmodules.service >/dev/null 2>&1 || :
@@ -586,7 +582,9 @@ fi
 %if %{enable_docs}
 %doc obj/bin/UserManual*.pdf
 %endif
+%if %{enable_webservice}
 %{_unitdir}/vboxweb.service
+%endif
 /lib/udev/VBoxCreateUSBNode.sh
 
 
@@ -623,6 +621,11 @@ fi
 
 
 %changelog
+* Sat Feb 02 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-4
+- Back to old udev commands, systemctl just does the same devadm commands but doesn't help much.
+- and add --action=add to udevadm trigger --subsystem-match=usb .
+- vboxweb.service fixes.
+
 * Sat Jan 26 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-3
 - fix for rfbz #2662, systemd of F18 changed names of udev services.
 
