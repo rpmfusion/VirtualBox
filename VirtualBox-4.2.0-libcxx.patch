@@ -4,13 +4,25 @@ Not a good idea if we don't need to be binary-compatible across exotic
 distribution. Doesn't work with trunk glibc heading towards 2.11 anyways.
 Static linking is not really supported anyways.
 
-Was From dd383911ef6a9a43c17b18d48b17cd82d6c8feb9 Mon Sep 17 00:00:00 2001
+Was From dd383911ef6a9a43c17b18d48b17cd82d6c8feb9 
+Mon Sep 17 00:00:00 2001
 From: Lubomir Rintel <lkundrak@v3.sk>
 Date: Fri, 18 Jun 2010 10:58:14 +0200
-diff --git a/Config.kmk b/Config.kmk
-index 0ea34d8..2ec388c 100644
+
+Redo for VirtualBox-4.2.x
+Sérgio Basto <sergio@serjux.com>
+
 --- a/Config.kmk
 +++ b/Config.kmk
+@@ -2588,7 +2588,7 @@ else
+ VBOX_SUFF_OBJ = $(SUFF_OBJ)
+ endif
+ VBOXW32GUEST_SUFF_LIB = .lib
+-VBOXLNX32GUEST_SUFF_LIB = .a
++VBOXLNX32GUEST_SUFF_LIB = .so
+ 
+ #
+ # SDKs for external libraries.
 @@ -3163,7 +3163,7 @@ TEMPLATE_VBOXR3EXE_LIBS                = pthread m rt dl
  TEMPLATE_VBOXR3EXE_LIBS                = \
  	$(L4_LIBDIR)/libvboxserver.s.so \
@@ -20,8 +32,6 @@ index 0ea34d8..2ec388c 100644
  	$(L4_LIBDIR)/libdl.s.so \
  	$(L4_LIBDIR)/libuc.0.s.so
   else ifeq ($(KBUILD_TARGET),os2)
-diff --git a/configure b/configure
-index 987cf1b..75d556c 100755
 --- a/configure
 +++ b/configure
 @@ -2582,7 +2582,7 @@ fi
@@ -57,8 +67,6 @@ index 987cf1b..75d556c 100755
  ifdef VBOX_X11_SEAMLESS_GUEST
   VBoxClient_DEFS += SEAMLESS_GUEST DYNAMIC_RESIZE
   VBoxClient_SOURCES += \
-diff --git a/src/VBox/Frontends/VirtualBox/Makefile.kmk b/src/VBox/Frontends/VirtualBox/Makefile.kmk
-index ed0163b..2ee8418 100644
 --- a/src/VBox/Frontends/VirtualBox/Makefile.kmk
 +++ b/src/VBox/Frontends/VirtualBox/Makefile.kmk
 @@ -957,7 +957,7 @@ endif # darwin
@@ -81,7 +89,6 @@ index ed0163b..2ee8418 100644
  SUPR3Static_EXTENDS = SUPR3
  
  #
-diff --git a/src/VBox/HostDrivers/VBoxNetFlt/Makefile.kmk b/src/VBox/HostDrivers/VBoxNetFlt/Makefile.kmk
 --- a/src/VBox/HostDrivers/VBoxNetFlt/Makefile.kmk.libcxx	2012-08-29 15:13:46.000000000 +0100
 +++ b/src/VBox/HostDrivers/VBoxNetFlt/Makefile.kmk	2012-09-02 02:49:31.198721147 +0100
 @@ -143,7 +143,7 @@ $(PATH_TARGET)/VBoxNetFltCat.dir/VBoxNet
@@ -171,8 +178,6 @@ diff --git a/src/VBox/HostDrivers/VBoxNetFlt/Makefile.kmk b/src/VBox/HostDrivers
  VBoxRes_DEPS     = $(VBOX_SVN_REV_KMK)
  VBoxRes_SOURCES = \
  	dummy.cpp \
-diff --git a/src/VBox/Installer/win/Stub/Makefile.kmk b/src/VBox/Installer/win/Stub/Makefile.kmk
-index a8f89eb..6cf55cc 100644
 --- a/src/VBox/Installer/win/Stub/Makefile.kmk
 +++ b/src/VBox/Installer/win/Stub/Makefile.kmk
 @@ -22,7 +22,7 @@ include	$(KBUILD_PATH)/subheader.kmk
@@ -184,8 +189,6 @@ index a8f89eb..6cf55cc 100644
  TEMPLATE_VBOXSTUB_POST_CMDS = $(NO_SUCH_VARIABLE)
  
  PROGRAMS.x86 += VBoxStub
-diff --git a/src/VBox/Storage/testcase/Makefile.kmk b/src/VBox/Storage/testcase/Makefile.kmk
-index f935b05..40f6bf2 100644
 --- a/src/VBox/Storage/testcase/Makefile.kmk
 +++ b/src/VBox/Storage/testcase/Makefile.kmk
 @@ -68,7 +68,7 @@ ifdef VBOX_WITH_TESTCASES
@@ -197,8 +200,6 @@ index f935b05..40f6bf2 100644
   vbox-img_DEFS += IN_VBOXDDU IN_VBOXDDU_STATIC VBOX_HDD_NO_DYNAMIC_BACKENDS IN_RT_R3
   vbox-img_SOURCES = \
  	vbox-img.cpp \
-diff --git a/src/libs/liblzf-3.4/Makefile.kmk b/src/libs/liblzf-3.4/Makefile.kmk
-index 44088fa..0afe89a 100644
 --- a/src/libs/liblzf-3.4/Makefile.kmk
 +++ b/src/libs/liblzf-3.4/Makefile.kmk
 @@ -33,7 +33,7 @@ VBox-liblzf_SOURCES = \
@@ -210,18 +211,25 @@ index 44088fa..0afe89a 100644
  VBox-liblzf-static_BLD_TYPE   = $(VBox-liblzf_BLD_TYPE)
  VBox-liblzf-static_DEFS       = $(VBox-liblzf_DEFS)
  VBox-liblzf-static_DEFS.x86   = $(VBox-liblzf_DEFS.x86)
-diff --git a/src/libs/zlib-1.2.1/Makefile.kmk b/src/libs/zlib-1.2.1/Makefile.kmk
-index fde8b7c..405d354 100644
---- a/src/libs/zlib-1.2.6/Makefile.kmk
-+++ b/src/libs/zlib-1.2.6/Makefile.kmk
-@@ -39,7 +39,7 @@ VBox-zlib_SOURCES = \
- 	inftrees.c \
- 	inffast.c
+--- ./src/VBox/Runtime/Makefile.kmk.orig	2012-12-27 18:33:44.262413863 +0000
++++ ./src/VBox/Runtime/Makefile.kmk	2012-12-27 18:34:26.856820592 +0000
+@@ -211,7 +211,7 @@ endif
+ #
+ # RuntimeR3 - Static Runtime for Ring-3 executables.
+ #
+-RuntimeR3_TEMPLATE      = VBoxR3Static
++RuntimeR3_TEMPLATE      = VBOXR3EXE
+ RuntimeR3_SDKS          = VBOX_LIBXML2 VBOX_OPENSSL VBOX_BOOST ## @todo why is BOOST and XML2 here? r3/xml.cpp is not in this lib...
+ RuntimeR3_SDKS.win      = $(VBOX_WINPSDK) $(VBOX_WINDDK)
+ RuntimeR3_DEFS          = IN_RT_R3 IN_SUP_R3 LDR_WITH_NATIVE LDR_WITH_ELF32 LDR_WITH_PE RT_WITH_VBOX RT_NO_GIP
+--- ./src/libs/kStuff/Makefile.kmk.orig	2012-12-27 18:36:01.629728244 +0000
++++ ./src/libs/kStuff/Makefile.kmk	2012-12-27 18:36:11.876827415 +0000
+@@ -75,7 +75,7 @@ VBox-kStuff_SOURCES = \
+ # The library for static linking.
+ #
+ LIBRARIES += VBox-kStuffStatic
+-VBox-kStuffStatic_TEMPLATE = VBoxR3Static
++VBox-kStuffStatic_TEMPLATE = VBOXR3EXE
+ VBox-kStuffStatic_EXTENDS = VBox-kStuff
  
--VBox-zlib-static_TEMPLATE = VBOXR3STATIC
-+VBox-zlib-static_TEMPLATE = VBOXR3EXE
- VBox-zlib-static_DEFS = $(VBox-zlib_DEFS)
- VBox-zlib-static_SOURCES = $(VBox-zlib_SOURCES)
  
--- 
-1.7.1
