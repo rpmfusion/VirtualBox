@@ -19,15 +19,15 @@
 #global enable_webservice 0
 #endif
 
-%if 0%{?fedora} < 18
+#if 0%{?fedora} < 18
 %global enable_docs 1
-%else
-%global enable_docs 0
-%endif
+#else
+#global enable_docs 0
+#endif
 
 Name:       VirtualBox
 Version:    4.2.6
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Release:    4%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -76,6 +76,14 @@ BuildRequires:  pam-devel
 BuildRequires:  mkisofs
 BuildRequires:  java-devel >= 1.6
 BuildRequires:  /usr/bin/pdflatex
+%if 0%{?fedora} >= 18
+BuildRequires:  doxygen-latex
+BuildRequires:  texlive-collection-fontsrecommended
+BuildRequires:  texlive-ec
+BuildRequires:  texlive-ucs
+BuildRequires:  texlive-tabulary
+BuildRequires:  texlive-fancybox
+%endif
 BuildRequires:  boost-devel
 #BuildRequires:  liblzf-devel
 BuildRequires:  libxml2-devel
@@ -195,6 +203,20 @@ which is generated during the build of main package.
 %setup -qn %{name}-%{version}%{prereltag}
 find -name '*.py[co]' -delete
 
+# Remove prebuilt binary tools 
+%if 0%{?fedora} < 16
+rm -rf kBuild
+%endif
+rm -rf tools
+# Remove bundle X11 sources and some lib sources, before patching.
+rm -rf src/VBox/Additions/x11/x11include
+rm -rf src/VBox/Additions/x11/x11stubs
+rm -rf src/libs/boost-1.37.0/   
+#rm -rf src/libs/liblzf-3.4/     
+rm -rf src/libs/libxml2-2.6.31/ 
+rm -rf src/libs/libpng-1.2.8/   
+rm -rf src/libs/zlib-1.2.6/ 
+
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .libcxx
@@ -212,23 +234,7 @@ find -name '*.py[co]' -delete
 %if 0%{?fedora} < 17
 %patch25 -p1 -b .xorg111
 %endif
-
 %patch26 -p1 -b .nobundles
-
-# Remove prebuilt binary tools
-%if 0%{?fedora} < 16
-rm -rf kBuild
-%endif
-rm -rf tools
-
-# Remove some bundle X11 sources.
-rm -rf src/VBox/Additions/x11/x11include
-rm -rf src/VBox/Additions/x11/x11stubs
-rm -rf src/libs/boost-1.37.0/   
-#rm -rf src/libs/liblzf-3.4/     
-rm -rf src/libs/libxml2-2.6.31/ 
-rm -rf src/libs/libpng-1.2.8/   
-rm -rf src/libs/zlib-1.2.6/ 
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -402,8 +408,10 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}    \
 install -m 0644 -D %{SOURCE9} \
     $RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
+%if %{enable_webservice}
 install -m 0644 -D %{SOURCE10} \
     $RPM_BUILD_ROOT%{_unitdir}/vboxweb.service
+%endif
 
 install -m 0644 -D %{SOURCE11} \
     $RPM_BUILD_ROOT%{_unitdir}/vboxservice.service
@@ -459,6 +467,10 @@ desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
 # Group for USB devices
 getent group vboxusers >/dev/null || groupadd -r vboxusers
 
+%if %{enable_webservice}
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%endif
+
 # Desktop databases
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 /usr/bin/update-desktop-database &>/dev/null || :
@@ -467,11 +479,10 @@ getent group vboxusers >/dev/null || groupadd -r vboxusers
 # Assign USB devices
 if /sbin/udevadm control --reload-rules >/dev/null 2>&1
 then
-#   /sbin/udevadm trigger --subsystem-match=usb >/dev/null 2>&1 || :
-#   /sbin/udevadm settle >/dev/null 2>&1 || :
-    systemctl restart udev-trigger.service
-    systemctl restart udev-settle.service
+   /sbin/udevadm trigger --subsystem-match=usb --action=add >/dev/null 2>&1 || :
+   /sbin/udevadm settle >/dev/null 2>&1 || :
 fi
+
 # should be in kmod package, not here
 /bin/systemctl try-restart fedora-loadmodules.service >/dev/null 2>&1 || :
 
@@ -571,7 +582,9 @@ fi
 %if %{enable_docs}
 %doc obj/bin/UserManual*.pdf
 %endif
+%if %{enable_webservice}
 %{_unitdir}/vboxweb.service
+%endif
 /lib/udev/VBoxCreateUSBNode.sh
 
 
@@ -608,6 +621,21 @@ fi
 
 
 %changelog
+* Sat Feb 02 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-4
+- Back to old udev commands, systemctl just does the same devadm commands but doesn't help much.
+- and add --action=add to udevadm trigger --subsystem-match=usb .
+- vboxweb.service fixes.
+
+* Sat Jan 26 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-3
+- fix for rfbz #2662, systemd of F18 changed names of udev services.
+
+* Tue Jan 15 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-2
+- Re enable_docs after add some BuildRequires of new texlive.
+- VBoxGuestLib is not need for new X11-xorg, so no compile instead patch source to
+  build with system sources.
+- Delete source bundles before patching sources and adjustments on the corresponding patches.
+- VirtualBox-4.2.0-libcxx.patch minor imporvements.
+
 * Mon Dec 24 2012 Sérgio Basto <sergio@serjux.com> - 4.2.6-1
 - New upstream release.
 - Fix some changelog dates.
