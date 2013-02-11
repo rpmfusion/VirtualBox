@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.2.6
-Release:    4%{?prerel:.%{prerel}}%{?dist}
+Release:    5%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -45,9 +45,7 @@ Source11:   vboxservice.service
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-4.1.18-strings.patch
 Patch3:     VirtualBox-4.2.0-libcxx.patch
-%ifarch x86_64
-Patch10:     VirtualBox-4.2.0-32bit.patch
-%endif
+Patch10:    VirtualBox-4.2.0-32bit.patch
 Patch15:    VirtualBox-OSE-4.0.0-makeself.patch
 Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
@@ -621,6 +619,9 @@ fi
 
 
 %changelog
+* Mon Feb 11 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-5
+- Remove if clause in Patch10, may make different src.rpms, my fault, rfbz #2679 .
+
 * Sat Feb 02 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-4
 - Back to old udev commands, systemctl just does the same devadm commands but doesn't help much.
 - and add --action=add to udevadm trigger --subsystem-match=usb .
