@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.2.6
-Release:    5%{?prerel:.%{prerel}}%{?dist}
+Release:    6%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -54,6 +54,7 @@ Patch23:    VirtualBox-4.2.0-mesa.patch
 Patch24:    VirtualBox-4.2.0-VBoxGuestLib.patch
 Patch25:    VirtualBox-4.2.0-xorg111.patch
 Patch26:    VirtualBox-4.2.4-no-bundles.patch
+Patch27:    VirtualBox-4.2.6-gcc48.patch
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -233,6 +234,7 @@ rm -rf src/libs/zlib-1.2.6/
 %patch25 -p1 -b .xorg111
 %endif
 %patch26 -p1 -b .nobundles
+%patch27 -p1 -b .gcc48
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -619,6 +621,9 @@ fi
 
 
 %changelog
+* Sat Feb 23 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-6
+- Enable build with gcc 4.8 .
+
 * Mon Feb 11 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-5
 - Remove if clause in Patch10, may make different src.rpms, my fault, rfbz #2679 .
 
