@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.2.6
-Release:    6%{?prerel:.%{prerel}}%{?dist}
+Version:    4.2.8
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -621,6 +621,10 @@ fi
 
 
 %changelog
+* Sat Mar 02 2013 Sérgio Basto <sergio@serjux.com> - 4.2.8-1
+- New upstream release.
+- Small fix on VirtualBox-4.2.0-mesa.patch .
+
 * Sat Feb 23 2013 Sérgio Basto <sergio@serjux.com> - 4.2.6-6
 - Enable build with gcc 4.8 .
 
