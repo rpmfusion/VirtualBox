@@ -20,16 +20,6 @@ Just compile with X11 system source and we may remove bundle X11 source code.
   endif
  
   VBOX_DARWIN_OPENGL_INST     = obj/VBoxOGL/GL/
---- ./src/VBox/Additions/x11/Makefile.kmk.orig	2012-09-23 01:00:38.301286632 +0100
-+++ ./src/VBox/Additions/x11/Makefile.kmk	2012-09-23 01:00:45.135370696 +0100
-@@ -24,7 +24,6 @@ if1of ($(KBUILD_TARGET), freebsd linux n
-  ifneq ($(KBUILD_TARGET), solaris)
-   include $(PATH_SUB_CURRENT)/vboxmouse/Makefile.kmk
-  endif
-- include $(PATH_SUB_CURRENT)/x11stubs/Makefile.kmk
- endif
- 
- include $(FILE_KBUILD_SUB_FOOTER)
 --- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.mesa	2012-09-13 09:26:18.000000000 +0100
 +++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2012-09-23 01:08:36.032101751 +0100
 @@ -63,18 +63,12 @@ VBoxOGL_TEMPLATE       = VBOXCROGLR3GUES
