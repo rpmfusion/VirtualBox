@@ -16,7 +16,7 @@ Let's not bug the user with updates that are not yet packaged.
                  populate();
              PeriodType index = (PeriodType)m_dayList.indexOf(VBoxUpdateDay(QString(), parser[0]));
 -            m_periodIndex = index == PeriodUndefined ? Period1Day : index;
-+            m_periodIndex = index == PeriodUndefined ? PeriodNever : index;
++            m_periodIndex = index == PeriodUndefined ? Period1Week : index;
          }
  
          /* Parse 'date' value: */

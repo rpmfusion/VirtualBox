@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.2.8
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Version:    4.2.10
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -55,7 +55,6 @@ Patch24:    VirtualBox-4.2.0-VBoxGuestLib.patch
 Patch25:    VirtualBox-4.2.0-xorg111.patch
 Patch26:    VirtualBox-4.2.4-no-bundles.patch
 Patch27:    VirtualBox-4.2.6-gcc48.patch
-Patch28:    VirtualBox-4.2.8-Linux_3.9.0_rc0_compile_fix.patch
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -236,7 +235,6 @@ rm -rf src/libs/zlib-1.2.6/
 %endif
 %patch26 -p1 -b .nobundles
 %patch27 -p1 -b .gcc48
-%patch28 -p1 -b .kernel-3.9
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -406,9 +404,10 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}    \
     obj/bin/additions/VBoxClient        \
     obj/bin/additions/VBoxControl
 
+# this is fix a long time 
 # Ideally, Xorg should autodetect this, but for some reason it no longer does
-install -m 0644 -D %{SOURCE9} \
-    $RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
+#install -m 0644 -D %{SOURCE9} \
+#    $RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 
 %if %{enable_webservice}
 install -m 0644 -D %{SOURCE10} \
@@ -421,6 +420,7 @@ install -m 0644 -D %{SOURCE11} \
 install -m 0755 -D src/VBox/Installer/linux/VBoxCreateUSBNode.sh \
     $RPM_BUILD_ROOT/lib/udev/VBoxCreateUSBNode.sh
 
+#review this 3
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
     $RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
@@ -608,7 +608,7 @@ fi
 %{_libdir}/xorg/modules/drivers/*
 %{_libdir}/dri/*
 %{_libdir}/VBoxOGL*.so
-%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
+#{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %exclude %{_datadir}/gdm
@@ -623,6 +623,12 @@ fi
 
 
 %changelog
+* Sat Mar 16 2013 Sérgio Basto <sergio@serjux.com> - 4.2.10-1
+- New upstream release.
+- Drop 00-vboxvideo.conf on guest X configuration, because this is fixed a long time ago, but we keep commented just in case.
+- Drop upstreamed patch VirtualBox-4.2.8-Linux_3.9.0_rc0_compile_fix.patch .
+- Modified noupdate.patch as reflection on bug rfbz #2722 , to check updates one time a week and ask for updates of extensions pack and VBoxGuestAdditions. We should also review strings for better dialogs.
+
 * Thu Mar 07 2013 Sérgio Basto <sergio@serjux.com> - 4.2.8-2
 - Added upstreamed patch for kernels 3.9, "That fix will be part of the next maintenance
   release". 
