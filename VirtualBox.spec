@@ -26,7 +26,7 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.2.10
+Version:    4.2.12
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -39,6 +39,7 @@ Source5:    VirtualBox-60-vboxguest.rules
 Source6:    VirtualBox.modules
 Source7:    VirtualBox-guest.modules
 Source8:    VirtualBox-vboxresize.desktop
+Source9:    VirtualBox-00-vboxvideo.conf
 Source10:   vboxweb.service
 Source11:   vboxservice.service
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
@@ -419,7 +420,7 @@ install -m 0644 -D %{SOURCE11} \
 install -m 0755 -D src/VBox/Installer/linux/VBoxCreateUSBNode.sh \
     $RPM_BUILD_ROOT/lib/udev/VBoxCreateUSBNode.sh
 
-#review this 2
+#review this 3
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
     $RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
@@ -622,6 +623,9 @@ fi
 
 
 %changelog
+* Mon Apr 15 2013 Sérgio Basto <sergio@serjux.com> - 4.2.12-1
+- New upstream release.
+
 * Sat Mar 16 2013 Sérgio Basto <sergio@serjux.com> - 4.2.10-1
 - New upstream release.
 - Drop 00-vboxvideo.conf on guest X configuration, because this is fixed a long time ago, but we keep commented just in case.
