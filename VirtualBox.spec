@@ -26,7 +26,7 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.2.10
+Version:    4.2.12
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -623,6 +623,9 @@ fi
 
 
 %changelog
+* Mon Apr 15 2013 Sérgio Basto <sergio@serjux.com> - 4.2.12-1
+- New upstream release.
+
 * Sat Mar 16 2013 Sérgio Basto <sergio@serjux.com> - 4.2.10-1
 - New upstream release.
 - Drop 00-vboxvideo.conf on guest X configuration, because this is fixed a long time ago, but we keep commented just in case.
