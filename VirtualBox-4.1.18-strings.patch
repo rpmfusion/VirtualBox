@@ -1,9 +1,9 @@
 * Mon Jul 09 2012 Sérgio Basto <sergio@serjux.com> 
-- rfbz #1826, last review of https://bugzilla.rpmfusion.org/attachment.cgi?id=888
+  rfbz #1826, last review of https://bugzilla.rpmfusion.org/attachment.cgi?id=888
   by: Naveed Hasan <naveed@cs.columbia.edu>
 
 * Sat Jun 16 2012 Sérgio Basto <sergio@serjux.com>
-- Rebased for 4.1.16 (partial rfbz #1826)
+  Rebased for 4.1.16 (partial rfbz #1826)
 
 
 From: Lubomir Rintel <lkundrak@v3.sk>
@@ -38,7 +38,7 @@ diff -Nurp VirtualBox-4.1.18/src/VBox/Frontends/VirtualBox/src/main.cpp VirtualB
 +  "the computer for the driver to load.<br/><br/>"
 +  "Alternatively, you may attempt to load the driver by issuing the "
 +  "following command with system administrator (root) privileges:<br/><br/>"
-+  "  <font color=blue>'/etc/sysconfig/modules/VirtualBox.modules'</font><br/><br/>"
++  "  <font color=blue>'systemctl restart systemd-modules-load.service'</font><br/><br/>"
    );
  
  QString g_QStrHintOtherWrongDriverVersion = QApplication::tr(
@@ -47,7 +47,7 @@ diff -Nurp VirtualBox-4.1.18/src/VBox/Frontends/VirtualBox/src/main.cpp VirtualB
    "VirtualBox. The installation of VirtualBox was apparently not "
    "successful. Executing<br/><br/>"
 -  "  <font color=blue>'/etc/init.d/vboxdrv setup'</font><br/><br/>"
-+  "  <font color=blue>'/etc/sysconfig/modules/VirtualBox.modules'</font> as root<br/><br/>"
++  "  <font color=blue>'systemctl restart systemd-modules-load.service '</font> as root<br/><br/>"
    "may correct this. Make sure that you do not mix the "
 -  "OSE version and the PUEL version of VirtualBox."
 +  "RPM Fusion version and the Oracle version of VirtualBox."
@@ -73,10 +73,10 @@ diff -Nurp VirtualBox-4.1.18/src/VBox/Installer/linux/VBox.sh VirtualBox-4.1.18.
  WARNING: The vboxdrv kernel module is not loaded. Either there is no module
           available for the current kernel (`uname -r`) or it failed to
 -         load. Please recompile the kernel module and install it by
-+         load. Reboot the computer or load the kernel module by executing
++         load. Please make sure that you have kmod-VirtualBox for current kernel and load the kernel module by executing
  
 -           sudo /etc/init.d/vboxdrv setup
-+           '/etc/sysconfig/modules/VirtualBox.modules' (as root)
++           'systemctl restart systemd-modules-load.service' (as root)
  
           You will not be able to start VMs until this problem is fixed.
  EOF
@@ -87,8 +87,8 @@ diff -Nurp VirtualBox-4.1.18/src/VBox/Installer/linux/VBox.sh VirtualBox-4.1.18.
  
 -           sudo /etc/init.d/vboxdrv restart
 +           '/sbin/udevadm control --reload-rules' (as root)
-+           'systemctl restart udev-trigger.service' (as root)
-+           'systemctl restart udev-settle.service' (as root)
++           '/sbin/udevadm trigger --subsystem-match=usb --action=add' (as root)
++           '/sbin/udevadm settle' (as root)
  
 -         and if that is not successful, try to re-install the package.
 +         and if that is not successful, then you're in situation that
@@ -106,7 +106,7 @@ diff -Nurp VirtualBox-4.1.18/src/VBox/VMM/VMMR3/VM.cpp VirtualBox-4.1.18.new2/sr
 -                                  "Re-setup the kernel module by executing "
 -                                  "'/etc/init.d/vboxdrv setup' as root");
 +                                  "Reboot the computer or load the kernel module by executing "
-+                                  "'/etc/sysconfig/modules/VirtualBox.modules' as root");
++                                  "'systemctl restart systemd-modules-load.service' as root");
  #else
                      pszError = N_("VirtualBox kernel driver not loaded");
  #endif
@@ -117,7 +117,7 @@ diff -Nurp VirtualBox-4.1.18/src/VBox/VMM/VMMR3/VM.cpp VirtualBox-4.1.18.new2/sr
 -                                  "reason. Re-setup the kernel module by executing "
 -                                  "'/etc/init.d/vboxdrv setup' as root");
 +                                  "reason. Load the kernel module by executing "
-+                                  "'/etc/sysconfig/modules/VirtualBox.modules' as root");
++                                  "'systemctl restart systemd-modules-load.service' as root");
  #else
                      pszError = N_("VirtualBox kernel driver not installed");
  #endif

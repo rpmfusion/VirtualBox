@@ -26,7 +26,7 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.2.12
+Version:    4.2.14
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -54,7 +54,6 @@ Patch23:    VirtualBox-4.2.0-mesa.patch
 Patch24:    VirtualBox-4.2.0-VBoxGuestLib.patch
 Patch25:    VirtualBox-4.2.0-xorg111.patch
 Patch26:    VirtualBox-4.2.4-no-bundles.patch
-Patch27:    VirtualBox-4.2.6-gcc48.patch
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -62,7 +61,7 @@ BuildRequires:  kBuild >= 0.1.98
 BuildRequires:  SDL-devel xalan-c-devel
 BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
-BuildRequires:  dev86 iasl libxslt-devel xerces-c-devel libIDL-devel
+BuildRequires:  iasl libxslt-devel xerces-c-devel libIDL-devel
 BuildRequires:  yasm
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  python-devel
@@ -70,7 +69,6 @@ BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
 BuildRequires:  qt4-devel
 BuildRequires:  gsoap-devel
-BuildRequires:  xz
 BuildRequires:  pam-devel
 BuildRequires:  mkisofs
 BuildRequires:  java-devel >= 1.6
@@ -234,16 +232,9 @@ rm -rf src/libs/zlib-1.2.6/
 %patch25 -p1 -b .xorg111
 %endif
 %patch26 -p1 -b .nobundles
-%patch27 -p1 -b .gcc48
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
-
-# Testings 
-#for S in doc/manual/fr_FR/*xml
-#do
-#    sed -i 's/[&][a-zA-Z0-9]\{2,5\}[;]/ /g' $S
-#done
 
 %build
 ./configure --disable-kmods \
@@ -424,13 +415,14 @@ install -m 0755 -D src/VBox/Installer/linux/VBoxCreateUSBNode.sh \
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
     $RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
-install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
-    $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+#ancient script /usr/bin/VBoxClient-all does not exits 
+#install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
+#    $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
 install -m 0644 -D %{SOURCE8} \
     $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
-desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+#desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 # Guest libraries
@@ -450,8 +442,8 @@ install -p -m 0644 -D %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/90-v
 install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-vboxguest.rules
 
 # Install modules load script
-install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}.modules
-install -p -m 0755 -D %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
+install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/modules-load.d/%{name}.modules
+install -p -m 0755 -D %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/modules-load.d/%{name}-guest.modules
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
@@ -486,7 +478,7 @@ then
 fi
 
 # should be in kmod package, not here
-/bin/systemctl try-restart fedora-loadmodules.service >/dev/null 2>&1 || :
+/bin/systemctl restart systemd-modules-load.service >/dev/null 2>&1 || :
 
 %preun
 if [ $1 -eq 0 ] ; then
@@ -516,7 +508,7 @@ fi
 /sbin/ldconfig
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 # should be in kmod package, not here
-/bin/systemctl try-restart fedora-loadmodules.service >/dev/null 2>&1 || :
+/bin/systemctl restart systemd-modules-load.service >/dev/null 2>&1 || :
 /bin/systemctl enable vboxservice.service >/dev/null 2>&1 || :
 /bin/systemctl restart vboxservice.service >/dev/null 2>&1 || :
 
@@ -578,7 +570,7 @@ fi
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
-%config %{_sysconfdir}/sysconfig/modules/%{name}.modules
+%config %{_sysconfdir}/modules-load.d/%{name}.modules
 %doc COPYING*
 %doc doc/*.*
 %if %{enable_docs}
@@ -610,10 +602,10 @@ fi
 %{_libdir}/VBoxOGL*.so
 #{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
-%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+#%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %exclude %{_datadir}/gdm
 %config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
-%config %{_sysconfdir}/sysconfig/modules/%{name}-guest.modules
+%config %{_sysconfdir}/modules-load.d/%{name}-guest.modules
 %doc COPYING
 %{_unitdir}/vboxservice.service
 
@@ -623,6 +615,16 @@ fi
 
 
 %changelog
+* Sat Jun 29 2013 Sérgio Basto <sergio@serjux.com> - 4.2.14-1
+- Change strings instructions to load modules. 
+- New upstream release.
+- Drop gcc-4.8 patch.
+
+* Sun May 12 2013 Sérgio Basto <sergio@serjux.com> - 4.2.12-2
+- drop some Buildrequires as documented in https://www.virtualbox.org/wiki/Linux%20build%20instructions
+- Use systemd-modules-load.service instead fedora-loadmodules.service ( Load legacy module
+  configuration ).
+
 * Mon Apr 15 2013 Sérgio Basto <sergio@serjux.com> - 4.2.12-1
 - New upstream release.
 
