@@ -1,12 +1,3 @@
-#!/bin/sh
-
-# Workaround for https://bugzilla.rpmfusion.org/show_bug.cgi?id=1083
-insert_module ()
-{
-        grep -qR "^[ \t]*blacklist[ \t][ \t]*$1[ \t]*" /etc/modprobe.d && return
-        modinfo $1 |awk '/filename:/ {print "insmod "$2}' |$SHELL
-}
-
-insert_module vboxguest
-insert_module vboxsf
-
+vboxguest
+vboxsf
+vboxvideo
