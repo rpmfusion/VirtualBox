@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.2.14
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Release:    2%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -442,8 +442,8 @@ install -p -m 0644 -D %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/90-v
 install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-vboxguest.rules
 
 # Install modules load script
-install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/modules-load.d/%{name}.modules
-install -p -m 0755 -D %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/modules-load.d/%{name}-guest.modules
+install -p -m 0755 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/modules-load.d/%{name}.conf
+install -p -m 0755 -D %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/modules-load.d/%{name}-guest.conf
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
@@ -570,7 +570,7 @@ fi
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
 %config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
-%config %{_sysconfdir}/modules-load.d/%{name}.modules
+%config %{_sysconfdir}/modules-load.d/%{name}.conf
 %doc COPYING*
 %doc doc/*.*
 %if %{enable_docs}
@@ -605,7 +605,7 @@ fi
 #%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %exclude %{_datadir}/gdm
 %config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
-%config %{_sysconfdir}/modules-load.d/%{name}-guest.modules
+%config %{_sysconfdir}/modules-load.d/%{name}-guest.conf
 %doc COPYING
 %{_unitdir}/vboxservice.service
 
@@ -615,6 +615,9 @@ fi
 
 
 %changelog
+* Sun Jun 30 2013 Sérgio Basto <sergio@serjux.com> - 4.2.14-2
+- Bugfix, forgot rename *.modules to *.conf, as defined in modules-load.d(5) . 
+
 * Sat Jun 29 2013 Sérgio Basto <sergio@serjux.com> - 4.2.14-1
 - Change strings instructions to load modules. 
 - New upstream release.
