@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.2.14
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Version:    4.2.16
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -615,6 +615,9 @@ fi
 
 
 %changelog
+* Fri Jul 05 2013 Sérgio Basto <sergio@serjux.com> - 4.2.16-1
+- New upstream release.
+
 * Sun Jun 30 2013 Sérgio Basto <sergio@serjux.com> - 4.2.14-2
 - Bugfix, forgot rename *.modules to *.conf, as defined in modules-load.d(5) . 
 
