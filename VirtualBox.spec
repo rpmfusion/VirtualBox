@@ -26,7 +26,7 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.2.16
+Version:    4.2.18
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -615,6 +615,15 @@ fi
 
 
 %changelog
+* Fri Sep 20 2013 Sérgio Basto <sergio@serjux.com> - 4.2.18-1
+- New upstream release.
+
+* Sun Sep 01 2013 Sérgio Basto <sergio@serjux.com> - 4.2.16-2
+- fixes for Kernel 3.11: 
+    https://www.virtualbox.org/changeset/47484/vbox/trunk
+    and
+    https://www.virtualbox.org/changeset/47588/vbox/trunk 
+
 * Fri Jul 05 2013 Sérgio Basto <sergio@serjux.com> - 4.2.16-1
 - New upstream release.
 
