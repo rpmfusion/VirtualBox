@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.2.18
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Release:    1%{?prerel:.%{prerel}}%{?dist}.1
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -615,6 +615,9 @@ fi
 
 
 %changelog
+* Sun Sep 29 2013 Nicolas Chauvet <kwizart@gmail.com> - 4.2.18-1.1
+- Rebuilt
+
 * Fri Sep 20 2013 Sérgio Basto <sergio@serjux.com> - 4.2.18-1
 - New upstream release.
 
