@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.2.16
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Version:    4.2.18
+Release:    2%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -54,6 +54,7 @@ Patch23:    VirtualBox-4.2.0-mesa.patch
 Patch24:    VirtualBox-4.2.0-VBoxGuestLib.patch
 Patch25:    VirtualBox-4.2.0-xorg111.patch
 Patch26:    VirtualBox-4.2.4-no-bundles.patch
+Patch27:    changeset_trunk_48529.diff 
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -232,6 +233,7 @@ rm -rf src/libs/zlib-1.2.6/
 %patch25 -p1 -b .xorg111
 %endif
 %patch26 -p1 -b .nobundles
+%patch27 -p1 -b .fix_shared_folders_for_Linux_3.11
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -615,6 +617,18 @@ fi
 
 
 %changelog
+* Sun Sep 29 2013 Sérgio Basto <sergio@serjux.com> - 4.2.18-2
+- Additions/linux: fix shared folders for Linux 3.11 
+
+* Fri Sep 20 2013 Sérgio Basto <sergio@serjux.com> - 4.2.18-1
+- New upstream release.
+
+* Sun Sep 01 2013 Sérgio Basto <sergio@serjux.com> - 4.2.16-2
+- fixes for Kernel 3.11: 
+    https://www.virtualbox.org/changeset/47484/vbox/trunk
+    and
+    https://www.virtualbox.org/changeset/47588/vbox/trunk 
+
 * Fri Jul 05 2013 Sérgio Basto <sergio@serjux.com> - 4.2.16-1
 - New upstream release.
 
