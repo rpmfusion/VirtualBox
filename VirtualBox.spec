@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.2.18
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Version:    4.3.0
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -44,17 +44,16 @@ Source10:   vboxweb.service
 Source11:   vboxservice.service
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-4.1.18-strings.patch
-Patch3:     VirtualBox-4.2.0-libcxx.patch
-Patch10:    VirtualBox-4.2.0-32bit.patch
-Patch15:    VirtualBox-OSE-4.0.0-makeself.patch
+Patch3:     VirtualBox-4.3.0-libcxx.patch
+Patch4:     VirtualBox-4.3.0-testmangle.patch
+Patch10:    VirtualBox-4.3.0-32bit.patch
 Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
-Patch23:    VirtualBox-4.2.0-mesa.patch
-Patch24:    VirtualBox-4.2.0-VBoxGuestLib.patch
+Patch23:    VirtualBox-4.3.0-mesa.patch
+Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
 Patch25:    VirtualBox-4.2.0-xorg111.patch
-Patch26:    VirtualBox-4.2.4-no-bundles.patch
-Patch27:    changeset_trunk_48529.diff 
+Patch26:    VirtualBox-4.3.0-no-bundles.patch
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -88,6 +87,9 @@ BuildRequires:  libxml2-devel
 BuildRequires:  libpng-devel
 BuildRequires:  zlib-devel
 BuildRequires:  device-mapper-devel
+BuildRequires:  libvpx-devel
+BuildRequires:  makeself
+
 #BuildRequires:  glibc(x86-32) glibc-devel(x86-32) libstdc++(x86-32)
 #BuildRequires:  glibc.i686 glibc-devel.i686 libstdc++.i686
 #BuildRequires:  /usr/lib/libc.so
@@ -218,7 +220,7 @@ rm -rf src/libs/zlib-1.2.6/
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .libcxx
-%patch15 -p1 -b .makeself
+%patch4 -p1 -b .mangletest
 %ifarch x86_64
 %patch10 -p1 -b .32bit
 %endif
@@ -233,7 +235,6 @@ rm -rf src/libs/zlib-1.2.6/
 %patch25 -p1 -b .xorg111
 %endif
 %patch26 -p1 -b .nobundles
-%patch27 -p1 -b .fix_shared_folders_for_Linux_3.11
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -248,6 +249,7 @@ sed -i 's/\r//' COPYING
   --disable-docs \
 %endif
 
+#--enable-vnc  --build-headless --build-libxml2
 #--disable-java
 #--disable-xpcom
 . ./env.sh
@@ -307,11 +309,9 @@ ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxballoonctrl
 %if %{enable_webservice}
 ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
 %endif
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBFE
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxbfe
 
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
-    obj/bin/VBoxTunctl  \
+    obj/bin/VBoxTunctl
 
 # Components
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/components \
@@ -328,24 +328,33 @@ install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
 
 # Executables
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
-    obj/bin/VBoxHeadless    \
-    obj/bin/VBoxSDL     \
-    obj/bin/VBoxNetDHCP \
-    obj/bin/VBoxNetAdpCtl   \
+    obj/bin/SUPInstall \
+    obj/bin/SUPLoggerCtl \
+    obj/bin/SUPUninstall \
     obj/bin/VirtualBox  \
+    obj/bin/VBoxAutostart \
+    obj/bin/VBoxBalloonCtrl \
+    obj/bin/VBoxExtPackHelperApp \
+    obj/bin/VBoxHeadless    \
     obj/bin/VBoxManage  \
+    obj/bin/VBoxManageHelp \
+    obj/bin/VBoxNetAdpCtl   \
+    obj/bin/VBoxNetDHCP \
+    obj/bin/VBoxNetNAT \
+    obj/bin/VBoxSDL     \
     obj/bin/VBoxSVC     \
+    obj/bin/VBoxTestOGL \
+    obj/bin/VBoxVMMPreload \
+    obj/bin/VBoxVolInfo \
     obj/bin/VBoxXPCOMIPCD   \
     obj/bin/VBoxSysInfo.sh  \
     obj/bin/vboxshell.py    \
-    obj/bin/VBoxTestOGL \
-    obj/bin/VBoxExtPackHelperApp \
-    obj/bin/VBoxBalloonCtrl \
 %if %{enable_webservice}
     obj/bin/vboxwebsrv  \
     obj/bin/webtest     \
 %endif
-    obj/bin/VBoxBFE
+
+install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh $RPM_BUILD_ROOT/lib/udev/VBoxCreateUSBNode.sh   
 
 # Language files
 install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
@@ -410,21 +419,17 @@ install -m 0644 -D %{SOURCE10} \
 install -m 0644 -D %{SOURCE11} \
     $RPM_BUILD_ROOT%{_unitdir}/vboxservice.service
 
-install -m 0755 -D src/VBox/Installer/linux/VBoxCreateUSBNode.sh \
-    $RPM_BUILD_ROOT/lib/udev/VBoxCreateUSBNode.sh
-
 #review this 3
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
     $RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
-#ancient script /usr/bin/VBoxClient-all does not exits 
+#/usr/bin/VBoxClient-all does not exits 
 #install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
 #    $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+#desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
 install -m 0644 -D %{SOURCE8} \
     $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
-
-#desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 # Guest libraries
@@ -529,8 +534,6 @@ fi
 %{_bindir}/VBox
 %{_bindir}/vboxballoonctrl
 %{_bindir}/VBoxBalloonCtrl
-%{_bindir}/vboxbfe
-%{_bindir}/VBoxBFE
 %{_bindir}/vboxheadless
 %{_bindir}/VBoxHeadless
 %{_bindir}/vboxmanage
@@ -555,13 +558,20 @@ fi
 %{_libdir}/virtualbox/VBoxTestOGL
 %{_libdir}/virtualbox/VBoxXPCOMIPCD
 %{_libdir}/virtualbox/VBoxBalloonCtrl
+%{_libdir}/virtualbox/SUPInstall
+%{_libdir}/virtualbox/SUPLoggerCtl
+%{_libdir}/virtualbox/SUPUninstall
+%{_libdir}/virtualbox/VBoxAutostart
+%{_libdir}/virtualbox/VBoxManageHelp
+%{_libdir}/virtualbox/VBoxNetNAT
+%{_libdir}/virtualbox/VBoxVMMPreload
+%{_libdir}/virtualbox/VBoxVolInfo
 %if %{enable_webservice}
 %{_libdir}/virtualbox/vboxwebsrv
 %{_libdir}/virtualbox/webtest
 %endif
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxHeadless
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxSDL
-%attr(4755,root,root) %{_libdir}/virtualbox/VBoxBFE
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
 %attr(4755,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
 %attr(4755,root,root) %{_libdir}/virtualbox/VirtualBox
@@ -608,7 +618,7 @@ fi
 %exclude %{_datadir}/gdm
 %config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
 %config %{_sysconfdir}/modules-load.d/%{name}-guest.conf
-%doc COPYING
+#doc COPYING
 %{_unitdir}/vboxservice.service
 
 
@@ -617,6 +627,12 @@ fi
 
 
 %changelog
+* Mon Oct 28 2013 Sérgio Basto <sergio@serjux.com> - 4.3.0-1
+- New upstream release.
+- Refactor patches VirtualBox-4.3.0-32bit.patch, VirtualBox-4.3.0-libcxx.patch, VirtualBox-4.3.0-mesa.patch, 
+VirtualBox-4.3.0-no-bundles.patch, VirtualBox-4.3.0-testmangle.patch and VirtualBox-4.3.0-VBoxGuestLib.patch
+- Took the opportunity to do a review: add some new binaries, need to review it again .
+
 * Sun Sep 29 2013 Sérgio Basto <sergio@serjux.com> - 4.2.18-2
 - Additions/linux: fix shared folders for Linux 3.11 
 
