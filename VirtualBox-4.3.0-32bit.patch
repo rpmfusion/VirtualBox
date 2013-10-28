@@ -22,7 +22,7 @@ index 42ce775..0932637 100755
 -  [ "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
 +  #[ "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
    # tools/common/makeself*
-   #[ $OSE -ge 1 ] && check_makeself
+   [ $OSE -ge 1 ] && check_makeself
  fi
 diff --git a/src/VBox/Devices/testcase/Makefile.kmk b/src/VBox/Devices/testcase/Makefile.kmk
 index 4debf81..59dae0d 100644
