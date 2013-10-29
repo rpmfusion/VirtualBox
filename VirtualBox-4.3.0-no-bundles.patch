@@ -1,6 +1,6 @@
---- ./Config.kmk.libcxx	2012-10-26 17:23:13.000000000 +0100
-+++ ./Config.kmk	2012-11-24 14:46:31.187664914 +0000
-@@ -2587,26 +2587,25 @@ VBOXLNX32GUEST_SUFF_LIB = .a
+--- ./Config.kmk.nobundles	2013-10-27 21:01:59.094737459 +0000
++++ ./Config.kmk	2013-10-27 21:09:07.046005624 +0000
+@@ -2742,19 +2742,19 @@ VBOXLNX32GUEST_SUFF_LIB = .so
  # SDKs for external libraries.
  #
  SDK_VBOX_LIBXML2          = .
@@ -23,10 +23,3 @@
   SDK_VBOX_ZLIB_LIBS  ?= $(PATH_STAGE_LIB)/VBox-zlib$(VBOX_SUFF_LIB)
  else
   SDK_VBOX_ZLIB_INCS  ?=
-  SDK_VBOX_ZLIB_LIBS  ?= z
-  SDK_VBOX_ZLIB_DEFS.linux ?= _LARGEFILE64_SOURCE
- endif
--
- SDK_VBOX_OPENSSL      = Only for VBoxRT and/or statically linked programs.
- SDK_VBOX_OPENSSL_VBOX_DEFAULT_INCS := $(PATH_OUT)/obj/crypto-headers/include
- SDK_VBOX_OPENSSL_INCS ?= $(SDK_VBOX_OPENSSL_VBOX_DEFAULT_INCS)

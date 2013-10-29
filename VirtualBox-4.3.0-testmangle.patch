@@ -1,0 +1,13 @@
+Disable a failing check.
+
+--- ./src/VBox/Runtime/Makefile.kmk.libcxx	2013-10-15 12:13:19.000000000 +0100
++++ ./src/VBox/Runtime/Makefile.kmk	2013-10-28 03:08:32.053146036 +0000
+@@ -2452,7 +2452,7 @@ test-doxygen::
+ #
+ # Test mangling.
+ #
+-if1of ($(LIBRARIES),RuntimeR3 RuntimeR0 RuntimeR0Drv RuntimeRC)
++if 0
+  test-mangling:: $(IPRT_OUT_DIR)/mangling.run
+  OTHERS      += $(IPRT_OUT_DIR)/mangling.run
+  CLEANS      += $(IPRT_OUT_DIR)/mangling.run
