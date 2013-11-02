@@ -26,7 +26,7 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.0
+Version:    4.3.2
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -627,6 +627,9 @@ fi
 
 
 %changelog
+* Sat Nov 02 2013 Sérgio Basto <sergio@serjux.com> - 4.3.2-1
+- New upstream release, bugfix release.
+
 * Mon Oct 28 2013 Sérgio Basto <sergio@serjux.com> - 4.3.0-1
 - New upstream release.
 - Refactor patches VirtualBox-4.3.0-32bit.patch, VirtualBox-4.3.0-libcxx.patch, VirtualBox-4.3.0-mesa.patch, 
