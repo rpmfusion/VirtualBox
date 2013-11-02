@@ -12,28 +12,6 @@ Date: Fri, 18 Jun 2010 10:58:14 +0200
 Redo for VirtualBox-4.2.x and updated for VirtualBox-4.3.x
 Sérgio Basto <sergio@serjux.com>
 
---- ./src/VBox/Disassembler/testcase/tstAsm.mac.orig	2013-10-27 22:49:12.971665505 +0000
-+++ ./src/VBox/Disassembler/testcase/tstAsm.mac	2013-10-27 22:49:17.290716021 +0000
-@@ -52,7 +52,4 @@
-  %error "TEST_BITS is missing or wrong."
- %endif
- 
--%if __YASM_MAJOR__ > 1 || (__YASM_MAJOR__ == 1 && __YASM_MINOR__ >= 2)
-- %define pmulhrwa pmulhrw
--%endif
- 
---- ./src/VBox/Disassembler/testcase/tstDisasm-1A.asm	2013-10-15 12:12:36.000000000 +0100
-+++ ./src/VBox/Disassembler/testcase/tstDisasm-1A.asm	2013-10-27 22:36:35.204829647 +0000
-@@ -26,9 +26,6 @@
- 
- BITS 32
- 
--%if __YASM_MAJOR__ > 1 || (__YASM_MAJOR__ == 1 && __YASM_MINOR__ >= 2)
-- %define pmulhrwa pmulhrw
--%endif
- 
- 
- BEGINCODE
 --- a/Config.kmk
 +++ b/Config.kmk
 @@ -2588,7 +2588,7 @@ else
