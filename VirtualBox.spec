@@ -26,7 +26,7 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.4
+Version:    4.3.6
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -627,6 +627,10 @@ fi
 
 
 %changelog
+* Wed Dec 18 2013 Sérgio Basto <sergio@serjux.com> - 4.3.6-1
+- New upstream release, a maintenance release of
+VirtualBox 4.3 which improves stability and fixes regressions.
+
 * Sat Nov 30 2013 Sérgio Basto <sergio@serjux.com> - 4.3.4-1
 - New upstream release, a maintenance release of
 VirtualBox 4.3 which improves stability and fixes regressions.
