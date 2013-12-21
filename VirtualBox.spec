@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.3.6
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Release:    3%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -627,6 +627,9 @@ fi
 
 
 %changelog
+* Sat Dec 21 2013 Nicolas Chauvet <kwizart@gmail.com> - 4.3.6-3
+- Rebuilt after branching
+
 * Sat Dec 21 2013 Nicolas Chauvet <kwizart@gmail.com> - 4.3.6-2
 - Rebuilt after branching
 
