@@ -13,11 +13,11 @@
 #global prerel RC4
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-#if 0%{?fedora} < 20
+%if 0%{?fedora} < 21
 %global enable_webservice 1
-#else
-#global enable_webservice 0
-#endif
+%else
+%global enable_webservice 0
+%endif
 
 #if 0%{?fedora} < 18
 %global enable_docs 1
@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.3.6
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Release:    4%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -50,9 +50,8 @@ Patch10:    VirtualBox-4.3.0-32bit.patch
 Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
-Patch23:    VirtualBox-4.3.0-mesa.patch
+Patch23:    VirtualBox-4.3.6-mesa.patch
 Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
-Patch25:    VirtualBox-4.2.0-xorg111.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
 
 %if 0%{?fedora} < 16
@@ -102,7 +101,6 @@ BuildRequires:  mesa-libGL-devel
 BuildRequires:  mesa-libOSMesa-devel
 BuildRequires:  pixman-devel
 BuildRequires:  xorg-x11-proto-devel
-BuildRequires:  xorg-x11-server-source
 BuildRequires:  xorg-x11-server-devel
 BuildRequires:  libXcursor-devel
 BuildRequires:  libXcomposite-devel
@@ -231,9 +229,6 @@ rm -rf src/libs/zlib-1.2.6/
 %endif
 %patch23 -p1 -b .mesa
 %patch24 -p1 -b .guestlib
-%if 0%{?fedora} < 17
-%patch25 -p1 -b .xorg111
-%endif
 %patch26 -p1 -b .nobundles
 
 # CRLF->LF
@@ -627,6 +622,17 @@ fi
 
 
 %changelog
+* Wed Dec 25 2013 Sérgio Basto <sergio@serjux.com> - 4.3.6-4
+- Update VirtualBox-4.3-mesa.patch, for guest drives and for Xorg-x11-server-1.14.99 in rawhide, glx internals "fixes" completely removed, eliminating BuildRequires of xorg-x11-server-source. 
+  Also add to VBoxOGL_LIBS libXcomposite, libXdamage etc of the system.
+- Disable webservice for rawhide, problems reported upstream with new gsoap version.
+
+* Sat Dec 21 2013 Nicolas Chauvet <kwizart@gmail.com> - 4.3.6-3
+- Rebuilt after branching
+
+* Sat Dec 21 2013 Nicolas Chauvet <kwizart@gmail.com> - 4.3.6-2
+- Rebuilt after branching
+
 * Wed Dec 18 2013 Sérgio Basto <sergio@serjux.com> - 4.3.6-1
 - New upstream release, a maintenance release of
 VirtualBox 4.3 which improves stability and fixes regressions.
