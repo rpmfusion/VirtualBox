@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.2.18
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Version:    4.2.22
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -50,11 +50,9 @@ Patch15:    VirtualBox-OSE-4.0.0-makeself.patch
 Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
-Patch23:    VirtualBox-4.2.0-mesa.patch
+Patch23:    VirtualBox-4.3.6-mesa.patch
 Patch24:    VirtualBox-4.2.0-VBoxGuestLib.patch
-Patch25:    VirtualBox-4.2.0-xorg111.patch
 Patch26:    VirtualBox-4.2.4-no-bundles.patch
-Patch27:    changeset_trunk_48529.diff 
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -100,7 +98,6 @@ BuildRequires:  mesa-libGL-devel
 BuildRequires:  mesa-libOSMesa-devel
 BuildRequires:  pixman-devel
 BuildRequires:  xorg-x11-proto-devel
-BuildRequires:  xorg-x11-server-source
 BuildRequires:  xorg-x11-server-devel
 BuildRequires:  libXcursor-devel
 BuildRequires:  libXcomposite-devel
@@ -229,11 +226,7 @@ rm -rf src/libs/zlib-1.2.6/
 %endif
 %patch23 -p1 -b .mesa
 %patch24 -p1 -b .guestlib
-%if 0%{?fedora} < 17
-%patch25 -p1 -b .xorg111
-%endif
 %patch26 -p1 -b .nobundles
-%patch27 -p1 -b .fix_shared_folders_for_Linux_3.11
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -617,6 +610,12 @@ fi
 
 
 %changelog
+* Sat Jan 11 2014 Sérgio Basto <sergio@serjux.com> - 4.2.22-1
+- maintenance releases of older stable branches which improve stability
+and fix regressions.
+- drop changeset_trunk_48529.diff upstream patch. 
+- using VirtualBox-4.3.6-mesa.patch, backport patch from F19+ builds.
+
 * Sun Sep 29 2013 Sérgio Basto <sergio@serjux.com> - 4.2.18-2
 - Additions/linux: fix shared folders for Linux 3.11 
 
