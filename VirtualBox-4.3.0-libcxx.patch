@@ -196,7 +196,7 @@ Sérgio Basto <sergio@serjux.com>
 -  vbox-img_LIBS += crypt
 +  vbox-img_LIBS += crypto
    ifdef SDK_VBOX_LIBXML2_LIBS
-    vbox-img_LIBS += xml2 lzma
+    vbox-img_LIBS += xml2
    endif
 --- a/src/libs/liblzf-3.4/Makefile.kmk
 +++ b/src/libs/liblzf-3.4/Makefile.kmk

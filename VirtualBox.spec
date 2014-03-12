@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.6
-Release:    4%{?prerel:.%{prerel}}%{?dist}
+Version:    4.3.8
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -53,6 +53,7 @@ Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.3.6-mesa.patch
 Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
+Patch27:    39-fix-wrong-vboxvideo_drv-source.patch
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -230,6 +231,7 @@ rm -rf src/libs/zlib-1.2.6/
 %patch23 -p1 -b .mesa
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
+%patch27 -p1 -b .fix_vboxvideo
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -622,6 +624,12 @@ fi
 
 
 %changelog
+* Thu Mar 13 2014 Sérgio Basto <sergio@serjux.com> - 4.3.8-1
+- Update to 4.3.8, need an upstream patch
+  39-fix-wrong-vboxvideo_drv-source.patch
+- No need patch Config.kmk in VirtualBox-4.3.6-mesa.patch
+- small adjustments in others patches.
+
 * Wed Dec 25 2013 Sérgio Basto <sergio@serjux.com> - 4.3.6-4
 - Update VirtualBox-4.3-mesa.patch, for guest drives and for Xorg-x11-server-1.14.99 in rawhide, glx internals "fixes" completely removed, eliminating BuildRequires of xorg-x11-server-source. 
   Also add to VBoxOGL_LIBS libXcomposite, libXdamage etc of the system.

@@ -1,5 +1,5 @@
---- ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk.guestlib	2013-10-27 20:50:38.091380572 +0000
-+++ ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk	2013-10-27 20:53:54.380791350 +0000
+--- ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk.guestlib	2014-03-01 03:57:34.446124468 +0000
++++ ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk	2014-03-01 04:00:47.863997911 +0000
 @@ -38,7 +38,7 @@ endif
  LIBRARIES += \
  	VBoxGuestR3Lib \
@@ -8,4 +8,4 @@
 +ifndef VBOX_USE_SYSTEM_XORG_HEADERS
   if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd)
    LIBRARIES += \
-         VBoxGuestR3LibXFree86
+   	VBoxGuestR3LibXFree86
