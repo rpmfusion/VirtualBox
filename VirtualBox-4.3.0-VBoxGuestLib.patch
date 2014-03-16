@@ -1,3 +1,5 @@
+when we use VBOX_USE_SYSTEM_XORG_HEADERS , we don't need compile the very old libXFree86 (from xfree86.org)
+Sérgio Basto <sergio@serjux.com>
 --- ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk.guestlib	2014-03-01 03:57:34.446124468 +0000
 +++ ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk	2014-03-01 04:00:47.863997911 +0000
 @@ -38,7 +38,7 @@ endif

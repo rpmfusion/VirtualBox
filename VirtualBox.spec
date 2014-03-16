@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.3.8
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Release:    2%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -39,7 +39,6 @@ Source5:    VirtualBox-60-vboxguest.rules
 Source6:    VirtualBox.modules
 Source7:    VirtualBox-guest.modules
 Source8:    VirtualBox-vboxresize.desktop
-Source9:    VirtualBox-00-vboxvideo.conf
 Source10:   vboxweb.service
 Source11:   vboxservice.service
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
@@ -403,11 +402,6 @@ install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}    \
     obj/bin/additions/VBoxClient        \
     obj/bin/additions/VBoxControl
 
-# this is fix a long time 
-# Ideally, Xorg should autodetect this, but for some reason it no longer does
-#install -m 0644 -D %{SOURCE9} \
-#    $RPM_BUILD_ROOT%{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
-
 %if %{enable_webservice}
 install -m 0644 -D %{SOURCE10} \
     $RPM_BUILD_ROOT%{_unitdir}/vboxweb.service
@@ -609,7 +603,6 @@ fi
 %{_libdir}/xorg/modules/drivers/*
 %{_libdir}/dri/*
 %{_libdir}/VBoxOGL*.so
-#{_sysconfdir}/X11/xorg.conf.d/00-vboxvideo.conf
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 #%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %exclude %{_datadir}/gdm
@@ -624,6 +617,9 @@ fi
 
 
 %changelog
+* Sun Mar 16 2014 Sérgio Basto <sergio@serjux.com> - 4.3.8-2
+- some cleanups and improvements.
+
 * Thu Mar 13 2014 Sérgio Basto <sergio@serjux.com> - 4.3.8-1
 - Update to 4.3.8, need an upstream patch
   39-fix-wrong-vboxvideo_drv-source.patch

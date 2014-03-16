@@ -1,6 +1,25 @@
 fakedri_drv.c,h:
 Just compile with X11 system source and we may remove bundle X11 source code.
 
+--- ./Config.kmk	2012-03-13 13:14:01.000000000 +0000
++++ ./Config.kmk	2012-03-27 23:55:28.070630137 +0100
+@@ -2003,15 +2003,7 @@ ifdef VBOX_WITH_CROGL
+  endif
+ 
+  if1of ($(KBUILD_TARGET), freebsd linux solaris)
+- # VBOX_PATH_MESA_SOURCE = $(PATH_ROOT)/src/libs/mesa-7.2
+-  VBOX_PATH_MESA_SOURCE = $(VBOX_PATH_X11_ROOT)/mesa-7.2
+-  VBOX_MESA_INCS = \
+-        $(VBOX_PATH_MESA_SOURCE) \
+-        $(VBOX_PATH_MESA_SOURCE)/include \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/ \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/glapi \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/main \
+-        $(VBOX_PATH_MESA_SOURCE)/src/mesa/drivers/dri/common
++  VBOX_MESA_INCS = 
+  endif
+ 
+  VBOX_DARWIN_OPENGL_INST     = obj/VBoxOGL/GL/
 --- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.mesa	2012-09-13 09:26:18.000000000 +0100
 +++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2012-09-23 01:08:36.032101751 +0100
 @@ -82,18 +82,12 @@ VBoxOGL_TEMPLATE       = VBOXCROGLR3GUES
