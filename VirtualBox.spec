@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.8
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Version:    4.3.10
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -52,7 +52,6 @@ Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.3.6-mesa.patch
 Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
-Patch27:    39-fix-wrong-vboxvideo_drv-source.patch
 
 %if 0%{?fedora} < 16
 BuildRequires:  kBuild >= 0.1.98
@@ -207,8 +206,12 @@ rm -rf kBuild
 %endif
 rm -rf tools
 # Remove bundle X11 sources and some lib sources, before patching.
-rm -rf src/VBox/Additions/x11/x11include
+mv src/VBox/Additions/x11/x11include/mesa-7.2 .
+rm -rf src/VBox/Additions/x11/x11include/*
+mv mesa-7.2 src/VBox/Additions/x11/x11include/
+
 rm -rf src/VBox/Additions/x11/x11stubs
+rm -rf src/VBox/GuestHost/OpenGL/include/GL
 rm -rf src/libs/boost-1.37.0/   
 #rm -rf src/libs/liblzf-3.4/     
 rm -rf src/libs/libxml2-2.6.31/ 
@@ -230,7 +233,6 @@ rm -rf src/libs/zlib-1.2.6/
 %patch23 -p1 -b .mesa
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
-%patch27 -p1 -b .fix_vboxvideo
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -617,6 +619,13 @@ fi
 
 
 %changelog
+* Mon Mar 31 2014 Sérgio Basto <sergio@serjux.com> - 4.3.10-1
+- In vboxvideo guest drive, don't patch the source code of Mesa part that use glapi and use bundled 
+  x11include/mesa-7.2 headers of Mesa, which btw rawhide doesn't have it, F20 have glapi in xorg-x11-server-source, but by what
+  I saw, seems is not correct use it.
+- New upstream release
+- Drop upstream patch "39-fix-wrong-vboxvideo_drv-source.patch"
+
 * Sun Mar 16 2014 Sérgio Basto <sergio@serjux.com> - 4.3.8-2
 - some cleanups and improvements.
 
