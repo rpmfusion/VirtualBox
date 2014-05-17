@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.10
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Version:    4.3.12
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -49,7 +49,7 @@ Patch10:    VirtualBox-4.3.0-32bit.patch
 Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
-Patch23:    VirtualBox-4.3.6-mesa.patch
+Patch23:    VirtualBox-4.3.10-xserver_guest.patch
 Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-4.3.10-gcc.patch
@@ -231,7 +231,7 @@ rm -rf src/libs/zlib-1.2.6/
 %if 0%{?fedora} < 16
 %patch22 -p1 -b .gsoap
 %endif
-%patch23 -p1 -b .mesa
+%patch23 -p1 -b .xserver_guest
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
 %patch27 -p1 -b .gcc
@@ -620,6 +620,10 @@ fi
 
 
 %changelog
+* Fri May 16 2014 Sérgio Basto <sergio@serjux.com> - 4.3.12-1
+- New upstream release .
+- Rename and split X11 and mesa (for guest) patches .
+
 * Fri May 02 2014 Sérgio Basto <sergio@serjux.com> - 4.3.10-2
 - Rebuild for new x11-xorg-server
 
