@@ -26,7 +26,7 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.12
+Version:    4.3.14
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -54,9 +54,7 @@ Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-4.3.10-gcc.patch
 
-%if 0%{?fedora} < 16
-BuildRequires:  kBuild >= 0.1.98
-%endif
+BuildRequires:  kBuild >= 0.1.9998
 BuildRequires:  SDL-devel xalan-c-devel
 BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
@@ -85,7 +83,7 @@ BuildRequires:  boost-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libpng-devel
 BuildRequires:  zlib-devel
-BuildRequires:  device-mapper-devel
+BuildRequires:  device-mapper-devel device-mapper-libs
 BuildRequires:  libvpx-devel
 BuildRequires:  makeself
 
@@ -202,9 +200,7 @@ which is generated during the build of main package.
 find -name '*.py[co]' -delete
 
 # Remove prebuilt binary tools 
-%if 0%{?fedora} < 16
 rm -rf kBuild
-%endif
 rm -rf tools
 # Remove bundle X11 sources and some lib sources, before patching.
 mv src/VBox/Additions/x11/x11include/mesa-7.2 .
@@ -234,7 +230,7 @@ rm -rf src/libs/zlib-1.2.6/
 %patch23 -p1 -b .xserver_guest
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
-%patch27 -p1 -b .gcc
+#patch27 -p1 -b .gcc
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -620,6 +616,9 @@ fi
 
 
 %changelog
+* Tue Jul 15 2014 Sérgio Basto <sergio@serjux.com> - 4.3.14-1
+- New upstream release .
+
 * Fri May 16 2014 Sérgio Basto <sergio@serjux.com> - 4.3.12-1
 - New upstream release .
 - Rename and split X11 and mesa (for guest) patches .
