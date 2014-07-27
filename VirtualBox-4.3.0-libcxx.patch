@@ -23,15 +23,6 @@ Sérgio Basto <sergio@serjux.com>
  
  #
  # SDKs for external libraries.
-@@ -3784,7 +3776,7 @@ endif
- # Unlike VBOXR3STATIC, this is strict wrt warnings and includes IPRT.
- #
- TEMPLATE_VBoxR3Static               = New name for VBOXR3STATIC
--TEMPLATE_VBoxR3Static_EXTENDS       = VBOXR3STATIC
-+TEMPLATE_VBoxR3Static_EXTENDS       = VBOXR3EXE
- TEMPLATE_VBoxR3Static_EXTENDS_BY    = appending
- TEMPLATE_VBoxR3Static_SDKS         += VBOX_OPENSSL
- TEMPLATE_VBoxR3Static_SDKS.win     += VBOX_NTDLL
 --- a/configure
 +++ b/configure
 @@ -2582,7 +2582,7 @@ fi
@@ -67,17 +58,6 @@ Sérgio Basto <sergio@serjux.com>
  ifdef VBOX_X11_SEAMLESS_GUEST
   VBoxClient_DEFS += SEAMLESS_GUEST DYNAMIC_RESIZE
   VBoxClient_SOURCES += \
---- a/src/VBox/HostDrivers/Support/Makefile.kmk.orig	2012-09-02 03:06:50.648190033 +0100
-+++ b/src/VBox/HostDrivers/Support/Makefile.kmk	2012-09-02 03:04:52.703001504 +0100
-@@ -94,7 +94,7 @@ SUPR3_SOURCES       = \
- #
- # Static version of SUPR3.
- #
--SUPR3Static_TEMPLATE = VBOXR3STATIC
-+SUPR3Static_TEMPLATE = VBOXR3EXE
- SUPR3Static_EXTENDS = SUPR3
- 
- #
 --- a/src/VBox/HostDrivers/VBoxNetFlt/Makefile.kmk.libcxx	2012-08-29 15:13:46.000000000 +0100
 +++ b/src/VBox/HostDrivers/VBoxNetFlt/Makefile.kmk	2012-09-02 02:49:31.198721147 +0100
 @@ -143,7 +143,7 @@ $(PATH_TARGET)/VBoxNetFltCat.dir/VBoxNet
@@ -209,17 +189,6 @@ Sérgio Basto <sergio@serjux.com>
  VBox-liblzf-static_BLD_TYPE   = $(VBox-liblzf_BLD_TYPE)
  VBox-liblzf-static_DEFS       = $(VBox-liblzf_DEFS)
  VBox-liblzf-static_DEFS.x86   = $(VBox-liblzf_DEFS.x86)
---- ./src/VBox/Runtime/Makefile.kmk.libcxx	2013-10-15 12:13:19.000000000 +0100
-+++ ./src/VBox/Runtime/Makefile.kmk	2013-10-28 03:08:32.053146036 +0000
-@@ -232,7 +232,7 @@ endif
- #
- # RuntimeR3 - Static Runtime for Ring-3 executables.
- #
--RuntimeR3_TEMPLATE      = VBoxR3Static
-+RuntimeR3_TEMPLATE      = VBOXR3EXE
- RuntimeR3_SDKS          = VBOX_OPENSSL VBOX_LIBXML2
- RuntimeR3_SDKS.win      = $(VBOX_WINPSDK) $(VBOX_WINDDK)
- RuntimeR3_DEFS          = IN_RT_R3 IN_SUP_R3 LDR_WITH_NATIVE LDR_WITH_ELF32 LDR_WITH_PE RT_WITH_VBOX RT_NO_GIP
 --- ./src/libs/kStuff/Makefile.kmk.orig	2012-12-27 18:36:01.629728244 +0000
 +++ ./src/libs/kStuff/Makefile.kmk	2012-12-27 18:36:11.876827415 +0000
 @@ -75,7 +75,7 @@ VBox-kStuff_SOURCES = \
@@ -231,3 +200,14 @@ Sérgio Basto <sergio@serjux.com>
  VBox-kStuffStatic_EXTENDS = VBox-kStuff
  
  
+--- ./src/VBox/Runtime/Makefile.kmk.libcxx	2014-07-15 23:08:58.294017830 +0100
++++ ./src/VBox/Runtime/Makefile.kmk	2014-07-15 23:12:41.365417070 +0100
+@@ -221,7 +221,7 @@ endif
+ #
+ # RuntimeR3 - Static Runtime for Ring-3 executables.
+ #
+-RuntimeR3_TEMPLATE      = VBoxR3Static
++RuntimeR3_TEMPLATE      = VBOXR3EXE
+ RuntimeR3_SDKS          = VBOX_OPENSSL VBOX_LIBXML2
+ RuntimeR3_SDKS.win      = $(VBOX_WINPSDK) $(VBOX_WINDDK)
+ RuntimeR3_DEFS          = \
