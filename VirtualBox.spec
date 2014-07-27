@@ -83,7 +83,7 @@ BuildRequires:  boost-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libpng-devel
 BuildRequires:  zlib-devel
-BuildRequires:  device-mapper-devel device-mapper-libs
+BuildRequires:  device-mapper-devel
 BuildRequires:  libvpx-devel
 BuildRequires:  makeself
 
@@ -618,6 +618,7 @@ fi
 %changelog
 * Tue Jul 15 2014 Sérgio Basto <sergio@serjux.com> - 4.3.14-1
 - New upstream release .
+- Unbunble kBuild, since KBuild from fedora is working again.
 
 * Fri May 16 2014 Sérgio Basto <sergio@serjux.com> - 4.3.12-1
 - New upstream release .
