@@ -26,7 +26,7 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.14
+Version:    4.3.16
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -616,6 +616,13 @@ fi
 
 
 %changelog
+* Wed Sep 10 2014 Sérgio Basto <sergio@serjux.com> - 4.3.16-1
+- New upstream release .
+- Fixed VirtualBox-4.3.0-VBoxGuestLib.patch .
+
+* Sat Aug 23 2014 Sérgio Basto <sergio@serjux.com> - 4.3.14-2
+- Rebuild for new gcc https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
 * Tue Jul 15 2014 Sérgio Basto <sergio@serjux.com> - 4.3.14-1
 - New upstream release .
 - Unbunble kBuild, since KBuild from fedora is working again.
