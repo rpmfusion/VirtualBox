@@ -1,15 +1,16 @@
 when we use VBOX_USE_SYSTEM_XORG_HEADERS , we don't need compile the very old libXFree86 (from xfree86.org)
 Sérgio Basto <sergio@serjux.com>
---- ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk.orig	2014-09-11 15:31:56.706906433 +0100
-+++ ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk	2014-09-11 15:32:24.737206867 +0100
-@@ -39,10 +39,6 @@ LIBRARIES += \
- 	VBoxGuestR3Lib \
+--- ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk.orig	2014-10-11 13:03:35.000000000 +0100
++++ ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk	2014-10-12 00:11:00.925507543 +0100
+@@ -40,9 +40,11 @@ LIBRARIES += \
  	VBoxGuestR3LibShared
  ifndef VBOX_ONLY_TESTSUITE
-- if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd)
--  LIBRARIES += \
--  	VBoxGuestR3LibXFree86
-- endif
+  if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd)
++ ifndef VBOX_USE_SYSTEM_XORG_HEADERS
+   LIBRARIES += \
+   	VBoxGuestR3LibXFree86
+  endif
++ endif
   if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris)
    LIBRARIES += \
    	VBoxGuestR3LibXOrg
