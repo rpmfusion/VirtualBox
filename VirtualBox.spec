@@ -26,7 +26,7 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.18
+Version:    4.3.20
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -616,6 +616,9 @@ fi
 
 
 %changelog
+* Sun Nov 23 2014 Sérgio Basto <sergio@serjux.com> - 4.3.20-1
+- New upstream release .
+
 * Sat Oct 11 2014 Sérgio Basto <sergio@serjux.com> - 4.3.18-1
 - New upstream release .
 - Removed trailing whitespaces .
