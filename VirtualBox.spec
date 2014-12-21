@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.3.20
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Release:    2%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -272,57 +272,55 @@ kmk %{_smp_mflags} \
 # the commercially supported version to minimize confusion
 
 # Directory structure
-install -d $RPM_BUILD_ROOT/%{_lib}/security
-install -d $RPM_BUILD_ROOT%{_bindir}
-install -d $RPM_BUILD_ROOT%{_sbindir}
-install -d $RPM_BUILD_ROOT%{_libdir}
-install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox
-install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/components
-install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls
-install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/ExtensionPacks
-install -d $RPM_BUILD_ROOT%{_libdir}/dri
-install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk
-install -d $RPM_BUILD_ROOT%{_datadir}/pixmaps
-install -d $RPM_BUILD_ROOT%{_datadir}/mime/packages
-install -d $RPM_BUILD_ROOT%{_datadir}/icons
-install -d $RPM_BUILD_ROOT%{_prefix}/src/%{name}-kmod-%{version}
-install -d $RPM_BUILD_ROOT%{python_sitelib}/virtualbox
+install -d %{buildroot}%{_bindir}
+install -d %{buildroot}%{_sbindir}
+install -d %{buildroot}%{_libdir}
+install -d %{buildroot}%{_libdir}/virtualbox
+install -d %{buildroot}%{_libdir}/virtualbox/components
+install -d %{buildroot}%{_libdir}/virtualbox/nls
+install -d %{buildroot}%{_libdir}/virtualbox/ExtensionPacks
+install -d %{buildroot}%{_libdir}/virtualbox/sdk
+install -d %{buildroot}%{_datadir}/pixmaps
+install -d %{buildroot}%{_datadir}/mime/packages
+install -d %{buildroot}%{_datadir}/icons
+install -d %{buildroot}%{_prefix}/src/%{name}-kmod-%{version}
+install -d %{buildroot}%{python_sitelib}/virtualbox
 
 # Binaries and Wrapper with Launchers
-install -p -m 0755 obj/bin/VBox.sh $RPM_BUILD_ROOT%{_bindir}/VBox
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VirtualBox
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/virtualbox
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxManage
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxmanage
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxSDL
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxsdl
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxVRDP
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxHeadless
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxheadless
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBalloonCtrl
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxballoonctrl
+install -p -m 0755 obj/bin/VBox.sh %{buildroot}%{_bindir}/VBox
+ln -s VBox %{buildroot}%{_bindir}/VirtualBox
+ln -s VBox %{buildroot}%{_bindir}/virtualbox
+ln -s VBox %{buildroot}%{_bindir}/VBoxManage
+ln -s VBox %{buildroot}%{_bindir}/vboxmanage
+ln -s VBox %{buildroot}%{_bindir}/VBoxSDL
+ln -s VBox %{buildroot}%{_bindir}/vboxsdl
+ln -s VBox %{buildroot}%{_bindir}/VBoxVRDP
+ln -s VBox %{buildroot}%{_bindir}/VBoxHeadless
+ln -s VBox %{buildroot}%{_bindir}/vboxheadless
+ln -s VBox %{buildroot}%{_bindir}/VBoxBalloonCtrl
+ln -s VBox %{buildroot}%{_bindir}/vboxballoonctrl
 %if %{enable_webservice}
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
+ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
 %endif
 
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
+install -p -m 0755 -t %{buildroot}%{_bindir} \
     obj/bin/VBoxTunctl
 
 # Components
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/components \
+install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/components \
     obj/bin/components/*
 
 # Lib
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
+install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/*.so
 
-install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
+install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/V*.gc       \
     obj/bin/V*.r0       \
     obj/bin/VBoxEFI*.fd
 
 # Executables
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
+install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/SUPInstall \
     obj/bin/SUPLoggerCtl \
     obj/bin/SUPUninstall \
@@ -349,33 +347,33 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
     obj/bin/webtest     \
 %endif
 
-install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh $RPM_BUILD_ROOT/lib/udev/VBoxCreateUSBNode.sh
+install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh %{buildroot}%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 
 # Language files
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
+install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
     obj/bin/nls/*
 
 # SDK
 pushd obj/bin/sdk/installer
 VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
-    python vboxapisetup.py install --prefix %{_prefix} --root $RPM_BUILD_ROOT
+    python vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
 popd
-cp -rp obj/bin/sdk/. $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk
-rm -rf $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk/installer
+cp -rp obj/bin/sdk/. %{buildroot}%{_libdir}/virtualbox/sdk
+rm -rf %{buildroot}%{_libdir}/virtualbox/sdk/installer
 
 # Icons
-install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
+install -p -m 0644 -t %{buildroot}%{_datadir}/pixmaps \
     obj/bin/VBox.png
 for S in obj/bin/icons/*
 do
     SIZE=$(basename $S)
-    install -d $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/{mimetypes,apps}
-    install -p -m 0644 $S/* $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes
-    [ -f $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png ] && mv \
-        $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png \
-        $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/apps/virtualbox.png
+    install -d %{buildroot}%{_datadir}/icons/hicolor/$SIZE/{mimetypes,apps}
+    install -p -m 0644 $S/* %{buildroot}%{_datadir}/icons/hicolor/$SIZE/mimetypes
+    [ -f %{buildroot}%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png ] && mv \
+        %{buildroot}%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png \
+        %{buildroot}%{_datadir}/icons/hicolor/$SIZE/apps/virtualbox.png
 done
-install -p -m 0644 obj/bin/virtualbox.xml $RPM_BUILD_ROOT%{_datadir}/mime/packages
+install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 
 # Guest X.Org drivers
 # Michael Thayer from Oracle wrote: I have applied the patch [1] I posted so that you
@@ -390,67 +388,69 @@ install -p -m 0644 obj/bin/virtualbox.xml $RPM_BUILD_ROOT%{_datadir}/mime/packag
 # [1] https://www.virtualbox.org/changeset/43588/vbox
 
 install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
-    $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
+    %{buildroot}%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
 # Guest tools
-install -m 0755 -t $RPM_BUILD_ROOT%{_sbindir}   \
+install -m 0755 -t %{buildroot}%{_sbindir}   \
     obj/bin/additions/mount.vboxsf
 
-install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}    \
+install -m 0755 -t %{buildroot}%{_bindir}    \
     obj/bin/additions/VBoxService       \
     obj/bin/additions/VBoxClient        \
     obj/bin/additions/VBoxControl
 
 %if %{enable_webservice}
 install -m 0644 -D %{SOURCE10} \
-    $RPM_BUILD_ROOT%{_unitdir}/vboxweb.service
+    %{buildroot}%{_unitdir}/vboxweb.service
 %endif
 
 install -m 0644 -D %{SOURCE11} \
-    $RPM_BUILD_ROOT%{_unitdir}/vboxservice.service
+    %{buildroot}%{_unitdir}/vboxservice.service
 
 #review this 3
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
-    $RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
+    %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
 #/usr/bin/VBoxClient-all does not exits
 #install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
-#    $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
-#desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+#    %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+#desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
 install -m 0644 -D %{SOURCE8} \
-    $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
-desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
+    %{buildroot}%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
+desktop-file-validate %{buildroot}%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 # Guest libraries
-install -m 0755 -t $RPM_BUILD_ROOT%{_libdir}    \
+install -d %{buildroot}%{_libdir}/dri
+install -m 0755 -t %{buildroot}%{_libdir}    \
     obj/bin/additions/VBoxOGL*.so
-ln -sf ../VBoxOGL.so $RPM_BUILD_ROOT%{_libdir}/dri/vboxvideo_dri.so
+ln -sf ../VBoxOGL.so %{buildroot}%{_libdir}/dri/vboxvideo_dri.so
 
-install -m 0755 -t $RPM_BUILD_ROOT/%{_lib}/security \
+install -d %{buildroot}%{_libdir}/security
+install -m 0755 -t %{buildroot}%{_libdir}/security \
     obj/bin/additions/pam_vbox.so
 
 # Installation root configuration
-install -d $RPM_BUILD_ROOT/%{_sysconfdir}/vbox
-echo 'INSTALL_DIR=%{_libdir}/virtualbox' > $RPM_BUILD_ROOT/%{_sysconfdir}/vbox/vbox.cfg
+install -d %{buildroot}%{_sysconfdir}/vbox
+echo 'INSTALL_DIR=%{_libdir}/virtualbox' > %{buildroot}%{_sysconfdir}/vbox/vbox.cfg
 
 # Install udev rules
-install -p -m 0644 -D %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
-install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-vboxguest.rules
+install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_prefix}/lib/udev/rules.d/90-vboxdrv.rules
+install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_prefix}/lib/udev/rules.d/60-vboxguest.rules
 
 # Install modules load script
-install -p -m 0644 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/modules-load.d/%{name}.conf
-install -p -m 0644 -D %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/modules-load.d/%{name}-guest.conf
+install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}.conf
+install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
 cp -al obj/bin/src/vbox* obj/bin/additions/src/vbox* %{name}-kmod-%{version}
-install -d $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{version}
-tar --use-compress-program xz -cf $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.xz \
+install -d %{buildroot}%{_datadir}/%{name}-kmod-%{version}
+tar --use-compress-program xz -cf %{buildroot}%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.xz \
     %{name}-kmod-%{version}
 
 # Menu entry
-desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
     --remove-key=DocPath --remove-category=X-MandrivaLinux-System \
     --vendor='' obj/bin/virtualbox.desktop
 
@@ -571,8 +571,8 @@ fi
 %{_datadir}/applications/*.desktop
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
-%config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
-%config %{_sysconfdir}/modules-load.d/%{name}.conf
+%{_prefix}/lib/udev/rules.d/90-vboxdrv.rules
+%{_prefix}/lib/modules-load.d/%{name}.conf
 %doc COPYING*
 %doc doc/*.*
 %if %{enable_docs}
@@ -581,7 +581,7 @@ fi
 %if %{enable_webservice}
 %{_unitdir}/vboxweb.service
 %endif
-/lib/udev/VBoxCreateUSBNode.sh
+%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 
 
 %files devel
@@ -594,7 +594,7 @@ fi
 
 
 %files guest
-/%{_lib}/security/pam_vbox.so
+%{_libdir}/security/pam_vbox.so
 %{_sbindir}/mount.vboxsf
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
@@ -605,8 +605,8 @@ fi
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 #%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %exclude %{_datadir}/gdm
-%config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
-%config %{_sysconfdir}/modules-load.d/%{name}-guest.conf
+%{_prefix}/lib/udev/rules.d/60-vboxguest.rules
+%{_prefix}/lib/modules-load.d/%{name}-guest.conf
 #doc COPYING
 %{_unitdir}/vboxservice.service
 
@@ -616,6 +616,13 @@ fi
 
 
 %changelog
+* Sun Dec 21 2014 Sérgio Basto <sergio@serjux.com> - 4.3.20-2
+- Moved files from /etc/modules-load.d/ to /usr/lib/modules-load.d/, fix rfbz #3469 .
+- Also moved files from /etc/udev/rules.d/ to /usr/lib/udev/rules.d/ and removed %config directive .
+- s/$RPM_BUILD_ROOT/%{buildroot}/g
+- Added %{_prefix} to /lib/udev/ .
+- Moved pam_vbox.so from %{_lib}/security/ to %{_libdir}/security/ .
+
 * Sun Nov 23 2014 Sérgio Basto <sergio@serjux.com> - 4.3.20-1
 - New upstream release .
 
