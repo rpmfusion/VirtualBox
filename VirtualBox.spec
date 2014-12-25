@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.16
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Version:    4.3.20
+Release:    2%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -90,7 +90,7 @@ BuildRequires:  makeself
 #BuildRequires:  glibc(x86-32) glibc-devel(x86-32) libstdc++(x86-32)
 #BuildRequires:  glibc.i686 glibc-devel.i686 libstdc++.i686
 #BuildRequires:  /usr/lib/libc.so
-#BuildRequires:  /usr/lib/libstdc++.so.6 /lib/libc.so.6 
+#BuildRequires:  /usr/lib/libstdc++.so.6 /lib/libc.so.6
 
 # For the X11 module
 BuildRequires:  libdrm-devel
@@ -199,7 +199,7 @@ which is generated during the build of main package.
 %setup -qn %{name}-%{version}%{prereltag}
 find -name '*.py[co]' -delete
 
-# Remove prebuilt binary tools 
+# Remove prebuilt binary tools
 rm -rf kBuild
 rm -rf tools
 # Remove bundle X11 sources and some lib sources, before patching.
@@ -209,11 +209,11 @@ mv mesa-7.2 src/VBox/Additions/x11/x11include/
 
 rm -rf src/VBox/Additions/x11/x11stubs
 rm -rf src/VBox/GuestHost/OpenGL/include/GL
-rm -rf src/libs/boost-1.37.0/   
-#rm -rf src/libs/liblzf-3.4/     
-rm -rf src/libs/libxml2-2.6.31/ 
-rm -rf src/libs/libpng-1.2.8/   
-rm -rf src/libs/zlib-1.2.6/ 
+rm -rf src/libs/boost-1.37.0/
+#rm -rf src/libs/liblzf-3.4/
+rm -rf src/libs/libxml2-2.6.31/
+rm -rf src/libs/libpng-1.2.8/
+rm -rf src/libs/zlib-1.2.6/
 
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
@@ -272,57 +272,55 @@ kmk %{_smp_mflags} \
 # the commercially supported version to minimize confusion
 
 # Directory structure
-install -d $RPM_BUILD_ROOT/%{_lib}/security
-install -d $RPM_BUILD_ROOT%{_bindir}
-install -d $RPM_BUILD_ROOT%{_sbindir}
-install -d $RPM_BUILD_ROOT%{_libdir}
-install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox
-install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/components
-install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls
-install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/ExtensionPacks
-install -d $RPM_BUILD_ROOT%{_libdir}/dri
-install -d $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk
-install -d $RPM_BUILD_ROOT%{_datadir}/pixmaps
-install -d $RPM_BUILD_ROOT%{_datadir}/mime/packages
-install -d $RPM_BUILD_ROOT%{_datadir}/icons
-install -d $RPM_BUILD_ROOT%{_prefix}/src/%{name}-kmod-%{version}
-install -d $RPM_BUILD_ROOT%{python_sitelib}/virtualbox
+install -d %{buildroot}%{_bindir}
+install -d %{buildroot}%{_sbindir}
+install -d %{buildroot}%{_libdir}
+install -d %{buildroot}%{_libdir}/virtualbox
+install -d %{buildroot}%{_libdir}/virtualbox/components
+install -d %{buildroot}%{_libdir}/virtualbox/nls
+install -d %{buildroot}%{_libdir}/virtualbox/ExtensionPacks
+install -d %{buildroot}%{_libdir}/virtualbox/sdk
+install -d %{buildroot}%{_datadir}/pixmaps
+install -d %{buildroot}%{_datadir}/mime/packages
+install -d %{buildroot}%{_datadir}/icons
+install -d %{buildroot}%{_prefix}/src/%{name}-kmod-%{version}
+install -d %{buildroot}%{python_sitelib}/virtualbox
 
 # Binaries and Wrapper with Launchers
-install -p -m 0755 obj/bin/VBox.sh $RPM_BUILD_ROOT%{_bindir}/VBox
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VirtualBox
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/virtualbox
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxManage
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxmanage
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxSDL
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxsdl
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxVRDP
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxHeadless
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxheadless
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/VBoxBalloonCtrl
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxballoonctrl
+install -p -m 0755 obj/bin/VBox.sh %{buildroot}%{_bindir}/VBox
+ln -s VBox %{buildroot}%{_bindir}/VirtualBox
+ln -s VBox %{buildroot}%{_bindir}/virtualbox
+ln -s VBox %{buildroot}%{_bindir}/VBoxManage
+ln -s VBox %{buildroot}%{_bindir}/vboxmanage
+ln -s VBox %{buildroot}%{_bindir}/VBoxSDL
+ln -s VBox %{buildroot}%{_bindir}/vboxsdl
+ln -s VBox %{buildroot}%{_bindir}/VBoxVRDP
+ln -s VBox %{buildroot}%{_bindir}/VBoxHeadless
+ln -s VBox %{buildroot}%{_bindir}/vboxheadless
+ln -s VBox %{buildroot}%{_bindir}/VBoxBalloonCtrl
+ln -s VBox %{buildroot}%{_bindir}/vboxballoonctrl
 %if %{enable_webservice}
-ln -s VBox $RPM_BUILD_ROOT%{_bindir}/vboxwebsrv
+ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
 %endif
 
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_bindir} \
+install -p -m 0755 -t %{buildroot}%{_bindir} \
     obj/bin/VBoxTunctl
 
 # Components
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/components \
+install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/components \
     obj/bin/components/*
 
 # Lib
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
+install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/*.so
 
-install -p -m 0644 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
+install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/V*.gc       \
     obj/bin/V*.r0       \
     obj/bin/VBoxEFI*.fd
 
 # Executables
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
+install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/SUPInstall \
     obj/bin/SUPLoggerCtl \
     obj/bin/SUPUninstall \
@@ -349,108 +347,110 @@ install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox \
     obj/bin/webtest     \
 %endif
 
-install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh $RPM_BUILD_ROOT/lib/udev/VBoxCreateUSBNode.sh   
+install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh %{buildroot}%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 
 # Language files
-install -p -m 0755 -t $RPM_BUILD_ROOT%{_libdir}/virtualbox/nls \
+install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
     obj/bin/nls/*
 
 # SDK
 pushd obj/bin/sdk/installer
 VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
-    python vboxapisetup.py install --prefix %{_prefix} --root $RPM_BUILD_ROOT
+    python vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
 popd
-cp -rp obj/bin/sdk/. $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk
-rm -rf $RPM_BUILD_ROOT%{_libdir}/virtualbox/sdk/installer
+cp -rp obj/bin/sdk/. %{buildroot}%{_libdir}/virtualbox/sdk
+rm -rf %{buildroot}%{_libdir}/virtualbox/sdk/installer
 
 # Icons
-install -p -m 0644 -t $RPM_BUILD_ROOT%{_datadir}/pixmaps \
+install -p -m 0644 -t %{buildroot}%{_datadir}/pixmaps \
     obj/bin/VBox.png
 for S in obj/bin/icons/*
 do
     SIZE=$(basename $S)
-    install -d $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/{mimetypes,apps}
-    install -p -m 0644 $S/* $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes
-    [ -f $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png ] && mv \
-        $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png \
-        $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/$SIZE/apps/virtualbox.png
+    install -d %{buildroot}%{_datadir}/icons/hicolor/$SIZE/{mimetypes,apps}
+    install -p -m 0644 $S/* %{buildroot}%{_datadir}/icons/hicolor/$SIZE/mimetypes
+    [ -f %{buildroot}%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png ] && mv \
+        %{buildroot}%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png \
+        %{buildroot}%{_datadir}/icons/hicolor/$SIZE/apps/virtualbox.png
 done
-install -p -m 0644 obj/bin/virtualbox.xml $RPM_BUILD_ROOT%{_datadir}/mime/packages
+install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 
 # Guest X.Org drivers
-# Michael Thayer from Oracle wrote: I have applied the patch [1] I posted so that you 
-# can build with VBOX_USE_SYSTEM_XORG_HEADERS=1 set in future to only 
+# Michael Thayer from Oracle wrote: I have applied the patch [1] I posted so that you
+# can build with VBOX_USE_SYSTEM_XORG_HEADERS=1 set in future to only
 # build the X.Org drivers against the installed system headers.
 # also wrote:
 # As vboxmouse_drv is not needed at all for X.Org Server 1.7 and later do not
 # build it in this case.
 # and
 # Build using local X.Org headers.  We assume X.Org Server 1.7 or later.
-# 
+#
 # [1] https://www.virtualbox.org/changeset/43588/vbox
 
 install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
-    $RPM_BUILD_ROOT%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
+    %{buildroot}%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
 # Guest tools
-install -m 0755 -t $RPM_BUILD_ROOT%{_sbindir}   \
+install -m 0755 -t %{buildroot}%{_sbindir}   \
     obj/bin/additions/mount.vboxsf
 
-install -m 0755 -t $RPM_BUILD_ROOT%{_bindir}    \
+install -m 0755 -t %{buildroot}%{_bindir}    \
     obj/bin/additions/VBoxService       \
     obj/bin/additions/VBoxClient        \
     obj/bin/additions/VBoxControl
 
 %if %{enable_webservice}
 install -m 0644 -D %{SOURCE10} \
-    $RPM_BUILD_ROOT%{_unitdir}/vboxweb.service
+    %{buildroot}%{_unitdir}/vboxweb.service
 %endif
 
 install -m 0644 -D %{SOURCE11} \
-    $RPM_BUILD_ROOT%{_unitdir}/vboxservice.service
+    %{buildroot}%{_unitdir}/vboxservice.service
 
 #review this 3
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
-    $RPM_BUILD_ROOT%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
+    %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 
-#/usr/bin/VBoxClient-all does not exits 
+#/usr/bin/VBoxClient-all does not exits
 #install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
-#    $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
-#desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+#    %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+#desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
 install -m 0644 -D %{SOURCE8} \
-    $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
-desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
+    %{buildroot}%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
+desktop-file-validate %{buildroot}%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
 
 # Guest libraries
-install -m 0755 -t $RPM_BUILD_ROOT%{_libdir}    \
+install -d %{buildroot}%{_libdir}/dri
+install -m 0755 -t %{buildroot}%{_libdir}    \
     obj/bin/additions/VBoxOGL*.so
-ln -sf ../VBoxOGL.so $RPM_BUILD_ROOT%{_libdir}/dri/vboxvideo_dri.so
+ln -sf ../VBoxOGL.so %{buildroot}%{_libdir}/dri/vboxvideo_dri.so
 
-install -m 0755 -t $RPM_BUILD_ROOT/%{_lib}/security \
+install -d %{buildroot}%{_libdir}/security
+install -m 0755 -t %{buildroot}%{_libdir}/security \
     obj/bin/additions/pam_vbox.so
 
 # Installation root configuration
-install -d $RPM_BUILD_ROOT/%{_sysconfdir}/vbox
-echo 'INSTALL_DIR=%{_libdir}/virtualbox' > $RPM_BUILD_ROOT/%{_sysconfdir}/vbox/vbox.cfg
+install -d %{buildroot}%{_sysconfdir}/vbox
+echo 'INSTALL_DIR=%{_libdir}/virtualbox' > %{buildroot}%{_sysconfdir}/vbox/vbox.cfg
 
 # Install udev rules
-install -p -m 0644 -D %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
-install -p -m 0644 -D %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/udev/rules.d/60-vboxguest.rules
+install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_prefix}/lib/udev/rules.d/90-vboxdrv.rules
+install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_prefix}/lib/udev/rules.d/60-vboxguest.rules
 
 # Install modules load script
-install -p -m 0644 -D %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/modules-load.d/%{name}.conf
-install -p -m 0644 -D %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/modules-load.d/%{name}-guest.conf
+install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}.conf
+install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
 cp -al obj/bin/src/vbox* obj/bin/additions/src/vbox* %{name}-kmod-%{version}
-install -d $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{version}
-tar --use-compress-program xz -cf $RPM_BUILD_ROOT%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.xz \
+install -d %{buildroot}%{_datadir}/%{name}-kmod-%{version}
+tar --use-compress-program xz -cf %{buildroot}%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.xz \
     %{name}-kmod-%{version}
 
 # Menu entry
-desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
     --remove-key=DocPath --remove-category=X-MandrivaLinux-System \
     --vendor='' obj/bin/virtualbox.desktop
 
@@ -501,7 +501,7 @@ fi
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 # Guest additions install
-%post guest 
+%post guest
 /sbin/ldconfig
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 # should be in kmod package, not here
@@ -571,8 +571,8 @@ fi
 %{_datadir}/applications/*.desktop
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
-%config %{_sysconfdir}/udev/rules.d/90-vboxdrv.rules
-%config %{_sysconfdir}/modules-load.d/%{name}.conf
+%{_prefix}/lib/udev/rules.d/90-vboxdrv.rules
+%{_prefix}/lib/modules-load.d/%{name}.conf
 %doc COPYING*
 %doc doc/*.*
 %if %{enable_docs}
@@ -581,7 +581,7 @@ fi
 %if %{enable_webservice}
 %{_unitdir}/vboxweb.service
 %endif
-/lib/udev/VBoxCreateUSBNode.sh
+%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 
 
 %files devel
@@ -594,7 +594,7 @@ fi
 
 
 %files guest
-/%{_lib}/security/pam_vbox.so
+%{_libdir}/security/pam_vbox.so
 %{_sbindir}/mount.vboxsf
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
@@ -605,8 +605,8 @@ fi
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 #%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %exclude %{_datadir}/gdm
-%config %{_sysconfdir}/udev/rules.d/60-vboxguest.rules
-%config %{_sysconfdir}/modules-load.d/%{name}-guest.conf
+%{_prefix}/lib/udev/rules.d/60-vboxguest.rules
+%{_prefix}/lib/modules-load.d/%{name}-guest.conf
 #doc COPYING
 %{_unitdir}/vboxservice.service
 
@@ -616,6 +616,21 @@ fi
 
 
 %changelog
+* Sun Dec 21 2014 Sérgio Basto <sergio@serjux.com> - 4.3.20-2
+- Moved files from /etc/modules-load.d/ to /usr/lib/modules-load.d/, fix rfbz #3469 .
+- Also moved files from /etc/udev/rules.d/ to /usr/lib/udev/rules.d/ and removed %config directive .
+- s/$RPM_BUILD_ROOT/%{buildroot}/g
+- Added %{_prefix} to /lib/udev/ .
+- Moved pam_vbox.so from %{_lib}/security/ to %{_libdir}/security/ .
+
+* Sun Nov 23 2014 Sérgio Basto <sergio@serjux.com> - 4.3.20-1
+- New upstream release .
+
+* Sat Oct 11 2014 Sérgio Basto <sergio@serjux.com> - 4.3.18-1
+- New upstream release .
+- Removed trailing whitespaces .
+- Refactor VirtualBox-4.3.0-VBoxGuestLib.patch to try upstreaming .
+
 * Wed Sep 10 2014 Sérgio Basto <sergio@serjux.com> - 4.3.16-1
 - New upstream release .
 - Fixed VirtualBox-4.3.0-VBoxGuestLib.patch .
@@ -651,7 +666,7 @@ fi
 - small adjustments in others patches.
 
 * Wed Dec 25 2013 Sérgio Basto <sergio@serjux.com> - 4.3.6-4
-- Update VirtualBox-4.3-mesa.patch, for guest drives and for Xorg-x11-server-1.14.99 in rawhide, glx internals "fixes" completely removed, eliminating BuildRequires of xorg-x11-server-source. 
+- Update VirtualBox-4.3-mesa.patch, for guest drives and for Xorg-x11-server-1.14.99 in rawhide, glx internals "fixes" completely removed, eliminating BuildRequires of xorg-x11-server-source.
   Also add to VBoxOGL_LIBS libXcomposite, libXdamage etc of the system.
 - Disable webservice for rawhide, problems reported upstream with new gsoap version.
 
@@ -674,30 +689,30 @@ VirtualBox 4.3 which improves stability and fixes regressions.
 
 * Mon Oct 28 2013 Sérgio Basto <sergio@serjux.com> - 4.3.0-1
 - New upstream release.
-- Refactor patches VirtualBox-4.3.0-32bit.patch, VirtualBox-4.3.0-libcxx.patch, VirtualBox-4.3.0-mesa.patch, 
+- Refactor patches VirtualBox-4.3.0-32bit.patch, VirtualBox-4.3.0-libcxx.patch, VirtualBox-4.3.0-mesa.patch,
 VirtualBox-4.3.0-no-bundles.patch, VirtualBox-4.3.0-testmangle.patch and VirtualBox-4.3.0-VBoxGuestLib.patch
 - Took the opportunity to do a review: add some new binaries, need to review it again .
 
 * Sun Sep 29 2013 Sérgio Basto <sergio@serjux.com> - 4.2.18-2
-- Additions/linux: fix shared folders for Linux 3.11 
+- Additions/linux: fix shared folders for Linux 3.11
 
 * Fri Sep 20 2013 Sérgio Basto <sergio@serjux.com> - 4.2.18-1
 - New upstream release.
 
 * Sun Sep 01 2013 Sérgio Basto <sergio@serjux.com> - 4.2.16-2
-- fixes for Kernel 3.11: 
+- fixes for Kernel 3.11:
     https://www.virtualbox.org/changeset/47484/vbox/trunk
     and
-    https://www.virtualbox.org/changeset/47588/vbox/trunk 
+    https://www.virtualbox.org/changeset/47588/vbox/trunk
 
 * Fri Jul 05 2013 Sérgio Basto <sergio@serjux.com> - 4.2.16-1
 - New upstream release.
 
 * Sun Jun 30 2013 Sérgio Basto <sergio@serjux.com> - 4.2.14-2
-- Bugfix, forgot rename *.modules to *.conf, as defined in modules-load.d(5) . 
+- Bugfix, forgot rename *.modules to *.conf, as defined in modules-load.d(5) .
 
 * Sat Jun 29 2013 Sérgio Basto <sergio@serjux.com> - 4.2.14-1
-- Change strings instructions to load modules. 
+- Change strings instructions to load modules.
 - New upstream release.
 - Drop gcc-4.8 patch.
 
@@ -717,7 +732,7 @@ VirtualBox-4.3.0-no-bundles.patch, VirtualBox-4.3.0-testmangle.patch and Virtual
 
 * Thu Mar 07 2013 Sérgio Basto <sergio@serjux.com> - 4.2.8-2
 - Added upstreamed patch for kernels 3.9, "That fix will be part of the next maintenance
-  release". 
+  release".
 
 * Sat Mar 02 2013 Sérgio Basto <sergio@serjux.com> - 4.2.8-1
 - New upstream release.
@@ -760,7 +775,7 @@ VirtualBox-4.3.0-no-bundles.patch, VirtualBox-4.3.0-testmangle.patch and Virtual
 
 * Sat Oct 27 2012 Sérgio Basto <sergio@serjux.com> - 4.2.4-1
 - New upstream release.
-- Drop patch VirtualBox-4.2.0-xorg17.patch and add VBOX_USE_SYSTEM_XORG_HEADERS=1. Changeset r43588, 
+- Drop patch VirtualBox-4.2.0-xorg17.patch and add VBOX_USE_SYSTEM_XORG_HEADERS=1. Changeset r43588,
 https://www.virtualbox.org/changeset/43588/vbox , allow compile vboxvideo with system headers, and
 "As vboxmouse_drv is not needed at all for X.Org Server 1.7 and later do not build it".
 - enable-webservice on F17 and lower (stables) and disable-docs on F18 and rawhide, can't buid it
@@ -770,8 +785,8 @@ https://www.virtualbox.org/changeset/43588/vbox , allow compile vboxvideo with s
 - On F16, need add one xorg header for xorg-x11-server 1.11.x
 
 * Sun Sep 23 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-3
-- Another clean X11 bundle sources (src/VBox/Additions/x11/x11stubs), minor improve on 
-VirtualBox-4.2.0-xorg17.patch and split VBoxGuestLib part into VirtualBox-4.2.0-VBoxGuestLib.patch 
+- Another clean X11 bundle sources (src/VBox/Additions/x11/x11stubs), minor improve on
+VirtualBox-4.2.0-xorg17.patch and split VBoxGuestLib part into VirtualBox-4.2.0-VBoxGuestLib.patch
 
 * Sat Sep 15 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-2
 - Disable websrv because fails to build on rawhide, temporarily I hope.
@@ -779,18 +794,18 @@ VirtualBox-4.2.0-xorg17.patch and split VBoxGuestLib part into VirtualBox-4.2.0-
 * Thu Sep 13 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-1
 - 4.2.0 released
 - Rebase and rework VirtualBox-4.2.0-xorg17.patch, add 2 new Definitions: XSERVER_LIBPCIACCESS XORG_VERSION_CURRENT=101300000
-- Rename and rework VirtualBox-OSE-4.1.10-mesa.patch 
+- Rename and rework VirtualBox-OSE-4.1.10-mesa.patch
 - Reorganize last 2 patches.
 - Revert attempt to remove 32-bits patch.
 
-* Thu Sep 13 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.7.RC4 
+* Thu Sep 13 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.7.RC4
 - Another try to compile with 32-bits suport on x86_64.
 
 * Sun Sep 09 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.6.RC4
-- Update to RC4. 
+- Update to RC4.
 - Rename 32-bits patch to VirtualBox-4.2.0-32bit.patch
 - Drop patch23 to fix ABI/API breakages in X11 1.13, appears fixed in RC4 !
-- Compile VBoxGuestLib with X11 sources from system and fix VBoxGuestR3LibRuntimeXF86.cpp. 
+- Compile VBoxGuestLib with X11 sources from system and fix VBoxGuestR3LibRuntimeXF86.cpp.
 - Removes X11 includes from sources (src/VBox/Additions/x11/x11include).
 
 * Fri Sep 07 2012 Sérgio Basto <sergio@serjux.com> - 4.2.0-0.5.RC3
@@ -808,7 +823,7 @@ VirtualBox-4.2.0-xorg17.patch and split VBoxGuestLib part into VirtualBox-4.2.0-
 - add BR # libstdc++.i686 and libc-devel.i686 for 32-bits
 BuildRequires:  /usr/lib/libc.so
 BuildRequires:  /usr/lib/libstdc++.so.6 /lib/libc.so.6
-- drop 32-bit patch and testmangle patch, no fails. 
+- drop 32-bit patch and testmangle patch, no fails.
 - rename and remove some patches
 cvs diff: VirtualBox-4.1.20-libcxx.patch was removed, no comparison available
 cvs diff: VirtualBox-4.1.20-x113.patch is a new entry, no comparison available
@@ -858,8 +873,8 @@ cvs diff: VirtualBox-OSE-4.1.4-xorg17.patch was removed, no comparison available
 * Tue May 22 2012 Sérgio Basto <sergio@serjux.com> - 4.1.16-1
 - New upstream release.
 
-* Mon May 21 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-7 
-- Customize VBOX_VERSION_STRING. 
+* Mon May 21 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-7
+- Customize VBOX_VERSION_STRING.
 
 * Wed May 16 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-6
 - Bump a release, to build a new tag, one more try.
@@ -871,15 +886,15 @@ cvs diff: VirtualBox-OSE-4.1.4-xorg17.patch was removed, no comparison available
 - Rename to VirtualBox, rfbz #1826
 
 * Tue May 1 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-3
-- Review spec with fedora-review 
+- Review spec with fedora-review
 - Remove requirement for hal for F15
 - .desktop, .service and xorg.conf.d/vboxvideo.conf are text files, put chmod 644
 - don't try start vboxservice.service, because vboxservice.service depends on kmods, maybe start when
-  modules are loaded. 
+  modules are loaded.
 
 * Sun Apr 29 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-2
-- Migrating vboxweb-service to a systemd unit file from a SysV initscript 
-- Add vboxservice.service systemd unit file in guest package, rfbz #2274. 
+- Migrating vboxweb-service to a systemd unit file from a SysV initscript
+- Add vboxservice.service systemd unit file in guest package, rfbz #2274.
 
 * Thu Apr 26 2012 Sérgio Basto <sergio@serjux.com> - 4.1.14-1
 - new release
@@ -903,7 +918,7 @@ cvs diff: VirtualBox-OSE-4.1.4-xorg17.patch was removed, no comparison available
 - Upsteam says that java stuff is fiexd , https://www.virtualbox.org/ticket/9848#comment:5
 - Upsteam says that have compile fixes for kernel 3.3-rc1 (in changelog).
 - backport fix for web-service with newer versions of GSOAP, Changeset 40476 and 40477 in vbox, kindly
-  fixed from Frank Mehnert "The real fix can be found in r40476 and r40477. You should be able to 
+  fixed from Frank Mehnert "The real fix can be found in r40476 and r40477. You should be able to
   apply these fixes to VBox 4.1.10 as well." and add -lssl and -lcrypto by my self.
 - drop Patch to allow to build with GCC 4.7
 
