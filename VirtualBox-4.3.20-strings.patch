@@ -1,4 +1,7 @@
-* Mon Jul 09 2012 Sérgio Basto <sergio@serjux.com> 
+* Fri Dec 26 2014 Sérgio Basto <sergio@serjux.com>
+  It is possible not have kmods is not always just not loaded kernel.
+
+* Mon Jul 09 2012 Sérgio Basto <sergio@serjux.com>
   rfbz #1826, last review of https://bugzilla.rpmfusion.org/attachment.cgi?id=888
   by: Naveed Hasan <naveed@cs.columbia.edu>
 
@@ -12,16 +15,9 @@ Subject: [PATCH] Replace some strings
 
 With ones that (sometimes) make more sense.
 ---
- src/VBox/Frontends/VirtualBox/src/main.cpp |   20 ++++++++++----------
- src/VBox/Installer/linux/VBox.sh           |   11 ++++++-----
- src/VBox/VMM/VMMR3/VM.cpp                  |    8 ++++----
- 3 files changed, 20 insertions(+), 19 deletions(-)
-
-
-diff -Nurp VirtualBox-4.1.18/src/VBox/Frontends/VirtualBox/src/main.cpp VirtualBox-4.1.18.new2/src/VBox/Frontends/VirtualBox/src/main.cpp
---- VirtualBox-4.1.18/src/VBox/Frontends/VirtualBox/src/main.cpp	2012-06-20 14:16:20.000000000 +0100
-+++ VirtualBox-4.1.18.new2/src/VBox/Frontends/VirtualBox/src/main.cpp	2012-07-09 04:57:00.690645723 +0100
-@@ -72,13 +72,16 @@ QString g_QStrHintLinuxNoMemory = QAppli
+--- ./src/VBox/Frontends/VirtualBox/src/main.cpp.orig	2014-12-26 03:15:24.511780506 +0000
++++ ./src/VBox/Frontends/VirtualBox/src/main.cpp	2014-12-26 03:35:54.819561727 +0000
+@@ -74,13 +74,15 @@ QString g_QStrHintLinuxNoMemory = QAppli
    );
  
  QString g_QStrHintLinuxNoDriver = QApplication::tr(
@@ -37,23 +33,22 @@ diff -Nurp VirtualBox-4.1.18/src/VBox/Frontends/VirtualBox/src/main.cpp VirtualB
 +  "  <font color=blue>'yum install kmod-VirtualBox-$(uname -r) kmod-VirtualBox'</font><br/><br/>"
 +  "On *not* stable versions of Fedora you need use akmods (because we don't have pre-built kmods) "
 +  "or for custom kernels, you may do instead as root:"
-+  "  <font color=blue>'yum install akmod-VirtualBox kernel-devel-$(uname -r)'</font>"
-+  "  <font color=blue>'akmods'</font><br/><br/>"
++  "  <font color=blue>'yum install akmod-VirtualBox kernel-devel-$(uname -r); akmods'</font>"
 +  "If you installed VirtualBox packages and don't had reboot the system, you may need load the "
 +  "kernel driver, doing as root:"
 +  "  <font color=blue>'systemctl restart systemd-modules-load.service'</font><br/><br/>"
    );
  
  QString g_QStrHintOtherWrongDriverVersion = QApplication::tr(
-@@ -92,18 +92,18 @@ QString g_QStrHintLinuxWrongDriverVersio
+@@ -94,18 +97,18 @@ QString g_QStrHintLinuxWrongDriverVersio
    "The VirtualBox kernel modules do not match this version of "
    "VirtualBox. The installation of VirtualBox was apparently not "
    "successful. Executing<br/><br/>"
 -  "  <font color=blue>'/etc/init.d/vboxdrv setup'</font><br/><br/>"
-+  "  <font color=blue>'systemctl restart systemd-modules-load.service'</font> as root<br/><br/>"
++  "  <font color=blue>'rmmod vboxnetadp vboxnetflt vboxdrv; systemctl restart systemd-modules-load.service'</font> as root<br/><br/>"
    "may correct this. Make sure that you do not mix the "
 -  "OSE version and the PUEL version of VirtualBox."
-+  "RPM Fusion version and the Oracle version of VirtualBox."
++  "RPMFusion version and the Oracle version of VirtualBox."
    );
  
  QString g_QStrHintOtherNoDriver = QApplication::tr(
@@ -68,41 +63,9 @@ diff -Nurp VirtualBox-4.1.18/src/VBox/Frontends/VirtualBox/src/main.cpp VirtualB
    );
  
  #if defined(DEBUG) && defined(Q_WS_X11) && defined(RT_OS_LINUX)
-diff -Nurp VirtualBox-4.1.18/src/VBox/Installer/linux/VBox.sh VirtualBox-4.1.18.new2/src/VBox/Installer/linux/VBox.sh
---- VirtualBox-4.1.18/src/VBox/Installer/linux/VBox.sh	2012-06-20 14:17:29.000000000 +0100
-+++ VirtualBox-4.1.18.new2/src/VBox/Installer/linux/VBox.sh	2012-07-09 05:02:47.158108166 +0100
-@@ -32,19 +32,22 @@ elif ! lsmod|grep -q vboxdrv; then
-     cat << EOF
- WARNING: The vboxdrv kernel module is not loaded. Either there is no module
-          available for the current kernel (`uname -r`) or it failed to
--         load. Please recompile the kernel module and install it by
-+         load. Please make sure that you have kmod-VirtualBox for current kernel and load the kernel module by executing
- 
--           sudo /etc/init.d/vboxdrv setup
-+           'systemctl restart systemd-modules-load.service' (as root)
- 
-          You will not be able to start VMs until this problem is fixed.
- EOF
- elif [ ! -c /dev/vboxdrv ]; then
-     cat << EOF
--WARNING: The character device /dev/vboxdrv does not exist. Try
-+WARNING: The character device /dev/vboxdrv does not exist. Try executing
- 
--           sudo /etc/init.d/vboxdrv restart
-+           '/sbin/udevadm control --reload-rules' (as root)
-+           '/sbin/udevadm trigger --subsystem-match=usb --action=add' (as root)
-+           '/sbin/udevadm settle' (as root)
- 
--         and if that is not successful, try to re-install the package.
-+         and if that is not successful, then you're in situation that
-+         can not possibly happen and there's nothing you can do about it.
- 
-          You will not be able to start VMs until this problem is fixed.
- EOF
-diff -Nurp VirtualBox-4.1.18/src/VBox/VMM/VMMR3/VM.cpp VirtualBox-4.1.18.new2/src/VBox/VMM/VMMR3/VM.cpp
---- VirtualBox-4.1.18/src/VBox/VMM/VMMR3/VM.cpp	2012-06-20 14:18:34.000000000 +0100
-+++ VirtualBox-4.1.18.new2/src/VBox/VMM/VMMR3/VM.cpp	2012-07-09 05:01:48.544521745 +0100
-@@ -375,8 +375,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
+--- ./src/VBox/VMM/VMMR3/VM.cpp.orig	2014-12-26 03:15:24.513780527 +0000
++++ ./src/VBox/VMM/VMMR3/VM.cpp	2014-12-26 03:35:54.821561747 +0000
+@@ -378,8 +378,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not loaded. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv is not set up properly. "
@@ -113,7 +76,7 @@ diff -Nurp VirtualBox-4.1.18/src/VBox/VMM/VMMR3/VM.cpp VirtualBox-4.1.18.new2/sr
  #else
                      pszError = N_("VirtualBox kernel driver not loaded");
  #endif
-@@ -417,8 +417,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
+@@ -420,8 +420,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not installed. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv was not created for some "
