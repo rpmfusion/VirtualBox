@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.3.20
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Release:    3%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -42,7 +42,7 @@ Source8:    VirtualBox-vboxresize.desktop
 Source10:   vboxweb.service
 Source11:   vboxservice.service
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
-Patch2:     VirtualBox-4.1.18-strings.patch
+Patch2:     VirtualBox-4.3.20-strings.patch
 Patch3:     VirtualBox-4.3.0-libcxx.patch
 Patch4:     VirtualBox-4.3.0-testmangle.patch
 Patch10:    VirtualBox-4.3.0-32bit.patch
@@ -178,10 +178,13 @@ Conflicts:  %{name} <= %{version}-%{release}
 
 
 %description guest
-This is the same that Guest Additions, therefore should only be installed on a guest system.
-Tools that utilize kernel modules for supporting integration
-with the Host, including file sharing and tracking of mouse pointer
-movement and X.org X11 video and mouse driver.
+Important note: VirtualBox-guest can't be installed on Host (master) system because
+contains X11 and OpenGL drives that will mess up with your X11 configurations.
+This subpackage replace Oracle Linux Guest Addition but just for Fedora,
+therefore should be installed only when we have one Fedora as a guest system.
+Tools that use kernel modules for supporting integration
+with the Host, including file sharing, clipboard sharing,
+X.org X11 video and mouse driver, USB and webcam proxy and Seamless mode.
 
 
 %package kmodsrc
@@ -616,6 +619,10 @@ fi
 
 
 %changelog
+* Fri Dec 26 2014 Sérgio Basto <sergio@serjux.com> - 4.3.20-3
+- Improved strings.patch asking to install kmods VirtualBox and also intructions for devel versions.
+- Improved description of VirtualBox-guest, alerting to not install on Host, one conclusion on rfbz #3425 .
+
 * Sun Dec 21 2014 Sérgio Basto <sergio@serjux.com> - 4.3.20-2
 - Moved files from /etc/modules-load.d/ to /usr/lib/modules-load.d/, fix rfbz #3469 .
 - Also moved files from /etc/udev/rules.d/ to /usr/lib/udev/rules.d/ and removed %config directive .
