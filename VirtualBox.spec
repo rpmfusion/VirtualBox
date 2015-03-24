@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.20
-Release:    3%{?prerel:.%{prerel}}%{?dist}
+Version:    4.3.26
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -619,6 +619,9 @@ fi
 
 
 %changelog
+* Tue Mar 24 2015 Leigh Scott <leigh123linux@googlemail.com> - 4.3.26-1
+- New upstream release .
+
 * Fri Dec 26 2014 Sérgio Basto <sergio@serjux.com> - 4.3.20-3
 - Improved strings.patch asking to install kmods VirtualBox and also intructions for devel versions.
 - Improved description of VirtualBox-guest, alerting to not install on Host, one conclusion on rfbz #3425 .
