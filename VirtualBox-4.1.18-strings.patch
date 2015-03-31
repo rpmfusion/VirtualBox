@@ -39,7 +39,7 @@ diff -Nurp VirtualBox-4.1.18/src/VBox/Frontends/VirtualBox/src/main.cpp VirtualB
 +  "or for custom kernels, you may do instead as root:"
 +  "  <font color=blue>'yum install akmod-VirtualBox kernel-devel-$(uname -r)'</font>"
 +  "  <font color=blue>'akmods'</font><br/><br/>"
-+  "If you installed VirtualBox packages and don't had reboot the system, you may need load the "
++  "If you installed VirtualBox packages and don't want reboot the system, you may need load the "
 +  "kernel driver, doing as root:"
 +  "  <font color=blue>'systemctl restart systemd-modules-load.service'</font><br/><br/>"
    );
