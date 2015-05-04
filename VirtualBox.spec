@@ -27,7 +27,7 @@
 
 Name:       VirtualBox
 Version:    4.3.26
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Release:    2%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -52,7 +52,7 @@ Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.3.10-xserver_guest.patch
 Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
-#Patch27:    VirtualBox-4.3.10-gcc.patch
+Patch27:    VirtualBox-4.3.26-gcc.patch
 
 BuildRequires:  kBuild >= 0.1.9998
 BuildRequires:  SDL-devel xalan-c-devel
@@ -233,7 +233,7 @@ rm -rf src/libs/zlib-1.2.6/
 %patch23 -p1 -b .xserver_guest
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
-#patch27 -p1 -b .gcc
+%patch27 -p2 -b .gcc
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -619,6 +619,10 @@ fi
 
 
 %changelog
+* Mon May 04 2015 Sérgio Basto <sergio@serjux.com> - 4.3.26-2
+- Rebuilt for F22 new xorg ABI
+- Allow build with gcc 5.1
+
 * Tue Mar 24 2015 Leigh Scott <leigh123linux@googlemail.com> - 4.3.26-1
 - New upstream release .
 
