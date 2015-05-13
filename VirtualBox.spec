@@ -26,8 +26,8 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.26
-Release:    3%{?prerel:.%{prerel}}%{?dist}
+Version:    4.3.28
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -53,7 +53,6 @@ Patch23:    VirtualBox-4.3.10-xserver_guest.patch
 Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-4.3.26-gcc.patch
-Patch28:    diff_smap_4.patch
 
 BuildRequires:  kBuild >= 0.1.9998
 BuildRequires:  SDL-devel xalan-c-devel
@@ -235,7 +234,6 @@ rm -rf src/libs/zlib-1.2.6/
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
 %patch27 -p2 -b .gcc
-%patch28 -p1 -b .smap
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -621,6 +619,10 @@ fi
 
 
 %changelog
+* Wed May 13 2015 Sérgio Basto <sergio@serjux.com> - 4.3.28-1
+- Update to 4.3.28 .
+- Drop diff_smap_4.patch .
+
 * Mon May 04 2015 Sérgio Basto <sergio@serjux.com> - 4.3.26-3
 - Added diff_smap_4.patch from https://www.virtualbox.org/ticket/13961 ,
   may fix problems for kernel >= 3.19 , I still need disable 3D to run plasma 5
