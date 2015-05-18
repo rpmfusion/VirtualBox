@@ -26,7 +26,7 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.26
+Version:    4.3.28
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -52,7 +52,7 @@ Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.3.10-xserver_guest.patch
 Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
-#Patch27:    VirtualBox-4.3.10-gcc.patch
+Patch27:    VirtualBox-4.3.26-gcc.patch
 
 BuildRequires:  kBuild >= 0.1.9998
 BuildRequires:  SDL-devel xalan-c-devel
@@ -233,7 +233,7 @@ rm -rf src/libs/zlib-1.2.6/
 %patch23 -p1 -b .xserver_guest
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
-#patch27 -p1 -b .gcc
+%patch27 -p2 -b .gcc
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -619,6 +619,19 @@ fi
 
 
 %changelog
+* Wed May 13 2015 Sérgio Basto <sergio@serjux.com> - 4.3.28-1
+- Update to 4.3.28 .
+- Drop diff_smap_4.patch .
+
+* Mon May 04 2015 Sérgio Basto <sergio@serjux.com> - 4.3.26-3
+- Added diff_smap_4.patch from https://www.virtualbox.org/ticket/13961 ,
+  may fix problems for kernel >= 3.19 , I still need disable 3D to run plasma 5
+  ( https://forums.virtualbox.org/viewtopic.php?f=6&t=64452&start=15#p320557 )
+
+* Mon May 04 2015 Sérgio Basto <sergio@serjux.com> - 4.3.26-2
+- Rebuilt for F22 new xorg ABI
+- Allow build with gcc 5.1
+
 * Tue Mar 24 2015 Leigh Scott <leigh123linux@googlemail.com> - 4.3.26-1
 - New upstream release .
 
