@@ -26,14 +26,14 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.28
+Version:    4.3.30
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
 License:    GPLv2 or (GPLv2 and CDDL)
 URL:        http://www.virtualbox.org/wiki/VirtualBox
-Source0:    http://dlc.sun.com.edgesuite.net/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
+Source0:    http://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
 Source3:    VirtualBox-90-vboxdrv.rules
 Source5:    VirtualBox-60-vboxguest.rules
 Source6:    VirtualBox.modules
@@ -233,7 +233,7 @@ rm -rf src/libs/zlib-1.2.6/
 %patch23 -p1 -b .xserver_guest
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
-%patch27 -p2 -b .gcc
+#patch27 -p2 -b .gcc
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -619,6 +619,9 @@ fi
 
 
 %changelog
+* Wed Jul 15 2015 Sérgio Basto <sergio@serjux.com> - 4.3.30-1
+- Update to 4.3.30
+
 * Wed May 13 2015 Sérgio Basto <sergio@serjux.com> - 4.3.28-1
 - Update to 4.3.28 .
 - Drop diff_smap_4.patch .
