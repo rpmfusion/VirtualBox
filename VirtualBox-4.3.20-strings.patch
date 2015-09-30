@@ -30,13 +30,13 @@ With ones that (sometimes) make more sense.
 -  "recompiles the vboxdrv kernel module if necessary."
 +  "The VirtualBox Linux kernel driver (vboxdrv) is probably not loaded."
 +  "You may not have kernel driver installed for kernel that is runnig, if so you may do as root:"
-+  "  <font color=blue>'yum install kmod-VirtualBox-$(uname -r) kmod-VirtualBox'</font><br/><br/>"
++  "  <font color=blue>yum install kmod-VirtualBox-$(uname -r) kmod-VirtualBox</font><br/><br/>"
 +  "On *not* stable versions of Fedora you need use akmods (because we don't have pre-built kmods) "
 +  "or for custom kernels, you may do instead as root:"
-+  "  <font color=blue>'yum install akmod-VirtualBox kernel-devel-$(uname -r); akmods'</font>"
-+  "If you installed VirtualBox packages and don't had reboot the system, you may need load the "
++  "  <font color=blue>yum install akmod-VirtualBox kernel-devel-$(uname -r); akmods</font>"
++  "If you installed VirtualBox packages and don't want reboot the system, you may need load the "
 +  "kernel driver, doing as root:"
-+  "  <font color=blue>'systemctl restart systemd-modules-load.service'</font><br/><br/>"
++  "  <font color=blue>systemctl restart systemd-modules-load.service</font><br/><br/>"
    );
  
  QString g_QStrHintOtherWrongDriverVersion = QApplication::tr(
@@ -45,7 +45,7 @@ With ones that (sometimes) make more sense.
    "VirtualBox. The installation of VirtualBox was apparently not "
    "successful. Executing<br/><br/>"
 -  "  <font color=blue>'/etc/init.d/vboxdrv setup'</font><br/><br/>"
-+  "  <font color=blue>'rmmod vboxnetadp vboxnetflt vboxdrv; systemctl restart systemd-modules-load.service'</font> as root<br/><br/>"
++  "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxdrv; systemctl restart systemd-modules-load.service</font> as root<br/><br/>"
    "may correct this. Make sure that you do not mix the "
 -  "OSE version and the PUEL version of VirtualBox."
 +  "RPMFusion version and the Oracle version of VirtualBox."

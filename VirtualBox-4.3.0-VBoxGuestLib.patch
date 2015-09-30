@@ -4,7 +4,7 @@ Sérgio Basto <sergio@serjux.com>
 +++ ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk	2014-10-12 00:11:00.925507543 +0100
 @@ -40,9 +40,11 @@ LIBRARIES += \
  	VBoxGuestR3LibShared
- ifndef VBOX_ONLY_TESTSUITE
+ ifndef VBOX_ONLY_VALIDATIONKIT
   if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd)
 + ifndef VBOX_USE_SYSTEM_XORG_HEADERS
    LIBRARIES += \
