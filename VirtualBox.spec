@@ -22,8 +22,8 @@
 %global enable_vnc 1
 
 Name:       VirtualBox
-Version:    5.0.4
-Release:    2.4%{?prerel:.%{prerel}}%{?dist}
+Version:    5.0.6
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -46,9 +46,8 @@ Patch23:    VirtualBox-4.3.10-xserver_guest.patch
 Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-4.3.26-gcc.patch
-# from Debian 
+# from Debian
 Patch28:    02-gsoap-build-fix.patch
-Patch29:    fix-build.patch
 
 BuildRequires:  kBuild >= 0.1.9998
 BuildRequires:  SDL-devel xalan-c-devel
@@ -209,7 +208,7 @@ rm -rf src/libs/libpng-1.2.8/
 rm -rf src/libs/zlib-1.2.6/
 
 %patch1 -p1 -b .noupdates
-%patch2 -p1 -b .strings
+#patch2 -p1 -b .strings
 #patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
 %if 0%{?fedora} < 16
@@ -222,7 +221,6 @@ rm -rf src/libs/zlib-1.2.6/
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
 #patch27 -p2 -b .gcc
-%patch29 -p1 -b .vnc
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -622,6 +620,9 @@ fi
 
 
 %changelog
+* Mon Oct 05 2015 Sérgio Basto <sergio@serjux.com> - 5.0.6-1
+- Update to VirtualBox-5.0.6 , without strings patch (need be rebased)
+
 * Wed Sep 30 2015 Sérgio Basto <sergio@serjux.com> - 5.0.4-2.4
 - enabled doc , vnc and webservices
 - Drop beramono patch
