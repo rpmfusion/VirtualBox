@@ -26,7 +26,7 @@
 #endif
 
 Name:       VirtualBox
-Version:    4.3.30
+Version:    4.3.32
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -619,6 +619,9 @@ fi
 
 
 %changelog
+* Tue Oct 20 2015 Sérgio Basto <sergio@serjux.com> - 4.3.32-1
+- Update to VirtualBox-4.3.32
+
 * Wed Jul 15 2015 Sérgio Basto <sergio@serjux.com> - 4.3.30-1
 - Update to 4.3.30
 
