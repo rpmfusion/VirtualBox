@@ -15,73 +15,73 @@ Subject: [PATCH] Replace some strings
 
 With ones that (sometimes) make more sense.
 ---
---- ./src/VBox/Frontends/VirtualBox/src/main.cpp.orig	2014-12-26 03:15:24.511780506 +0000
-+++ ./src/VBox/Frontends/VirtualBox/src/main.cpp	2014-12-26 03:35:54.819561727 +0000
-@@ -74,13 +74,15 @@ QString g_QStrHintLinuxNoMemory = QAppli
-   );
+--- ./src/VBox/Frontends/VirtualBox/src/main.cpp.orig	2015-10-22 05:10:58.521991520 +0100
++++ ./src/VBox/Frontends/VirtualBox/src/main.cpp	2015-10-22 05:12:17.710849475 +0100
+@@ -99,13 +99,15 @@ QString g_QStrHintLinuxNoMemory = QAppli
+     );
  
  QString g_QStrHintLinuxNoDriver = QApplication::tr(
--  "The VirtualBox Linux kernel driver (vboxdrv) is either not loaded or "
--  "there is a permission problem with /dev/vboxdrv. Please reinstall the kernel "
--  "module by executing<br/><br/>"
--  "  <font color=blue>'/etc/init.d/vboxdrv setup'</font><br/><br/>"
--  "as root. If it is available in your distribution, you should install the "
--  "DKMS package first. This package keeps track of Linux kernel changes and "
--  "recompiles the vboxdrv kernel module if necessary."
-+  "The VirtualBox Linux kernel driver (vboxdrv) is probably not loaded."
-+  "You may not have kernel driver installed for kernel that is runnig, if so you may do as root:"
-+  "  <font color=blue>yum install kmod-VirtualBox-$(uname -r) kmod-VirtualBox</font><br/><br/>"
-+  "On *not* stable versions of Fedora you need use akmods (because we don't have pre-built kmods) "
-+  "or for custom kernels, you may do instead as root:"
-+  "  <font color=blue>yum install akmod-VirtualBox kernel-devel-$(uname -r); akmods</font>"
-+  "If you installed VirtualBox packages and don't want reboot the system, you may need load the "
-+  "kernel driver, doing as root:"
-+  "  <font color=blue>systemctl restart systemd-modules-load.service</font><br/><br/>"
-   );
+-    "The VirtualBox Linux kernel driver (vboxdrv) is either not loaded or "
+-    "there is a permission problem with /dev/vboxdrv. Please reinstall the kernel "
+-    "module by executing<br/><br/>"
+-    "  <font color=blue>'/sbin/vboxconfig'</font><br/><br/>"
+-    "as root. If it is available in your distribution, you should install the "
+-    "DKMS package first. This package keeps track of Linux kernel changes and "
+-    "recompiles the vboxdrv kernel module if necessary."
++    "The VirtualBox Linux kernel driver (vboxdrv) is probably not loaded."
++    "You may not have kernel driver installed for kernel that is runnig, if so you may do as root:"
++    "  <font color=blue>yum install kmod-VirtualBox-$(uname -r) kmod-VirtualBox</font><br/><br/>"
++    "On *not* stable versions of Fedora you need use akmods (because we don't have pre-built kmods) "
++    "or for custom kernels, you may do instead as root:"
++    "  <font color=blue>yum install akmod-VirtualBox kernel-devel-$(uname -r); akmods</font>"
++    "If you installed VirtualBox packages and don't want reboot the system, you may need load the "
++    "kernel driver, doing as root:"
++    "  <font color=blue>systemctl restart systemd-modules-load.service</font><br/><br/>"
+     );
  
  QString g_QStrHintOtherWrongDriverVersion = QApplication::tr(
-@@ -94,18 +97,18 @@ QString g_QStrHintLinuxWrongDriverVersio
-   "The VirtualBox kernel modules do not match this version of "
-   "VirtualBox. The installation of VirtualBox was apparently not "
-   "successful. Executing<br/><br/>"
--  "  <font color=blue>'/etc/init.d/vboxdrv setup'</font><br/><br/>"
-+  "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxdrv; systemctl restart systemd-modules-load.service</font> as root<br/><br/>"
-   "may correct this. Make sure that you do not mix the "
--  "OSE version and the PUEL version of VirtualBox."
-+  "RPMFusion version and the Oracle version of VirtualBox."
-   );
+@@ -119,18 +121,18 @@ QString g_QStrHintLinuxWrongDriverVersio
+     "The VirtualBox kernel modules do not match this version of "
+     "VirtualBox. The installation of VirtualBox was apparently not "
+     "successful. Executing<br/><br/>"
+-    "  <font color=blue>'/sbin/vboxconfig'</font><br/><br/>"
++    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxdrv; systemctl restart systemd-modules-load.service</font> as root<br/><br/>"
+     "may correct this. Make sure that you do not mix the "
+-    "OSE version and the PUEL version of VirtualBox."
++    "RPMFusion version and the Oracle version of VirtualBox."
+     );
  
  QString g_QStrHintOtherNoDriver = QApplication::tr(
-   "Make sure the kernel module has been loaded successfully."
-   );
+     "Make sure the kernel module has been loaded successfully."
+     );
  
 -/* I hope this isn't (C), (TM) or (R) Microsoft support ;-) */
 +/* We're going to try to give a helping hand */
  QString g_QStrHintReinstall = QApplication::tr(
--  "Please try reinstalling VirtualBox."
-+  "Please report the problem to the RPM Fusion Bugzilla."
-   );
+-    "Please try reinstalling VirtualBox."
++    "Please report the problem to the RPM Fusion Bugzilla."
+     );
  
- #if defined(DEBUG) && defined(Q_WS_X11) && defined(RT_OS_LINUX)
---- ./src/VBox/VMM/VMMR3/VM.cpp.orig	2014-12-26 03:15:24.513780527 +0000
-+++ ./src/VBox/VMM/VMMR3/VM.cpp	2014-12-26 03:35:54.821561747 +0000
-@@ -378,8 +378,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
+ 
+--- ./src/VBox/VMM/VMMR3/VM.cpp.orig	2015-10-15 14:59:57.000000000 +0100
++++ ./src/VBox/VMM/VMMR3/VM.cpp	2015-10-22 05:27:44.791920876 +0100
+@@ -380,8 +380,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not loaded. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv is not set up properly. "
 -                                  "Re-setup the kernel module by executing "
--                                  "'/etc/init.d/vboxdrv setup' as root");
+-                                  "'/sbin/vboxconfig' as root");
 +                                  "Load the kernel module by executing "
 +                                  "'systemctl restart systemd-modules-load.service' as root");
  #else
                      pszError = N_("VirtualBox kernel driver not loaded");
  #endif
-@@ -420,8 +420,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
+@@ -422,8 +422,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not installed. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv was not created for some "
 -                                  "reason. Re-setup the kernel module by executing "
--                                  "'/etc/init.d/vboxdrv setup' as root");
+-                                  "'/sbin/vboxconfig' as root");
 +                                  "reason. Install the kernel module by executing "
 +                                  "'yum install kmod-VirtualBox-$(uname -r) kmod-VirtualBox' as root");
  #else

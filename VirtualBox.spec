@@ -22,7 +22,7 @@
 %global enable_vnc 1
 
 Name:       VirtualBox
-Version:    5.0.6
+Version:    5.0.8
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -39,7 +39,6 @@ Source10:   vboxweb.service
 Source11:   vboxservice.service
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-4.3.20-strings.patch
-#Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.3.10-xserver_guest.patch
@@ -193,23 +192,22 @@ which is generated during the build of main package.
 find -name '*.py[co]' -delete
 
 # Remove prebuilt binary tools
-rm -rf kBuild
-rm -rf tools
+rm -r kBuild/
+rm -r tools/
 # Remove bundle X11 sources and some lib sources, before patching.
 mv src/VBox/Additions/x11/x11include/mesa-7.2 .
-rm -rf src/VBox/Additions/x11/x11include/*
+rm -r src/VBox/Additions/x11/x11include/*
 mv mesa-7.2 src/VBox/Additions/x11/x11include/
 
-rm -rf src/VBox/Additions/x11/x11stubs
-rm -rf src/VBox/GuestHost/OpenGL/include/GL
+rm -r src/VBox/Additions/x11/x11stubs
+rm -r src/VBox/GuestHost/OpenGL/include/GL
 #rm -rf src/libs/liblzf-3.4/
-rm -rf src/libs/libxml2-2.6.31/
-rm -rf src/libs/libpng-1.2.8/
-rm -rf src/libs/zlib-1.2.6/
+rm -r src/libs/libxml2-2.9.2/
+rm -r src/libs/libpng-1.2.53/
+rm -r src/libs/zlib-1.2.8/
 
 %patch1 -p1 -b .noupdates
-#patch2 -p1 -b .strings
-#patch17 -p1 -b .beramono
+%patch2 -p1 -b .strings
 %patch18 -p1 -b .aiobug
 %if 0%{?fedora} < 16
 %patch22 -p1 -b .gsoap
@@ -250,7 +248,7 @@ sed -i 's/\r//' COPYING
 kmk %{_smp_mflags} \
     KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_OUT="$PWD/obj"      \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox         \
-    VBOX_WITH_TESTCASES=0 VBOX_WITH_VALIDATIONKIT=0 VBOX_WITH_VBOX_IMG=1 \
+    VBOX_WITH_TESTCASES= VBOX_WITH_VALIDATIONKIT= VBOX_WITH_VBOX_IMG=1 \
     VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
     VBOX_PATH_DOCBOOK_DTD=/usr/share/sgml/docbook/xml-dtd-4.5/ \
