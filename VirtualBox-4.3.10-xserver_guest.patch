@@ -26,29 +26,18 @@ Just compile with X11 system source and we may remove bundle X11 source code.
   VBoxOGL_DEFS     += VBOX_NO_NATIVEGL
  endif
  
-@@ -222,11 +216,20 @@ VBoxOGL_LIBS = \
- 	$(VBOX_LIB_OGL_CRUTIL) \
- 	$(PATH_STAGE_LIB)/additions/VBoxOGLspuload$(VBOX_SUFF_LIB)
+@@ -213,10 +207,10 @@
+ 
  if1of ($(KBUILD_TARGET), linux solaris freebsd)
-- VBoxOGL_LIBS += \
+  VBoxOGL_LIBS += \
 - 	$(PATH_STAGE_LIB)/libXcomposite.so \
 - 	$(PATH_STAGE_LIB)/libXdamage.so \
 - 	$(PATH_STAGE_LIB)/libXfixes.so \
 - 	$(PATH_STAGE_LIB)/libXext.so
-+ if1of ($(KBUILD_TARGET).$(KBUILD_TARGET_ARCH),linux.x86 )
-+  VBoxOGL_LIBS += \
-+ 	/usr/lib/libXcomposite.so \
-+ 	/usr/lib/libXdamage.so \
-+ 	/usr/lib/libXfixes.so \
-+ 	/usr/lib/libXext.so
-+ endif
-+ if1of ($(KBUILD_TARGET).$(KBUILD_TARGET_ARCH),linux.amd64 )
-+  VBoxOGL_LIBS += \
-+ 	/usr/lib64/libXcomposite.so \
-+ 	/usr/lib64/libXdamage.so \
-+ 	/usr/lib64/libXfixes.so \
-+ 	/usr/lib64/libXext.so
-+ endif
++ 	Xcomposite \
++ 	Xdamage \
++ 	Xfixes \
++ 	Xext
   ifdef VBoxOGL_FAKEDRI
    ifeq ($(KBUILD_TARGET), freebsd)
      VBoxOGL_LIBS += \

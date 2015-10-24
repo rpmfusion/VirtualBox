@@ -4,7 +4,11 @@
 # -Wall        -- VirtualBox takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
 # -fexceptions -- R0 code doesn't link against C++ library, no __gxx_personality_v0
-%global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
+#global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
+# fix for error: code model kernel does not support PIC mode
+#global optflags %(echo %{optflags} -fno-pic)
+#global optflags %(echo %{optflags} | sed 's/-specs=.*cc1 //')
+
 
 # In prerelease builds (such as betas), this package has the same
 # major version number, while the kernel module abi is not guarranteed
@@ -13,20 +17,12 @@
 #global prerel RC4
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%if 0%{?fedora} < 21
 %global enable_webservice 1
-%else
-%global enable_webservice 0
-%endif
-
-#if 0%{?fedora} < 18
 %global enable_docs 1
-#else
-#global enable_docs 0
-#endif
+%global enable_vnc 1
 
 Name:       VirtualBox
-Version:    4.3.32
+Version:    5.0.8
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -43,16 +39,14 @@ Source10:   vboxweb.service
 Source11:   vboxservice.service
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-4.3.20-strings.patch
-Patch3:     VirtualBox-4.3.0-libcxx.patch
-Patch4:     VirtualBox-4.3.0-testmangle.patch
-Patch10:    VirtualBox-4.3.0-32bit.patch
-Patch17:    VirtualBox-OSE-4.0.0-beramono.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.3.10-xserver_guest.patch
 Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-4.3.26-gcc.patch
+# from Debian
+Patch28:    02-gsoap-build-fix.patch
 
 BuildRequires:  kBuild >= 0.1.9998
 BuildRequires:  SDL-devel xalan-c-devel
@@ -65,11 +59,15 @@ BuildRequires:  python-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
 BuildRequires:  qt4-devel
+%if %{enable_webservice}
 BuildRequires:  gsoap-devel
+%endif
 BuildRequires:  pam-devel
 BuildRequires:  mkisofs
 BuildRequires:  java-devel >= 1.6
+%if %{enable_docs}
 BuildRequires:  /usr/bin/pdflatex
+BuildRequires:  docbook-dtds
 %if 0%{?fedora} >= 18
 BuildRequires:  doxygen-latex
 BuildRequires:  texlive-collection-fontsrecommended
@@ -77,6 +75,7 @@ BuildRequires:  texlive-ec
 BuildRequires:  texlive-ucs
 BuildRequires:  texlive-tabulary
 BuildRequires:  texlive-fancybox
+%endif
 %endif
 BuildRequires:  boost-devel
 #BuildRequires:  liblzf-devel
@@ -87,10 +86,13 @@ BuildRequires:  device-mapper-devel
 BuildRequires:  libvpx-devel
 BuildRequires:  makeself
 
-#BuildRequires:  glibc(x86-32) glibc-devel(x86-32) libstdc++(x86-32)
-#BuildRequires:  glibc.i686 glibc-devel.i686 libstdc++.i686
-#BuildRequires:  /usr/lib/libc.so
-#BuildRequires:  /usr/lib/libstdc++.so.6 /lib/libc.so.6
+# for 32bit on 64
+%ifarch x86_64
+BuildRequires:  libstdc++-static(x86-32) glibc(x86-32) glibc-devel(x86-32) libgcc(x86-32)
+BuildRequires:  libstdc++-static(x86-64)
+%else
+BuildRequires:  libstdc++-static
+%endif
 
 # For the X11 module
 BuildRequires:  libdrm-devel
@@ -103,6 +105,9 @@ BuildRequires:  xorg-x11-server-devel
 BuildRequires:  libXcursor-devel
 BuildRequires:  libXcomposite-devel
 BuildRequires:  libXmu-devel
+%if %{enable_vnc}
+BuildRequires:  libvncserver-devel
+%endif
 
 BuildRequires: systemd-units
 Requires(post): systemd-units
@@ -118,12 +123,8 @@ ExclusiveArch:  i586 x86_64
 ExclusiveArch:  i386 x86_64
 %endif
 
-Provides:   %{name}-OSE = %{version}-%{release}
-Obsoletes:  %{name}-OSE < %{version}-%{release}
 Requires:   %{name}-kmod = %{version}
 Provides:   %{name}-kmod-common = %{version}-%{release}
-Provides:   %{name}-OSE-kmod-common = %{version}-%{release}
-Obsoletes:  %{name}-OSE-kmod-common < %{version}-%{release}
 Conflicts:  %{name}-guest <= %{version}-%{release}
 
 %description
@@ -136,8 +137,6 @@ Summary:    %{name} SDK
 Group:      Development/Libraries
 Requires:   %{name} = %{version}-%{release}
 Requires:   python-%{name} = %{version}-%{release}
-Provides:   %{name}-OSE-devel = %{version}-%{release}
-Obsoletes:  %{name}-OSE-devel < %{version}-%{release}
 
 %description devel
 %{name} Software Development Kit.
@@ -147,8 +146,6 @@ Obsoletes:  %{name}-OSE-devel < %{version}-%{release}
 Summary:    Python bindings for %{name}
 Group:      Development/Libraries
 Requires:   %{name} = %{version}-%{release}
-Provides:   python-%{name}-OSE = %{version}-%{release}
-Obsoletes:  python-%{name}-OSE < %{version}-%{release}
 
 %description -n python-%{name}
 Python XPCOM bindings to %{name}.
@@ -157,18 +154,12 @@ Python XPCOM bindings to %{name}.
 %package guest
 Summary:    %{name} Guest Additions
 Group:      System Environment/Base
-Provides:   %{name}-OSE-guest = %{version}-%{release}
-Obsoletes:  %{name}-OSE-guest < %{version}-%{release}
 Requires:   %{name}-kmod = %{version}
 Provides:   %{name}-kmod-common = %{version}-%{release}
-Provides:   %{name}-OSE-kmod-common = %{version}-%{release}
-Obsoletes:  %{name}-OSE-kmod-common < %{version}-%{release}
 Requires:   xorg-x11-server-Xorg
 Requires:   xorg-x11-xinit
 Provides:   xorg-x11-drv-VirtualBox = %{version}-%{release}
 Obsoletes:  xorg-x11-drv-VirtualBox < %{version}-%{release}
-Provides:   xorg-x11-drv-VirtualBox-OSE = %{version}-%{release}
-Obsoletes:  xorg-x11-drv-VirtualBox-OSE < %{version}-%{release}
 %if "%(xserver-sdk-abi-requires 2>/dev/null)"
 Requires:   %(xserver-sdk-abi-requires ansic)
 Requires:   %(xserver-sdk-abi-requires videodrv)
@@ -190,8 +181,6 @@ X.org X11 video and mouse driver, USB and webcam proxy and Seamless mode.
 %package kmodsrc
 Summary:    %{name} kernel module source code
 Group:      System Environment/Kernel
-Provides:   %{name}-OSE-kmodsrc = %{version}-%{release}
-Obsoletes:  %{name}-OSE-kmodsrc < %{version}-%{release}
 
 %description kmodsrc
 Source tree used for building kernel module packages (%{name}-kmod)
@@ -203,32 +192,28 @@ which is generated during the build of main package.
 find -name '*.py[co]' -delete
 
 # Remove prebuilt binary tools
-rm -rf kBuild
-rm -rf tools
+rm -r kBuild/
+rm -r tools/
 # Remove bundle X11 sources and some lib sources, before patching.
 mv src/VBox/Additions/x11/x11include/mesa-7.2 .
-rm -rf src/VBox/Additions/x11/x11include/*
+rm -r src/VBox/Additions/x11/x11include/*
 mv mesa-7.2 src/VBox/Additions/x11/x11include/
 
-rm -rf src/VBox/Additions/x11/x11stubs
-rm -rf src/VBox/GuestHost/OpenGL/include/GL
-rm -rf src/libs/boost-1.37.0/
+rm -r src/VBox/Additions/x11/x11stubs
+rm -r src/VBox/GuestHost/OpenGL/include/GL
 #rm -rf src/libs/liblzf-3.4/
-rm -rf src/libs/libxml2-2.6.31/
-rm -rf src/libs/libpng-1.2.8/
-rm -rf src/libs/zlib-1.2.6/
+rm -r src/libs/libxml2-2.9.2/
+rm -r src/libs/libpng-1.2.53/
+rm -r src/libs/zlib-1.2.8/
 
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
-%patch3 -p1 -b .libcxx
-%patch4 -p1 -b .mangletest
-%ifarch x86_64
-%patch10 -p1 -b .32bit
-%endif
-%patch17 -p1 -b .beramono
 %patch18 -p1 -b .aiobug
 %if 0%{?fedora} < 16
 %patch22 -p1 -b .gsoap
+%endif
+%if 0%{?fedora} > 20
+%patch28 -p1 -b .gsoap2
 %endif
 %patch23 -p1 -b .xserver_guest
 %patch24 -p1 -b .guestlib
@@ -243,11 +228,14 @@ sed -i 's/\r//' COPYING
 %if %{enable_webservice}
   --enable-webservice \
 %endif
+%if %{enable_vnc}
+  --enable-vnc \
+%endif
 %if !%{enable_docs}
   --disable-docs \
 %endif
 
-#--enable-vnc  --build-headless --build-libxml2
+#--build-headless --build-libxml2
 #--disable-java
 #--disable-xpcom
 . ./env.sh
@@ -260,11 +248,10 @@ sed -i 's/\r//' COPYING
 kmk %{_smp_mflags} \
     KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_OUT="$PWD/obj"      \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox         \
-    VBOX_WITH_REGISTRATION_REQUEST= VBOX_WITH_UPDATE_REQUEST=   \
-    VBOX_GCC_OPT="%{optflags}" VBOX_GCC_GC_OPT="%{optflags}"    \
-    VBOX_GCC_R0_OPT="%{optflags}" VBOX_GCC_WERR=""          \
+    VBOX_WITH_TESTCASES= VBOX_WITH_VALIDATIONKIT= VBOX_WITH_VBOX_IMG=1 \
     VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
+    VBOX_PATH_DOCBOOK_DTD=/usr/share/sgml/docbook/xml-dtd-4.5/ \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
     VBOX_BUILD_PUBLISHER=_%{?vendor:%(echo %{vendor} \
     | sed -e 's/ //g' | cut -c 1-9)}%{?!vendor:custom}
@@ -302,6 +289,11 @@ ln -s VBox %{buildroot}%{_bindir}/VBoxHeadless
 ln -s VBox %{buildroot}%{_bindir}/vboxheadless
 ln -s VBox %{buildroot}%{_bindir}/VBoxBalloonCtrl
 ln -s VBox %{buildroot}%{_bindir}/vboxballoonctrl
+ln -s VBox %{buildroot}%{_bindir}/VBoxAutostart
+ln -s VBox %{buildroot}%{_bindir}/vboxautostart
+ln -s VBox %{buildroot}%{_bindir}/VBoxDTrace
+ln -s VBox %{buildroot}%{_bindir}/vboxdtrace
+ln -s %{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
 %if %{enable_webservice}
 ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
 %endif
@@ -318,7 +310,7 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/*.so
 
 install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox \
-    obj/bin/V*.gc       \
+    obj/bin/V*.rc       \
     obj/bin/V*.r0       \
     obj/bin/VBoxEFI*.fd
 
@@ -333,7 +325,6 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/VBoxExtPackHelperApp \
     obj/bin/VBoxHeadless    \
     obj/bin/VBoxManage  \
-    obj/bin/VBoxManageHelp \
     obj/bin/VBoxNetAdpCtl   \
     obj/bin/VBoxNetDHCP \
     obj/bin/VBoxNetNAT \
@@ -345,6 +336,8 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/VBoxXPCOMIPCD   \
     obj/bin/VBoxSysInfo.sh  \
     obj/bin/vboxshell.py    \
+    obj/bin/vbox-img    \
+    obj/bin/VBoxDTrace    \
 %if %{enable_webservice}
     obj/bin/vboxwebsrv  \
     obj/bin/webtest     \
@@ -536,6 +529,11 @@ fi
 %{_bindir}/VBoxTunctl
 %{_bindir}/virtualbox
 %{_bindir}/VirtualBox
+%{_bindir}/VBoxAutostart
+%{_bindir}/vboxautostart
+%{_bindir}/VBoxDTrace
+%{_bindir}/vboxdtrace
+%{_bindir}/vbox-img
 %if %{enable_webservice}
 %{_bindir}/vboxwebsrv
 %endif
@@ -555,10 +553,11 @@ fi
 %{_libdir}/virtualbox/SUPLoggerCtl
 %{_libdir}/virtualbox/SUPUninstall
 %{_libdir}/virtualbox/VBoxAutostart
-%{_libdir}/virtualbox/VBoxManageHelp
 %{_libdir}/virtualbox/VBoxNetNAT
 %{_libdir}/virtualbox/VBoxVMMPreload
 %{_libdir}/virtualbox/VBoxVolInfo
+%{_libdir}/virtualbox/VBoxDTrace
+%{_libdir}/virtualbox/vbox-img
 %if %{enable_webservice}
 %{_libdir}/virtualbox/vboxwebsrv
 %{_libdir}/virtualbox/webtest
@@ -606,7 +605,7 @@ fi
 %{_libdir}/dri/*
 %{_libdir}/VBoxOGL*.so
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
-#%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+#{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %exclude %{_datadir}/gdm
 %{_prefix}/lib/udev/rules.d/60-vboxguest.rules
 %{_prefix}/lib/modules-load.d/%{name}-guest.conf
@@ -619,8 +618,15 @@ fi
 
 
 %changelog
-* Tue Oct 20 2015 Sérgio Basto <sergio@serjux.com> - 4.3.32-1
-- Update to VirtualBox-4.3.32
+* Mon Oct 05 2015 Sérgio Basto <sergio@serjux.com> - 5.0.6-1
+- Update to VirtualBox-5.0.6 , without strings patch (need be rebased)
+
+* Wed Sep 30 2015 Sérgio Basto <sergio@serjux.com> - 5.0.4-2.4
+- enabled doc , vnc and webservices
+- Drop beramono patch
+
+* Tue Sep 29 2015 Sérgio Basto <sergio@serjux.com> - 5.0.4-2
+- Drop 32bits patch
 
 * Wed Jul 15 2015 Sérgio Basto <sergio@serjux.com> - 4.3.30-1
 - Update to 4.3.30
