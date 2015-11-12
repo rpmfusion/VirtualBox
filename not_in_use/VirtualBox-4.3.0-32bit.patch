@@ -15,12 +15,12 @@ diff --git a/configure b/configure
 index 42ce775..0932637 100755
 --- a/configure
 +++ b/configure
-@@ -2525,7 +2525,7 @@ if [ "$OS" = "linux" ]; then
+@@ -2772,7 +2772,7 @@
+     check_libcap
    fi
-   check_libcap
    check_compiler_h
--  [ "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
-+  #[ "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
+-  [ $ONLY_ADDITIONS -eq 0 -a "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
++  #[ $ONLY_ADDITIONS -eq 0 -a "$BUILD_MACHINE" = "amd64" -a $WITH_VMMRAW -eq 1 ] && check_32bit
    # tools/common/makeself*
    [ $OSE -ge 1 ] && check_makeself
  fi
