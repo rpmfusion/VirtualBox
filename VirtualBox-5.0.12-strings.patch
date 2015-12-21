@@ -1,22 +1,5 @@
-* Fri Dec 26 2014 Sérgio Basto <sergio@serjux.com>
-  It is possible not have kmods is not always just not loaded kernel.
-
-* Mon Jul 09 2012 Sérgio Basto <sergio@serjux.com>
-  rfbz #1826, last review of https://bugzilla.rpmfusion.org/attachment.cgi?id=888
-  by: Naveed Hasan <naveed@cs.columbia.edu>
-
-* Sat Jun 16 2012 Sérgio Basto <sergio@serjux.com>
-  Rebased for 4.1.16 (partial rfbz #1826)
-
-
-From: Lubomir Rintel <lkundrak@v3.sk>
-Date: Mon, 10 May 2010 12:08:47 -0400
-Subject: [PATCH] Replace some strings
-
-With ones that (sometimes) make more sense.
----
---- ./src/VBox/Frontends/VirtualBox/src/main.cpp.orig	2015-10-22 05:10:58.521991520 +0100
-+++ ./src/VBox/Frontends/VirtualBox/src/main.cpp	2015-10-22 05:12:17.710849475 +0100
+--- VirtualBox-5.0.12/src/VBox/Frontends/VirtualBox/src/main.cpp	2015-12-18 16:21:39.000000000 +0000
++++ VirtualBox-5.0.12.new/src/VBox/Frontends/VirtualBox/src/main.cpp	2015-12-21 23:06:22.952311299 +0000
 @@ -99,13 +99,15 @@ QString g_QStrHintLinuxNoMemory = QAppli
      );
  
@@ -24,7 +7,7 @@ With ones that (sometimes) make more sense.
 -    "The VirtualBox Linux kernel driver (vboxdrv) is either not loaded or "
 -    "there is a permission problem with /dev/vboxdrv. Please reinstall the kernel "
 -    "module by executing<br/><br/>"
--    "  <font color=blue>'/sbin/vboxconfig'</font><br/><br/>"
+-    "  <font color=blue>'/sbin/rcvboxdrv setup'</font><br/><br/>"
 -    "as root. If it is available in your distribution, you should install the "
 -    "DKMS package first. This package keeps track of Linux kernel changes and "
 -    "recompiles the vboxdrv kernel module if necessary."
@@ -44,7 +27,7 @@ With ones that (sometimes) make more sense.
      "The VirtualBox kernel modules do not match this version of "
      "VirtualBox. The installation of VirtualBox was apparently not "
      "successful. Executing<br/><br/>"
--    "  <font color=blue>'/sbin/vboxconfig'</font><br/><br/>"
+-    "  <font color=blue>'/sbin/rcvboxdrv setup'</font><br/><br/>"
 +    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxdrv; systemctl restart systemd-modules-load.service</font> as root<br/><br/>"
      "may correct this. Make sure that you do not mix the "
 -    "OSE version and the PUEL version of VirtualBox."
@@ -63,14 +46,14 @@ With ones that (sometimes) make more sense.
      );
  
  
---- ./src/VBox/VMM/VMMR3/VM.cpp.orig	2015-10-15 14:59:57.000000000 +0100
-+++ ./src/VBox/VMM/VMMR3/VM.cpp	2015-10-22 05:27:44.791920876 +0100
+--- VirtualBox-5.0.12/src/VBox/VMM/VMMR3/VM.cpp	2015-12-18 16:22:45.000000000 +0000
++++ VirtualBox-5.0.12.new/src/VBox/VMM/VMMR3/VM.cpp	2015-12-21 23:08:39.637679696 +0000
 @@ -380,8 +380,8 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
  #ifdef RT_OS_LINUX
                      pszError = N_("VirtualBox kernel driver not loaded. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv is not set up properly. "
 -                                  "Re-setup the kernel module by executing "
--                                  "'/sbin/vboxconfig' as root");
+-                                  "'/sbin/rcvboxdrv setup' as root");
 +                                  "Load the kernel module by executing "
 +                                  "'systemctl restart systemd-modules-load.service' as root");
  #else
@@ -81,7 +64,7 @@ With ones that (sometimes) make more sense.
                      pszError = N_("VirtualBox kernel driver not installed. The vboxdrv kernel module "
                                    "was either not loaded or /dev/vboxdrv was not created for some "
 -                                  "reason. Re-setup the kernel module by executing "
--                                  "'/sbin/vboxconfig' as root");
+-                                  "'/sbin/rcvboxdrv setup' as root");
 +                                  "reason. Install the kernel module by executing "
 +                                  "'yum install kmod-VirtualBox-$(uname -r) kmod-VirtualBox' as root");
  #else

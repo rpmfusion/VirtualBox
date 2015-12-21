@@ -4,10 +4,10 @@
 # -Wall        -- VirtualBox takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
 # -fexceptions -- R0 code doesn't link against C++ library, no __gxx_personality_v0
-#global optflags %(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
+#global optflags %%(rpm --eval %%optflags |sed 's/-Wall//;s/-m[0-9][0-9]//;s/-fexceptions//')
 # fix for error: code model kernel does not support PIC mode
-#global optflags %(echo %{optflags} -fno-pic)
-#global optflags %(echo %{optflags} | sed 's/-specs=.*cc1 //')
+#global optflags %%(echo %%{optflags} -fno-pic)
+#global optflags %%(echo %%{optflags} | sed 's/-specs=.*cc1 //')
 
 
 # In prerelease builds (such as betas), this package has the same
@@ -22,7 +22,7 @@
 %global enable_vnc 1
 
 Name:       VirtualBox
-Version:    5.0.10
+Version:    5.0.12
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -38,7 +38,7 @@ Source8:    VirtualBox-vboxresize.desktop
 Source10:   vboxweb.service
 Source11:   vboxservice.service
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
-Patch2:     VirtualBox-4.3.20-strings.patch
+Patch2:     VirtualBox-5.0.12-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.3.10-xserver_guest.patch
@@ -203,7 +203,7 @@ rm -r src/VBox/Additions/x11/x11stubs
 rm -r src/VBox/GuestHost/OpenGL/include/GL
 #rm -rf src/libs/liblzf-3.4/
 rm -r src/libs/libxml2-2.9.2/
-rm -r src/libs/libpng-1.2.53/
+rm -r src/libs/libpng-1.2.*/
 rm -r src/libs/zlib-1.2.8/
 
 %patch1 -p1 -b .noupdates
@@ -618,6 +618,11 @@ fi
 
 
 %changelog
+* Mon Dec 21 2015 Sérgio Basto <sergio@serjux.com> - 5.0.12-1
+- Update VirtualBox to 5.0.12
+- Silent warning: Macro expanded in comment.
+- Fix VirtualBox-4.3.0-no-bundles.patch and VirtualBox-5.0.12-strings.patch
+
 * Thu Nov 12 2015 Sérgio Basto <sergio@serjux.com> - 5.0.10-1
 - Update VirtualBox to 5.0.10
 
