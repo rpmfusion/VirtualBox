@@ -22,7 +22,7 @@
 %global enable_vnc 1
 
 Name:       VirtualBox
-Version:    5.0.12
+Version:    5.0.14
 Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -618,6 +618,9 @@ fi
 
 
 %changelog
+* Wed Jan 20 2016 Sérgio Basto <sergio@serjux.com> - 5.0.14-1
+- Update VirtualBox to 5.0.14
+
 * Mon Dec 21 2015 Sérgio Basto <sergio@serjux.com> - 5.0.12-1
 - Update VirtualBox to 5.0.12
 - Silent warning: Macro expanded in comment.
