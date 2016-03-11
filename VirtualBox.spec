@@ -17,13 +17,13 @@
 #global prerel RC4
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%global enable_webservice 1
-%global enable_docs 1
-%global enable_vnc 1
+%bcond_without webservice
+%bcond_without docs
+%bcond_without vnc
 
 Name:       VirtualBox
-Version:    5.0.14
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Version:    5.0.16
+Release:    2%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -44,9 +44,16 @@ Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.3.10-xserver_guest.patch
 Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
-Patch27:    VirtualBox-4.3.26-gcc.patch
+Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
+# Upstream patch and I also added some fixes for gcc6
+# just apply to Fedora 24+
+Patch29:    changeset_trunk_59273.diff
+Patch30:    changeset_trunk_59959.diff
+Patch31:    changeset_trunk_59960.diff
+Patch32:    VirtualBox-gcc6-fixes.patch
+
 
 BuildRequires:  kBuild >= 0.1.9998
 BuildRequires:  SDL-devel xalan-c-devel
@@ -59,13 +66,13 @@ BuildRequires:  python-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
 BuildRequires:  qt4-devel
-%if %{enable_webservice}
+%if %{with webservice}
 BuildRequires:  gsoap-devel
 %endif
 BuildRequires:  pam-devel
 BuildRequires:  mkisofs
 BuildRequires:  java-devel >= 1.6
-%if %{enable_docs}
+%if %{with docs}
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  docbook-dtds
 %if 0%{?fedora} >= 18
@@ -105,7 +112,7 @@ BuildRequires:  xorg-x11-server-devel
 BuildRequires:  libXcursor-devel
 BuildRequires:  libXcomposite-devel
 BuildRequires:  libXmu-devel
-%if %{enable_vnc}
+%if %{with vnc}
 BuildRequires:  libvncserver-devel
 %endif
 
@@ -212,26 +219,32 @@ rm -r src/libs/zlib-1.2.8/
 %if 0%{?fedora} < 16
 %patch22 -p1 -b .gsoap
 %endif
-%if 0%{?fedora} > 20
-%patch28 -p1 -b .gsoap2
-%endif
 %patch23 -p1 -b .xserver_guest
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
-#patch27 -p2 -b .gcc
+%patch27 -p1 -b .gcc
+%if 0%{?fedora} > 20
+%patch28 -p1 -b .gsoap2
+%endif
+%if 0%{?fedora} > 23
+%patch29 -p1 -b .gcc6
+%patch30 -p1 -b .gcc6
+%patch31 -p1 -b .gcc6
+%patch32 -p1 -b .gcc6
+%endif
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
 
 %build
 ./configure --disable-kmods \
-%if %{enable_webservice}
+%if %{with webservice}
   --enable-webservice \
 %endif
-%if %{enable_vnc}
+%if %{with vnc}
   --enable-vnc \
 %endif
-%if !%{enable_docs}
+%if !%{with docs}
   --disable-docs \
 %endif
 
@@ -294,7 +307,7 @@ ln -s VBox %{buildroot}%{_bindir}/vboxautostart
 ln -s VBox %{buildroot}%{_bindir}/VBoxDTrace
 ln -s VBox %{buildroot}%{_bindir}/vboxdtrace
 ln -s %{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
-%if %{enable_webservice}
+%if %{with webservice}
 ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
 %endif
 
@@ -338,7 +351,7 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/vboxshell.py    \
     obj/bin/vbox-img    \
     obj/bin/VBoxDTrace    \
-%if %{enable_webservice}
+%if %{with webservice}
     obj/bin/vboxwebsrv  \
     obj/bin/webtest     \
 %endif
@@ -395,7 +408,7 @@ install -m 0755 -t %{buildroot}%{_bindir}    \
     obj/bin/additions/VBoxClient        \
     obj/bin/additions/VBoxControl
 
-%if %{enable_webservice}
+%if %{with webservice}
 install -m 0644 -D %{SOURCE10} \
     %{buildroot}%{_unitdir}/vboxweb.service
 %endif
@@ -454,7 +467,7 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
 # Group for USB devices
 getent group vboxusers >/dev/null || groupadd -r vboxusers
 
-%if %{enable_webservice}
+%if %{with webservice}
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 %endif
 
@@ -534,7 +547,7 @@ fi
 %{_bindir}/VBoxDTrace
 %{_bindir}/vboxdtrace
 %{_bindir}/vbox-img
-%if %{enable_webservice}
+%if %{with webservice}
 %{_bindir}/vboxwebsrv
 %endif
 %{_bindir}/VBoxVRDP
@@ -558,7 +571,7 @@ fi
 %{_libdir}/virtualbox/VBoxVolInfo
 %{_libdir}/virtualbox/VBoxDTrace
 %{_libdir}/virtualbox/vbox-img
-%if %{enable_webservice}
+%if %{with webservice}
 %{_libdir}/virtualbox/vboxwebsrv
 %{_libdir}/virtualbox/webtest
 %endif
@@ -577,10 +590,10 @@ fi
 %{_prefix}/lib/modules-load.d/%{name}.conf
 %doc COPYING*
 %doc doc/*.*
-%if %{enable_docs}
+%if %{with docs}
 %doc obj/bin/UserManual*.pdf
 %endif
-%if %{enable_webservice}
+%if %{with webservice}
 %{_unitdir}/vboxweb.service
 %endif
 %{_prefix}/lib/udev/VBoxCreateUSBNode.sh
@@ -618,6 +631,16 @@ fi
 
 
 %changelog
+* Fri Mar 11 2016 Sérgio Basto <sergio@serjux.com>- 5.0.16-2
+- Add GCC6 fixes to compile on F24, still doesn't build on rawhide because glibc
+https://www.virtualbox.org/ticket/15205#comment:8
+- Use bcond_with and bcond_without macros (see details and how it works on
+  /lib/rpm/macros)
+- Update help strings to use dnf and akmods.
+
+* Fri Mar 04 2016 Sérgio Basto <sergio@serjux.com> - 5.0.16-1
+- Update VirtualBox to 5.0.16
+
 * Wed Jan 20 2016 Sérgio Basto <sergio@serjux.com> - 5.0.14-1
 - Update VirtualBox to 5.0.14
 
