@@ -1,0 +1,34 @@
+Index: trunk/src/VBox/Runtime/r3/alloc-ef-cpp.cpp
+===================================================================
+--- trunk/src/VBox/Runtime/r3/alloc-ef-cpp.cpp	(revision 57434)
++++ trunk/src/VBox/Runtime/r3/alloc-ef-cpp.cpp	(revision 59273)
+@@ -95,4 +95,14 @@
+ 
+ 
++#ifdef __cpp_sized_deallocation
++void RT_EF_CDECL operator delete(void *pv, RT_EF_SIZE_T cb) RT_EF_NOTHROW
++{
++    NOREF(cb);
++    AssertMsgFailed(("cb ignored!\n"));
++    rtR3MemFree("delete", RTMEMTYPE_DELETE, pv, ASMReturnAddress(), NULL, 0, NULL);
++}
++#endif
++
++
+ void RT_EF_CDECL operator delete(void * pv, const std::nothrow_t &) RT_EF_NOTHROW
+ {
+@@ -131,4 +141,14 @@
+ 
+ 
++#ifdef __cpp_sized_deallocation
++void RT_EF_CDECL operator delete[](void * pv, RT_EF_SIZE_T cb) RT_EF_NOTHROW
++{
++    NOREF(cb);
++    AssertMsgFailed(("cb ignored!\n"));
++    rtR3MemFree("delete[]", RTMEMTYPE_DELETE_ARRAY, pv, ASMReturnAddress(), NULL, 0, NULL);
++}
++#endif
++
++
+ void RT_EF_CDECL operator delete[](void *pv, const std::nothrow_t &) RT_EF_NOTHROW
+ {

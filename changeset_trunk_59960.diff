@@ -1,0 +1,16 @@
+Index: trunk/src/VBox/Main/src-server/linux/HostHardwareLinux.cpp
+===================================================================
+--- trunk/src/VBox/Main/src-server/linux/HostHardwareLinux.cpp	(revision 58046)
++++ trunk/src/VBox/Main/src-server/linux/HostHardwareLinux.cpp	(revision 59960)
+@@ -1147,5 +1147,10 @@
+     if (cchRead == 0)
+         return VINF_SUCCESS;
+-    if (cchRead < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
++    if (   cchRead < 0
++        && (   errno == EAGAIN
++#if EAGAIN != EWOULDBLOCK
++            || errno == EWOULDBLOCK
++#endif
++            ))
+         return VINF_SUCCESS;
+     Assert(errno > 0);

@@ -19,11 +19,12 @@
 
 %bcond_without webservice
 %bcond_without docs
-%bcond_without vnc
+%bcond_with vnc
 
 Name:       VirtualBox
 Version:    5.0.16
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+#Release:    3%%{?prerel:.%%{prerel}}%%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -34,7 +35,6 @@ Source3:    VirtualBox-90-vboxdrv.rules
 Source5:    VirtualBox-60-vboxguest.rules
 Source6:    VirtualBox.modules
 Source7:    VirtualBox-guest.modules
-Source8:    VirtualBox-vboxresize.desktop
 Source10:   vboxweb.service
 Source11:   vboxservice.service
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
@@ -53,7 +53,6 @@ Patch29:    changeset_trunk_59273.diff
 Patch30:    changeset_trunk_59959.diff
 Patch31:    changeset_trunk_59960.diff
 Patch32:    VirtualBox-gcc6-fixes.patch
-
 
 BuildRequires:  kBuild >= 0.1.9998
 BuildRequires:  SDL-devel xalan-c-devel
@@ -106,6 +105,7 @@ BuildRequires:  libdrm-devel
 BuildRequires:  libpciaccess-devel
 BuildRequires:  mesa-libGL-devel
 BuildRequires:  mesa-libOSMesa-devel
+BuildRequires:  mesa-libEGL-devel
 BuildRequires:  pixman-devel
 BuildRequires:  xorg-x11-proto-devel
 BuildRequires:  xorg-x11-server-devel
@@ -206,8 +206,13 @@ mv src/VBox/Additions/x11/x11include/mesa-7.2 .
 rm -r src/VBox/Additions/x11/x11include/*
 mv mesa-7.2 src/VBox/Additions/x11/x11include/
 
+#rm include/VBox/HostServices/glext.h
+#rm include/VBox/HostServices/glxext.h
+#rm include/VBox/HostServices/wglext.h
+
 rm -r src/VBox/Additions/x11/x11stubs
-rm -r src/VBox/GuestHost/OpenGL/include/GL
+#rm -r src/VBox/GuestHost/OpenGL/include/GL
+
 #rm -rf src/libs/liblzf-3.4/
 rm -r src/libs/libxml2-2.9.2/
 rm -r src/libs/libpng-1.2.*/
@@ -289,63 +294,39 @@ install -d %{buildroot}%{_datadir}/icons
 install -d %{buildroot}%{_prefix}/src/%{name}-kmod-%{version}
 install -d %{buildroot}%{python_sitelib}/virtualbox
 
-# Binaries and Wrapper with Launchers
-install -p -m 0755 obj/bin/VBox.sh %{buildroot}%{_bindir}/VBox
-ln -s VBox %{buildroot}%{_bindir}/VirtualBox
-ln -s VBox %{buildroot}%{_bindir}/virtualbox
-ln -s VBox %{buildroot}%{_bindir}/VBoxManage
-ln -s VBox %{buildroot}%{_bindir}/vboxmanage
-ln -s VBox %{buildroot}%{_bindir}/VBoxSDL
-ln -s VBox %{buildroot}%{_bindir}/vboxsdl
-ln -s VBox %{buildroot}%{_bindir}/VBoxVRDP
-ln -s VBox %{buildroot}%{_bindir}/VBoxHeadless
-ln -s VBox %{buildroot}%{_bindir}/vboxheadless
-ln -s VBox %{buildroot}%{_bindir}/VBoxBalloonCtrl
-ln -s VBox %{buildroot}%{_bindir}/vboxballoonctrl
-ln -s VBox %{buildroot}%{_bindir}/VBoxAutostart
-ln -s VBox %{buildroot}%{_bindir}/vboxautostart
-ln -s VBox %{buildroot}%{_bindir}/VBoxDTrace
-ln -s VBox %{buildroot}%{_bindir}/vboxdtrace
-ln -s %{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
-%if %{with webservice}
-ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
-%endif
-
-install -p -m 0755 -t %{buildroot}%{_bindir} \
-    obj/bin/VBoxTunctl
-
-# Components
-install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/components \
-    obj/bin/components/*
-
-# Lib
+# Libs
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/*.so
 
 install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox \
-    obj/bin/V*.rc       \
-    obj/bin/V*.r0       \
-    obj/bin/VBoxEFI*.fd
+    obj/bin/VBoxEFI*.fd \
+    obj/bin/*.rc        \
+    obj/bin/*.r0
+
+# Binaries
+install -p -m 0755 obj/bin/VBox.sh %{buildroot}%{_bindir}/VBox
+install -p -m 0755 -t %{buildroot}%{_bindir} \
+    obj/bin/VBoxTunctl
 
 # Executables
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
+    obj/bin/VirtualBox  \
+    obj/bin/VBoxHeadless    \
+    obj/bin/VBoxNetDHCP \
+    obj/bin/VBoxNetNAT \
+    obj/bin/VBoxNetAdpCtl   \
+    obj/bin/VBoxVolInfo \
+    obj/bin/VBoxSDL     \
     obj/bin/SUPInstall \
     obj/bin/SUPLoggerCtl \
     obj/bin/SUPUninstall \
-    obj/bin/VirtualBox  \
     obj/bin/VBoxAutostart \
     obj/bin/VBoxBalloonCtrl \
     obj/bin/VBoxExtPackHelperApp \
-    obj/bin/VBoxHeadless    \
     obj/bin/VBoxManage  \
-    obj/bin/VBoxNetAdpCtl   \
-    obj/bin/VBoxNetDHCP \
-    obj/bin/VBoxNetNAT \
-    obj/bin/VBoxSDL     \
     obj/bin/VBoxSVC     \
     obj/bin/VBoxTestOGL \
     obj/bin/VBoxVMMPreload \
-    obj/bin/VBoxVolInfo \
     obj/bin/VBoxXPCOMIPCD   \
     obj/bin/VBoxSysInfo.sh  \
     obj/bin/vboxshell.py    \
@@ -356,7 +337,29 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/webtest     \
 %endif
 
-install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh %{buildroot}%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
+# Wrapper with Launchers
+ln -s VBox %{buildroot}%{_bindir}/VirtualBox
+ln -s VBox %{buildroot}%{_bindir}/virtualbox
+ln -s VBox %{buildroot}%{_bindir}/VBoxManage
+ln -s VBox %{buildroot}%{_bindir}/vboxmanage
+ln -s VBox %{buildroot}%{_bindir}/VBoxSDL
+ln -s VBox %{buildroot}%{_bindir}/vboxsdl
+ln -s VBox %{buildroot}%{_bindir}/VBoxVRDP
+ln -s VBox %{buildroot}%{_bindir}/VBoxHeadless
+ln -s VBox %{buildroot}%{_bindir}/vboxheadless
+ln -s VBox %{buildroot}%{_bindir}/VBoxDTrace
+ln -s VBox %{buildroot}%{_bindir}/vboxdtrace
+ln -s VBox %{buildroot}%{_bindir}/VBoxBalloonCtrl
+ln -s VBox %{buildroot}%{_bindir}/vboxballoonctrl
+ln -s VBox %{buildroot}%{_bindir}/VBoxAutostart
+ln -s VBox %{buildroot}%{_bindir}/vboxautostart
+%if %{with webservice}
+ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
+%endif
+ln -s %{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
+
+# Components , preserve symlinks
+cp -a obj/bin/components/* %{buildroot}%{_libdir}/virtualbox/components/
 
 # Language files
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
@@ -408,48 +411,14 @@ install -m 0755 -t %{buildroot}%{_bindir}    \
     obj/bin/additions/VBoxClient        \
     obj/bin/additions/VBoxControl
 
-%if %{with webservice}
-install -m 0644 -D %{SOURCE10} \
-    %{buildroot}%{_unitdir}/vboxweb.service
-%endif
-
-install -m 0644 -D %{SOURCE11} \
-    %{buildroot}%{_unitdir}/vboxservice.service
-
-#review this 3
-install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
-    %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
-
-#/usr/bin/VBoxClient-all does not exits
-#install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
-#    %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
-#desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
-
-install -m 0644 -D %{SOURCE8} \
-    %{buildroot}%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
-desktop-file-validate %{buildroot}%{_datadir}/gdm/autostart/LoginWindow/vbox-autoresize.desktop
-
 # Guest libraries
-install -d %{buildroot}%{_libdir}/dri
 install -m 0755 -t %{buildroot}%{_libdir}    \
-    obj/bin/additions/VBoxOGL*.so
+    obj/bin/additions/VBox*.so
+install -d %{buildroot}%{_libdir}/dri
 ln -sf ../VBoxOGL.so %{buildroot}%{_libdir}/dri/vboxvideo_dri.so
-
 install -d %{buildroot}%{_libdir}/security
 install -m 0755 -t %{buildroot}%{_libdir}/security \
     obj/bin/additions/pam_vbox.so
-
-# Installation root configuration
-install -d %{buildroot}%{_sysconfdir}/vbox
-echo 'INSTALL_DIR=%{_libdir}/virtualbox' > %{buildroot}%{_sysconfdir}/vbox/vbox.cfg
-
-# Install udev rules
-install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_prefix}/lib/udev/rules.d/90-vboxdrv.rules
-install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_prefix}/lib/udev/rules.d/60-vboxguest.rules
-
-# Install modules load script
-install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}.conf
-install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
@@ -458,10 +427,51 @@ install -d %{buildroot}%{_datadir}/%{name}-kmod-%{version}
 tar --use-compress-program xz -cf %{buildroot}%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.xz \
     %{name}-kmod-%{version}
 
+%if %{with webservice}
+install -m 0644 -D %{SOURCE10} \
+    %{buildroot}%{_unitdir}/vboxweb.service
+%endif
+
+install -m 0644 -D %{SOURCE11} \
+    %{buildroot}%{_unitdir}/vboxservice.service
+
+#review this 2
+install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
+    %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
+#/usr/bin/VBoxClient-all does not exits
+#install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
+#    %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+#desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+
+# Installation root configuration
+install -d %{buildroot}%{_sysconfdir}/vbox
+echo 'INSTALL_DIR=%{_libdir}/virtualbox' > %{buildroot}%{_sysconfdir}/vbox/vbox.cfg
+
+# Install udev rules
+install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh %{buildroot}%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
+install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_prefix}/lib/udev/rules.d/90-vboxdrv.rules
+install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_prefix}/lib/udev/rules.d/60-vboxguest.rules
+
+# Install modules load script
+install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}.conf
+install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
+
 # Menu entry
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
     --remove-key=DocPath --remove-category=X-MandrivaLinux-System \
     --vendor='' obj/bin/virtualbox.desktop
+
+# to review:
+#if [ -d ExtensionPacks/VNC ]; then
+#  install -m 755 -d $RPM_BUILD_ROOT/usr/lib/virtualbox/ExtensionPacks
+#  mv ExtensionPacks/VNC $RPM_BUILD_ROOT/usr/lib/virtualbox/ExtensionPacks
+#fi
+#set_selinux_permissions /usr/lib/virtualbox /usr/share/virtualbox
+#for i in rdesktop-vrdp.tar.gz rdesktop-vrdp-keymaps; do
+#    mv $i $RPM_BUILD_ROOT/usr/share/virtualbox; done
+#mv rdesktop-vrdp $RPM_BUILD_ROOT/usr/bin
+#
+# vboxautostart-service
 
 %post
 # Group for USB devices
@@ -530,6 +540,11 @@ fi
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
 %files
+%doc doc/
+%if %{with docs}
+%doc obj/bin/UserManual*.pdf
+%endif
+%license COPYING*
 %{_bindir}/VBox
 %{_bindir}/vboxballoonctrl
 %{_bindir}/VBoxBalloonCtrl
@@ -566,20 +581,20 @@ fi
 %{_libdir}/virtualbox/SUPLoggerCtl
 %{_libdir}/virtualbox/SUPUninstall
 %{_libdir}/virtualbox/VBoxAutostart
-%{_libdir}/virtualbox/VBoxNetNAT
 %{_libdir}/virtualbox/VBoxVMMPreload
-%{_libdir}/virtualbox/VBoxVolInfo
 %{_libdir}/virtualbox/VBoxDTrace
 %{_libdir}/virtualbox/vbox-img
 %if %{with webservice}
 %{_libdir}/virtualbox/vboxwebsrv
 %{_libdir}/virtualbox/webtest
 %endif
-%attr(4755,root,root) %{_libdir}/virtualbox/VBoxHeadless
-%attr(4755,root,root) %{_libdir}/virtualbox/VBoxSDL
-%attr(4755,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
-%attr(4755,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
-%attr(4755,root,root) %{_libdir}/virtualbox/VirtualBox
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetNAT
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxVolInfo
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxHeadless
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxSDL
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
+%attr(4511,root,root) %{_libdir}/virtualbox/VirtualBox
 %{_datadir}/pixmaps/*
 %{_datadir}/icons/*
 %{_datadir}/mime/*
@@ -588,11 +603,6 @@ fi
 %config %{_sysconfdir}/vbox/vbox.cfg
 %{_prefix}/lib/udev/rules.d/90-vboxdrv.rules
 %{_prefix}/lib/modules-load.d/%{name}.conf
-%doc COPYING*
-%doc doc/*.*
-%if %{with docs}
-%doc obj/bin/UserManual*.pdf
-%endif
 %if %{with webservice}
 %{_unitdir}/vboxweb.service
 %endif
@@ -609,20 +619,19 @@ fi
 
 
 %files guest
-%{_libdir}/security/pam_vbox.so
+%license COPYING*
 %{_sbindir}/mount.vboxsf
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
 %{_bindir}/VBoxService
+%{_libdir}/security/pam_vbox.so
 %{_libdir}/xorg/modules/drivers/*
 %{_libdir}/dri/*
-%{_libdir}/VBoxOGL*.so
+%{_libdir}/VBox*.so
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 #{_sysconfdir}/xdg/autostart/vboxclient.desktop
-%exclude %{_datadir}/gdm
 %{_prefix}/lib/udev/rules.d/60-vboxguest.rules
 %{_prefix}/lib/modules-load.d/%{name}-guest.conf
-#doc COPYING
 %{_unitdir}/vboxservice.service
 
 
@@ -631,6 +640,13 @@ fi
 
 
 %changelog
+* Sat Mar 12 2016 Sérgio Basto <sergio@serjux.com> - 5.0.16-3
+- Package review with upstream RPM, better organization.
+- Delete source8 not in use since 2009.
+- Fix some errors: VBoxNetNAT permissions, preserve components symlinks
+- vnc don't have snippet to install, disable it (to fix later).
+- Add notes to add service vboxautostart and to install rdesktop-vrdp.
+
 * Fri Mar 11 2016 Sérgio Basto <sergio@serjux.com>- 5.0.16-2
 - Add GCC6 fixes to compile on F24, still doesn't build on rawhide because glibc
 https://www.virtualbox.org/ticket/15205#comment:8
