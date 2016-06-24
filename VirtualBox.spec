@@ -1,5 +1,3 @@
-%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
-
 # Standard compiler flags, without:
 # -Wall        -- VirtualBox takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
@@ -9,22 +7,26 @@
 #global optflags %%(echo %%{optflags} -fno-pic)
 #global optflags %%(echo %%{optflags} | sed 's/-specs=.*cc1 //')
 
-
 # In prerelease builds (such as betas), this package has the same
 # major version number, while the kernel module abi is not guarranteed
 # to be stable. This is so that we force the module update in sync with
 # userspace.
-#global prerel RC4
-%global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
+#global prerel 106108
+%global prereltag %{?prerel:-%(awk 'BEGIN {print toupper("%{prerel}")}')}
+%global __arch_install_post   /usr/lib/rpm/check-rpaths /usr/lib/rpm/check-buildroot
 
 %bcond_without webservice
-%bcond_without docs
+%if 0%{?rhel} 
+    %bcond_with docs
+%else
+    %bcond_without docs
+%endif
 %bcond_with vnc
 
 Name:       VirtualBox
-Version:    5.0.16
-#Release:    3%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    3%{?dist}
+Version:    5.0.22
+#Release:    6%%{?prerel:.%%{prerel}}%%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -48,11 +50,12 @@ Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
 # Upstream patch and I also added some fixes for gcc6
-# just apply to Fedora 24+
-Patch29:    changeset_trunk_59273.diff
 Patch30:    changeset_trunk_59959.diff
 Patch31:    changeset_trunk_59960.diff
-Patch32:    VirtualBox-gcc6-fixes.patch
+# just applied to Fedora 24+
+Patch33:    VirtualBox-gcc6-fixes.patch
+Patch34:    VirtualBox-5.0.16-glibc.patch
+
 
 BuildRequires:  kBuild >= 0.1.9998
 BuildRequires:  SDL-devel xalan-c-devel
@@ -61,7 +64,7 @@ BuildRequires:  libcurl-devel
 BuildRequires:  iasl libxslt-devel xerces-c-devel libIDL-devel
 BuildRequires:  yasm
 BuildRequires:  pulseaudio-libs-devel
-BuildRequires:  python-devel
+BuildRequires:  python2-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
 BuildRequires:  qt4-devel
@@ -74,14 +77,12 @@ BuildRequires:  java-devel >= 1.6
 %if %{with docs}
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  docbook-dtds
-%if 0%{?fedora} >= 18
 BuildRequires:  doxygen-latex
 BuildRequires:  texlive-collection-fontsrecommended
 BuildRequires:  texlive-ec
 BuildRequires:  texlive-ucs
 BuildRequires:  texlive-tabulary
 BuildRequires:  texlive-fancybox
-%endif
 %endif
 BuildRequires:  boost-devel
 #BuildRequires:  liblzf-devel
@@ -116,10 +117,7 @@ BuildRequires:  libXmu-devel
 BuildRequires:  libvncserver-devel
 %endif
 
-BuildRequires: systemd-units
-Requires(post): systemd-units
-Requires(preun): systemd-units
-Requires(postun): systemd-units
+BuildRequires: systemd
 
 # Plague-specific weirdness
 %if 0%{?fedora} > 11 || 0%{?rhel} > 5
@@ -152,21 +150,22 @@ Requires:   python-%{name} = %{version}-%{release}
 %package -n python-%{name}
 Summary:    Python bindings for %{name}
 Group:      Development/Libraries
-Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python2-%{srcname}}
 
 %description -n python-%{name}
 Python XPCOM bindings to %{name}.
 
 
-%package guest
+%package guest-additions
 Summary:    %{name} Guest Additions
 Group:      System Environment/Base
 Requires:   %{name}-kmod = %{version}
 Provides:   %{name}-kmod-common = %{version}-%{release}
 Requires:   xorg-x11-server-Xorg
 Requires:   xorg-x11-xinit
-Provides:   xorg-x11-drv-VirtualBox = %{version}-%{release}
-Obsoletes:  xorg-x11-drv-VirtualBox < %{version}-%{release}
+Provides:   %{name}-guest = %{version}-%{release}
+Obsoletes:  %{name}-guest < %{version}-%{release}
 %if "%(xserver-sdk-abi-requires 2>/dev/null)"
 Requires:   %(xserver-sdk-abi-requires ansic)
 Requires:   %(xserver-sdk-abi-requires videodrv)
@@ -175,7 +174,7 @@ Requires:   %(xserver-sdk-abi-requires xinput)
 Conflicts:  %{name} <= %{version}-%{release}
 
 
-%description guest
+%description guest-additions
 Important note: VirtualBox-guest can't be installed on Host (master) system because
 contains X11 and OpenGL drives that will mess up with your X11 configurations.
 This subpackage replace Oracle Linux Guest Addition but just for Fedora,
@@ -195,23 +194,20 @@ which is generated during the build of main package.
 
 
 %prep
-%setup -qn %{name}-%{version}%{prereltag}
+%setup -q
 find -name '*.py[co]' -delete
 
 # Remove prebuilt binary tools
 rm -r kBuild/
 rm -r tools/
 # Remove bundle X11 sources and some lib sources, before patching.
-mv src/VBox/Additions/x11/x11include/mesa-7.2 .
-rm -r src/VBox/Additions/x11/x11include/*
-mv mesa-7.2 src/VBox/Additions/x11/x11include/
+rm -r src/VBox/Additions/x11/x11include/
+rm -r src/VBox/Additions/x11/x11stubs/
+#rm -r src/VBox/GuestHost/OpenGL/include/GL
 
 #rm include/VBox/HostServices/glext.h
 #rm include/VBox/HostServices/glxext.h
 #rm include/VBox/HostServices/wglext.h
-
-rm -r src/VBox/Additions/x11/x11stubs
-#rm -r src/VBox/GuestHost/OpenGL/include/GL
 
 #rm -rf src/libs/liblzf-3.4/
 rm -r src/libs/libxml2-2.9.2/
@@ -227,15 +223,17 @@ rm -r src/libs/zlib-1.2.8/
 %patch23 -p1 -b .xserver_guest
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
-%patch27 -p1 -b .gcc
+#patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
-%if 0%{?fedora} > 23
-%patch29 -p1 -b .gcc6
 %patch30 -p1 -b .gcc6
 %patch31 -p1 -b .gcc6
-%patch32 -p1 -b .gcc6
+%if 0%{?fedora} > 23
+%patch33 -p1 -b .gcc6
+%endif
+%if 0%{?fedora} > 24
+%patch34 -p1 -b .glibc
 %endif
 
 # CRLF->LF
@@ -258,6 +256,10 @@ sed -i 's/\r//' COPYING
 #--disable-xpcom
 . ./env.sh
 
+#TODO fix publisher in copr
+%global publisher _%{?vendor:%(echo "%{vendor}" | \ 
+     sed -e 's/[^[:alnum:]]//g; s/FedoraProject//' | cut -c -9)}%{?!vendor:custom}
+
 # VirtualBox build system installs and builds in the same step,
 # not allways looking for the installed files to places they have
 # really been installed to. Therefore we do not override any of
@@ -266,13 +268,22 @@ sed -i 's/\r//' COPYING
 kmk %{_smp_mflags} \
     KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_OUT="$PWD/obj"      \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox         \
-    VBOX_WITH_TESTCASES= VBOX_WITH_VALIDATIONKIT= VBOX_WITH_VBOX_IMG=1 \
+    VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox        \
+    VBOX_WITH_TESTCASES= \
+    VBOX_WITH_VALIDATIONKIT= \
+    VBOX_WITH_VBOX_IMG=1 \
     VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
+%if %{with docs}
+    VBOX_WITH_DOCS=1 \
+%endif
     VBOX_PATH_DOCBOOK_DTD=/usr/share/sgml/docbook/xml-dtd-4.5/ \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
-    VBOX_BUILD_PUBLISHER=_%{?vendor:%(echo %{vendor} \
-    | sed -e 's/ //g' | cut -c 1-9)}%{?!vendor:custom}
+    VBOX_BUILD_PUBLISHER=%{publisher}
+
+#    VBOX_WITH_DOCS_CHM=1 \
+#VBOX_WITH_DOCS_TRANSLATIONS=1
+#VBOX_WITH_LIGHTDM_GREETER=1 \
 
 
 %install
@@ -292,7 +303,7 @@ install -d %{buildroot}%{_datadir}/pixmaps
 install -d %{buildroot}%{_datadir}/mime/packages
 install -d %{buildroot}%{_datadir}/icons
 install -d %{buildroot}%{_prefix}/src/%{name}-kmod-%{version}
-install -d %{buildroot}%{python_sitelib}/virtualbox
+install -d %{buildroot}%{python2_sitelib}/virtualbox
 
 # Libs
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
@@ -356,7 +367,7 @@ ln -s VBox %{buildroot}%{_bindir}/vboxautostart
 %if %{with webservice}
 ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
 %endif
-ln -s %{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
+ln -s ../../%{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
 
 # Components , preserve symlinks
 cp -a obj/bin/components/* %{buildroot}%{_libdir}/virtualbox/components/
@@ -399,26 +410,39 @@ install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 #
 # [1] https://www.virtualbox.org/changeset/43588/vbox
 
-install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
-    %{buildroot}%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
+#install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
+#    %{buildroot}%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
 # Guest tools
 install -m 0755 -t %{buildroot}%{_sbindir}   \
+    obj/bin/additions/VBoxService       \
     obj/bin/additions/mount.vboxsf
 
 install -m 0755 -t %{buildroot}%{_bindir}    \
-    obj/bin/additions/VBoxService       \
     obj/bin/additions/VBoxClient        \
     obj/bin/additions/VBoxControl
+
+install -m 0644 -D %{SOURCE11} \
+    %{buildroot}%{_unitdir}/vboxservice.service
 
 # Guest libraries
 install -m 0755 -t %{buildroot}%{_libdir}    \
     obj/bin/additions/VBox*.so
-install -d %{buildroot}%{_libdir}/dri
-ln -sf ../VBoxOGL.so %{buildroot}%{_libdir}/dri/vboxvideo_dri.so
+# New guest additions dropped vboxvideo_dri.so
+#install -d %{buildroot}%{_libdir}/dri
+#ln -sf ../VBoxOGL.so %{buildroot}%{_libdir}/dri/vboxvideo_dri.so
 install -d %{buildroot}%{_libdir}/security
 install -m 0755 -t %{buildroot}%{_libdir}/security \
     obj/bin/additions/pam_vbox.so
+
+# init/vboxadd-x11 code near call the function install_x11_startup_app 
+install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
+    %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
+ln -s ../..%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh \
+    %{buildroot}%{_bindir}/VBoxClient-all
+install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
+    %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
@@ -432,25 +456,14 @@ install -m 0644 -D %{SOURCE10} \
     %{buildroot}%{_unitdir}/vboxweb.service
 %endif
 
-install -m 0644 -D %{SOURCE11} \
-    %{buildroot}%{_unitdir}/vboxservice.service
-
-#review this 2
-install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
-    %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
-#/usr/bin/VBoxClient-all does not exits
-#install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
-#    %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
-#desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
-
 # Installation root configuration
 install -d %{buildroot}%{_sysconfdir}/vbox
 echo 'INSTALL_DIR=%{_libdir}/virtualbox' > %{buildroot}%{_sysconfdir}/vbox/vbox.cfg
 
 # Install udev rules
 install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh %{buildroot}%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
-install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_prefix}/lib/udev/rules.d/90-vboxdrv.rules
-install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_prefix}/lib/udev/rules.d/60-vboxguest.rules
+install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_udevrulesdir}/90-vboxdrv.rules
+install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_udevrulesdir}/60-vboxguest.rules
 
 # Install modules load script
 install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}.conf
@@ -458,8 +471,7 @@ install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_prefix}/lib/modules-load.d/%{nam
 
 # Menu entry
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
-    --remove-key=DocPath --remove-category=X-MandrivaLinux-System \
-    --vendor='' obj/bin/virtualbox.desktop
+    --remove-key=DocPath --vendor='' obj/bin/virtualbox.desktop
 
 # to review:
 #if [ -d ExtensionPacks/VNC ]; then
@@ -520,27 +532,53 @@ fi
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 # Guest additions install
-%post guest
+%post guest-additions
 /sbin/ldconfig
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 # should be in kmod package, not here
 /bin/systemctl restart systemd-modules-load.service >/dev/null 2>&1 || :
 /bin/systemctl enable vboxservice.service >/dev/null 2>&1 || :
 /bin/systemctl restart vboxservice.service >/dev/null 2>&1 || :
+## This is the LSB version of useradd and should work on recent
+## distributions
+#useradd -d /var/run/vboxadd -g 1 -r -s /bin/false vboxadd >/dev/null 2>&1
+## And for the others, we choose a UID ourselves
+#useradd -d /var/run/vboxadd -g 1 -u 501 -o -s /bin/false vboxadd >/dev/null 2>&1
+#
+## Add a group "vboxsf" for Shared Folders access
+## All users which want to access the auto-mounted Shared Folders have to
+## be added to this group.
+#groupadd -r -f vboxsf >/dev/null 2>&1
+#echo "KERNEL=${udev_fix}\"vboxguest\", NAME=\"vboxguest\", OWNER=\"vboxadd\", MODE=\"0660\"" > /etc/udev/rules.d/60-vboxadd.rules
+#echo "KERNEL=${udev_fix}\"vboxuser\", NAME=\"vboxuser\", OWNER=\"vboxadd\", MODE=\"0666\"" >> /etc/udev/rules.d/60-vboxadd.rules
+#chcon -u system_u -t mount_exec_t "$lib_path/$PACKAGE/mount.vboxsf" > /dev/null 2>&1
+# for i in "$lib_path"/*.so
+# do
+#     restorecon "$i" >/dev/null
+# done
+# ;;
+#chcon -u system_u -t lib_t "$lib_dir"/*.so
 
-%preun guest
+# Our logging code generates some glue code on 32-bit systems.  At least F10
+# needs a rule to allow this.  Send all output to /dev/null in case this is
+# completely irrelevant on the target system.
+#chcon -t unconfined_execmem_exec_t '/usr/bin/VBoxClient' > /dev/null 2>&1
+#semanage fcontext -a -t unconfined_execmem_exec_t '/usr/bin/VBoxClient' > /dev/null 2>&1
+
+
+%preun guest-additions
 if [ $1 -eq 0 ] ; then
     # Package removal, not upgrade
     /bin/systemctl --no-reload disable vboxservice.service > /dev/null 2>&1 || :
     /bin/systemctl stop vboxservice.service > /dev/null 2>&1 || :
 fi
 
-%postun guest
+%postun guest-additions
 /sbin/ldconfig
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
 %files
-%doc doc/
+%doc doc/*cpp doc/VMM
 %if %{with docs}
 %doc obj/bin/UserManual*.pdf
 %endif
@@ -614,22 +652,22 @@ fi
 
 
 %files -n python-%{name}
-%{python_sitelib}/virtualbox
-%{python_sitelib}/vboxapi*
+%{python2_sitelib}/virtualbox
+%{python2_sitelib}/vboxapi*
 
 
-%files guest
+%files guest-additions
 %license COPYING*
-%{_sbindir}/mount.vboxsf
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
-%{_bindir}/VBoxService
+%{_bindir}/VBoxClient-all
+%{_sbindir}/VBoxService
+%{_sbindir}/mount.vboxsf
 %{_libdir}/security/pam_vbox.so
-%{_libdir}/xorg/modules/drivers/*
-%{_libdir}/dri/*
+#{_libdir}/xorg/modules/drivers/*
 %{_libdir}/VBox*.so
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
-#{_sysconfdir}/xdg/autostart/vboxclient.desktop
+%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %{_prefix}/lib/udev/rules.d/60-vboxguest.rules
 %{_prefix}/lib/modules-load.d/%{name}-guest.conf
 %{_unitdir}/vboxservice.service
@@ -638,8 +676,37 @@ fi
 %files kmodsrc
 %{_datadir}/%{name}-kmod-%{version}
 
-
 %changelog
+* Fri Jun 24 2016 Sérgio Basto <sergio@serjux.com> - 5.0.22-1
+- Update VirtualBox to 5.0.22
+
+* Thu Apr 28 2016 Sérgio Basto <sergio@serjux.com> - 5.0.20-1
+- Update VirtualBox to 5.0.20
+
+* Sun Apr 24 2016 Sérgio Basto <sergio@serjux.com> - 5.0.18-3
+- Fix Documentation
+
+* Sat Apr 23 2016 Sérgio Basto <sergio@serjux.com> - 5.0.18-2
+- Fixed VirtualBox-kmod.spec.tmpl
+- And rename package guest to guest-additions as Mageia distro is a better,
+  name, imo.
+
+* Tue Apr 19 2016 Sérgio Basto <sergio@serjux.com> - 5.0.18-1
+- Update to 5.0.18
+- Update python packaging.
+
+* Mon Apr 04 2016 Sérgio Basto <sergio@serjux.com> - 5.0.17-6.106108
+- More guest improvments and fixes
+
+* Fri Apr 01 2016 Sérgio Basto <sergio@serjux.com> - 5.0.17-5.106108
+- Do not install vboxvideo_drv.so, instead vboxvideo.ko.
+
+* Wed Mar 30 2016 Sérgio Basto <sergio@serjux.com> - 5.0.17-4.106108
+- Remove vboxvideo.ko for VirtualBox-guest r106140
+
+* Mon Mar 21 2016 Sérgio Basto <sergio@serjux.com> - 5.0.17-2.106108
+- Add one upstream patch VirtualBox-5.0.17-r106108-r106114.patch
+
 * Sat Mar 12 2016 Sérgio Basto <sergio@serjux.com> - 5.0.16-3
 - Package review with upstream RPM, better organization.
 - Delete source8 not in use since 2009.

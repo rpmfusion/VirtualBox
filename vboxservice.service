@@ -3,7 +3,7 @@ Description=VirtualBox guest services
 ConditionVirtualization=oracle
 
 [Service]
-ExecStart=/usr/bin/VBoxService -f
+ExecStart=/usr/sbin/VBoxService -f
 
 [Install]
 WantedBy=multi-user.target

@@ -13,7 +13,7 @@
  
  SDK_VBOX_LIBPNG       = .
 -SDK_VBOX_LIBPNG_INCS ?= $(PATH_ROOT)/src/libs/libpng-1.2.54
-+SDK_VBOX_LIBPNG_INCS ?= /usr/include/libpng15
++SDK_VBOX_LIBPNG_INCS ?= /usr/include/libpng16
  SDK_VBOX_LIBPNG_LIBS ?= $(PATH_STAGE_LIB)/VBox-libpng$(VBOX_SUFF_LIB)
  
  SDK_VBOX_ZLIB         = .
