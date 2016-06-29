@@ -24,9 +24,9 @@
 %bcond_with vnc
 
 Name:       VirtualBox
-Version:    5.0.22
+Version:    5.0.24
 #Release:    6%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -679,6 +679,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Jun 28 2016 Sérgio Basto <sergio@serjux.com> - 5.0.24-1
+- Update VirtualBox to 5.0.24
+
 * Fri Jun 24 2016 Sérgio Basto <sergio@serjux.com> - 5.0.22-2
 - Add VirtualBox-5.0.22-guest_soname.patch, do not hack SONAME for
   VBoxOGL and VBoxEGL in guest-additions.
