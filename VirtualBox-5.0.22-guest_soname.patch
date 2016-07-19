@@ -1,3 +1,9 @@
+Warning this patch may disable X11 guest 3D, don't use it ! .
+Still under investigation, RPMFusion needs VirtualBox-guest-additions rpm doesn't
+provides :
+libEGL.so.1()(64bit)
+libGL.so.1()(64bit)
+
 Do not change SONAME in Linux for VBoxOGL and VBoxEGL
 --- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.orig	2016-06-24 20:01:44.794134277 +0100
 +++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2016-06-24 20:01:54.994262126 +0100

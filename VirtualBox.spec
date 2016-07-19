@@ -24,7 +24,7 @@
 %bcond_with vnc
 
 Name:       VirtualBox
-Version:    5.0.24
+Version:    5.0.26
 #Release:    6%%{?prerel:.%%{prerel}}%%{?dist}
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
@@ -133,6 +133,7 @@ ExclusiveArch:  i386 x86_64
 Requires:   %{name}-kmod = %{version}
 Provides:   %{name}-kmod-common = %{version}-%{release}
 Conflicts:  %{name}-guest <= %{version}-%{release}
+Conflicts:  %{name}-guest-additions <= %{version}-%{release}
 
 %description
 A general-purpose full virtualizer and emulator for 32-bit and
@@ -679,6 +680,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Jul 18 2016 Sérgio Basto <sergio@serjux.com> - 5.0.26-1
+- Update to 5.0.26
+
 * Tue Jun 28 2016 Sérgio Basto <sergio@serjux.com> - 5.0.24-1
 - Update VirtualBox to 5.0.24
 
