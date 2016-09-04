@@ -1,6 +1,6 @@
 --- ./Config.kmk.orig	2015-12-18 16:16:51.000000000 +0000
 +++ ./Config.kmk	2015-12-21 23:27:27.833020706 +0000
-@@ -3181,19 +3181,19 @@ VBOXLNX32GUEST_SUFF_LIB = .a
+@@ -3446,19 +3446,19 @@ VBOXLNX32GUEST_SUFF_LIB = .a
  # SDKs for external libraries.
  #
  SDK_VBOX_LIBXML2          = .

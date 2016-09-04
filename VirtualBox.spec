@@ -16,7 +16,7 @@
 %global __arch_install_post   /usr/lib/rpm/check-rpaths /usr/lib/rpm/check-buildroot
 
 %bcond_without webservice
-%if 0%{?rhel} 
+%if 0%{?rhel}
     %bcond_with docs
 %else
     %bcond_without docs
@@ -24,9 +24,9 @@
 %bcond_with vnc
 
 Name:       VirtualBox
-Version:    5.0.26
-#Release:    6%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Version:    5.1.4
+#Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -40,7 +40,7 @@ Source7:    VirtualBox-guest.modules
 Source10:   vboxweb.service
 Source11:   vboxservice.service
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
-Patch2:     VirtualBox-5.0.12-strings.patch
+Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-4.3.10-xserver_guest.patch
@@ -49,9 +49,7 @@ Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
-# Upstream patches 
-Patch30:    changeset_trunk_59959.diff
-Patch31:    changeset_trunk_59960.diff
+# Upstream patches
 # I added some fixes for gcc6 just applied to Fedora 24+
 Patch33:    VirtualBox-gcc6-fixes.patch
 # just applied to Fedora 25+
@@ -69,7 +67,9 @@ BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  python2-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
-BuildRequires:  qt4-devel
+BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qtx11extras-devel
+BuildRequires:  qt5-linguist
 %if %{with webservice}
 BuildRequires:  gsoap-devel
 %endif
@@ -115,6 +115,7 @@ BuildRequires:  xorg-x11-server-devel
 BuildRequires:  libXcursor-devel
 BuildRequires:  libXcomposite-devel
 BuildRequires:  libXmu-devel
+BuildRequires:  libXinerama-devel
 %if %{with vnc}
 BuildRequires:  libvncserver-devel
 %endif
@@ -227,10 +228,8 @@ rm -r src/libs/zlib-1.2.8/
 %patch26 -p1 -b .nobundles
 #patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
-%patch28 -p1 -b .gsoap2
+#patch28 -p1 -b .gsoap2
 %endif
-%patch30 -p1 -b .gcc6
-%patch31 -p1 -b .gcc6
 %if 0%{?fedora} > 23
 %patch33 -p1 -b .gcc6
 %endif
@@ -241,6 +240,13 @@ rm -r src/libs/zlib-1.2.8/
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
+
+# Fix the library path in wrapper script for 64-bit; otherwise, it will
+# find itself as the VirtualBox executable, and end up in endless call
+# loop...
+%ifarch x86_64
+sed -i 's@/usr/lib@/usr/lib64@' src/VBox/Installer/linux/VBox.sh
+%endif
 
 %build
 ./configure --disable-kmods \
@@ -260,7 +266,7 @@ sed -i 's/\r//' COPYING
 . ./env.sh
 
 #TODO fix publisher in copr
-%global publisher _%{?vendor:%(echo "%{vendor}" | \ 
+%global publisher _%{?vendor:%(echo "%{vendor}" | \
      sed -e 's/[^[:alnum:]]//g; s/FedoraProject//' | cut -c -9)}%{?!vendor:custom}
 
 # VirtualBox build system installs and builds in the same step,
@@ -438,7 +444,7 @@ install -d %{buildroot}%{_libdir}/security
 install -m 0755 -t %{buildroot}%{_libdir}/security \
     obj/bin/additions/pam_vbox.so
 
-# init/vboxadd-x11 code near call the function install_x11_startup_app 
+# init/vboxadd-x11 code near call the function install_x11_startup_app
 install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
     %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 ln -s ../..%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh \
@@ -680,6 +686,15 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun Sep 04 2016 Sérgio Basto <sergio@serjux.com> - 5.1.4-1
+- Update VBox to 5.1.4
+- Sat Jul 16 2016 Rok Mandeljc <rok.mandeljc@gmail.com>
+  - Fixed the 64-bit lib suffix in /usr/bin/VirtualBox so that it finds the
+      VirtualBox installation instead of ending up in infinite call loop
+  - Update VirtualBox to 5.1.0
+  - Drop upstream patches, rebase the rest
+  - Add Qt5 dependencies
+
 * Sun Sep 04 2016 Leigh Scott <leigh123linux@googlemail.com> - 5.0.26-2
 - Rebuild for new libvpx version
 
@@ -822,7 +837,7 @@ https://www.virtualbox.org/ticket/15205#comment:8
 - Rebuild for new x11-xorg-server
 
 * Mon Mar 31 2014 Sérgio Basto <sergio@serjux.com> - 4.3.10-1
-- In vboxvideo guest drive, don't patch the source code of Mesa part that use glapi and use bundled 
+- In vboxvideo guest drive, don't patch the source code of Mesa part that use glapi and use bundled
   x11include/mesa-7.2 headers of Mesa, which btw rawhide doesn't have it, F20 have glapi in xorg-x11-server-source, but by what
   I saw, seems is not correct use it.
 - New upstream release
@@ -1402,14 +1417,14 @@ cvs diff: VirtualBox-OSE-4.1.4-xorg17.patch was removed, no comparison available
 * Tue Oct 30 2007 Till Maas <opensource till name> - 1.5.2-1
 - Update to new version
 
-* Wed Oct 03 2007 Till Maas <opensource till name> 
+* Wed Oct 03 2007 Till Maas <opensource till name>
 - 1.5.2-0.2.20071003svn5134
 - update to devel Version
 
-* Wed Sep 19 2007 Till Maas <opensource till name> 
+* Wed Sep 19 2007 Till Maas <opensource till name>
 - 1.5.2-0.1.20070919svn4897
 - Update to devel Version that may support Fedora as Guest again
-- Make /dev/vboxdrv owned by root instead of vboxusers, because only 
+- Make /dev/vboxdrv owned by root instead of vboxusers, because only
   the group is needed
 
 * Mon Sep 03 2007 Till Maas <opensource till name> - 1.5.0-1
