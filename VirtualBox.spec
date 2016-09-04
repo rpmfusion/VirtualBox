@@ -15,7 +15,7 @@
 %global prereltag %{?prerel:-%(awk 'BEGIN {print toupper("%{prerel}")}')}
 %global __arch_install_post   /usr/lib/rpm/check-rpaths /usr/lib/rpm/check-buildroot
 
-%bcond_without webservice
+%bcond_with webservice
 %if 0%{?rhel}
     %bcond_with docs
 %else
