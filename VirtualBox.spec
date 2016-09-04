@@ -26,7 +26,7 @@
 Name:       VirtualBox
 Version:    5.0.26
 #Release:    6%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -642,7 +642,7 @@ fi
 %{_datadir}/applications/*.desktop
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
-%{_prefix}/lib/udev/rules.d/90-vboxdrv.rules
+%{_udevrulesdir}/90-vboxdrv.rules
 %{_prefix}/lib/modules-load.d/%{name}.conf
 %if %{with webservice}
 %{_unitdir}/vboxweb.service
@@ -671,7 +671,7 @@ fi
 %{_libdir}/VBox*.so
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
-%{_prefix}/lib/udev/rules.d/60-vboxguest.rules
+%{_udevrulesdir}/60-vboxguest.rules
 %{_prefix}/lib/modules-load.d/%{name}-guest.conf
 %{_unitdir}/vboxservice.service
 
@@ -680,6 +680,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun Sep 04 2016 Leigh Scott <leigh123linux@googlemail.com> - 5.0.26-2
+- Rebuild for new libvpx version
+
 * Mon Jul 18 2016 Sérgio Basto <sergio@serjux.com> - 5.0.26-1
 - Update to 5.0.26
 
