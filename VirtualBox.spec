@@ -15,7 +15,7 @@
 %global prereltag %{?prerel:-%(awk 'BEGIN {print toupper("%{prerel}")}')}
 %global __arch_install_post   /usr/lib/rpm/check-rpaths /usr/lib/rpm/check-buildroot
 
-%bcond_with webservice
+%bcond_without webservice
 %if 0%{?rhel}
     %bcond_with docs
 %else
@@ -26,7 +26,7 @@
 Name:       VirtualBox
 Version:    5.1.4
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -49,6 +49,7 @@ Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
+Patch29:    29-fix-ftbfs-as-needed.patch
 # Upstream patches
 # I added some fixes for gcc6 just applied to Fedora 24+
 Patch33:    VirtualBox-gcc6-fixes.patch
@@ -226,10 +227,11 @@ rm -r src/libs/zlib-1.2.8/
 %patch23 -p1 -b .xserver_guest
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
-#patch27 -p1 -b .gcc
+%patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
-#patch28 -p1 -b .gsoap2
+%patch28 -p1 -b .gsoap2
 %endif
+%patch29 -p1 -b .as_need
 %if 0%{?fedora} > 23
 %patch33 -p1 -b .gcc6
 %endif
@@ -686,6 +688,10 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Sep 06 2016 Sérgio Basto <sergio@serjux.com> - 5.1.4-2
+- Enable webservice with fix of patch 02-gsoap-build-fix, add patch to allow
+  gcc-6.2 and add patch 29-fix-ftbfs-as-needed from Debian
+
 * Sun Sep 04 2016 Sérgio Basto <sergio@serjux.com> - 5.1.4-1
 - Update VBox to 5.1.4
 - Sat Jul 16 2016 Rok Mandeljc <rok.mandeljc@gmail.com>
