@@ -26,7 +26,7 @@
 Name:       VirtualBox
 Version:    5.1.4
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -59,6 +59,7 @@ Patch34:    VirtualBox-5.0.16-glibc.patch
 Patch35:    VirtualBox-5.0.22-guest_soname.patch
 Patch36:    modify_for_4_8_bo_move.patch
 Patch37:    smap.diff
+Patch38:    fix_for_4_8_rc5.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998
@@ -244,6 +245,7 @@ rm -r src/libs/zlib-1.2.8/
 %patch35 -p1 -b .soname
 %patch36 -p1 -b .kernel4.8-rc4
 %patch37 -p1 -b .kernel4.8-rc4.2
+%patch38 -p1 -b .kernel4.8-rc5
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -693,6 +695,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Sep 10 2016 Sérgio Basto <sergio@serjux.com> - 5.1.4-4
+- Fix for kernel 4.8.0-rc5
+
 * Wed Sep 07 2016 Sérgio Basto <sergio@serjux.com> - 5.1.4-3
 - Fixes for linux kernel-4.8-rc4, fixes from openSUSE
   https://build.opensuse.org/package/show/Virtualization/virtualbox
