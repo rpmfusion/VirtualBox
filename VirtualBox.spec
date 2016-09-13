@@ -50,12 +50,8 @@ Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
 Patch29:    29-fix-ftbfs-as-needed.patch
-# Upstream patches
-# I added some fixes for gcc6 just applied to Fedora 24+
-Patch33:    VirtualBox-gcc6-fixes.patch
-# just applied to Fedora 25+
+# Patch34 just applied to Fedora 25+
 Patch34:    VirtualBox-5.0.16-glibc.patch
-
 Patch35:    VirtualBox-5.0.22-guest_soname.patch
 Patch37:    smap.diff
 
@@ -234,14 +230,11 @@ rm -r src/libs/zlib-1.2.8/
 %patch28 -p1 -b .gsoap2
 %endif
 %patch29 -p1 -b .as_need
-%if 0%{?fedora} > 23
-%patch33 -p1 -b .gcc6
-%endif
 %if 0%{?fedora} > 24
-%patch34 -p1 -b .glibc
+#patch34 -p1 -b .glibc
 %endif
 %patch35 -p1 -b .soname
-%patch37 -p1 -b .kernel4.8-rc4.2
+%patch37 -p1 -b .kernel4.7-smap
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
