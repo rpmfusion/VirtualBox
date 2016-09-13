@@ -24,9 +24,9 @@
 %bcond_with vnc
 
 Name:       VirtualBox
-Version:    5.1.4
+Version:    5.1.6
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    4%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -57,9 +57,7 @@ Patch33:    VirtualBox-gcc6-fixes.patch
 Patch34:    VirtualBox-5.0.16-glibc.patch
 
 Patch35:    VirtualBox-5.0.22-guest_soname.patch
-Patch36:    modify_for_4_8_bo_move.patch
 Patch37:    smap.diff
-Patch38:    fix_for_4_8_rc5.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998
@@ -231,7 +229,7 @@ rm -r src/libs/zlib-1.2.8/
 %patch23 -p1 -b .xserver_guest
 %patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
-%patch27 -p1 -b .gcc
+#patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
@@ -243,9 +241,7 @@ rm -r src/libs/zlib-1.2.8/
 %patch34 -p1 -b .glibc
 %endif
 %patch35 -p1 -b .soname
-%patch36 -p1 -b .kernel4.8-rc4
 %patch37 -p1 -b .kernel4.8-rc4.2
-%patch38 -p1 -b .kernel4.8-rc5
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -695,6 +691,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Sep 13 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-1
+- Update VBox to 5.1.6
+
 * Sat Sep 10 2016 Sérgio Basto <sergio@serjux.com> - 5.1.4-4
 - Fix for kernel 4.8.0-rc5
 
