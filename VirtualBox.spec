@@ -326,15 +326,18 @@ install -p -m 0755 obj/bin/VBox.sh %{buildroot}%{_bindir}/VBox
 install -p -m 0755 -t %{buildroot}%{_bindir} \
     obj/bin/VBoxTunctl
 
-# Executables
-install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
-    obj/bin/VirtualBox  \
+# Executables with special permissions
+install -p -m 4511 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/VBoxHeadless    \
     obj/bin/VBoxNetDHCP \
     obj/bin/VBoxNetNAT \
     obj/bin/VBoxNetAdpCtl   \
     obj/bin/VBoxVolInfo \
     obj/bin/VBoxSDL     \
+    obj/bin/VirtualBox
+
+# Executables
+install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/SUPInstall \
     obj/bin/SUPLoggerCtl \
     obj/bin/SUPUninstall \
@@ -420,7 +423,7 @@ install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 #install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
 #    %{buildroot}%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 
-# Guest tools
+# Guest-additions tools
 install -m 0755 -t %{buildroot}%{_sbindir}   \
     obj/bin/additions/VBoxService       \
     obj/bin/additions/mount.vboxsf
@@ -633,13 +636,13 @@ fi
 %{_libdir}/virtualbox/vboxwebsrv
 %{_libdir}/virtualbox/webtest
 %endif
-%attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetNAT
-%attr(4511,root,root) %{_libdir}/virtualbox/VBoxVolInfo
-%attr(4511,root,root) %{_libdir}/virtualbox/VBoxHeadless
-%attr(4511,root,root) %{_libdir}/virtualbox/VBoxSDL
-%attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
-%attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
-%attr(4511,root,root) %{_libdir}/virtualbox/VirtualBox
+%{_libdir}/virtualbox/VBoxNetNAT
+%{_libdir}/virtualbox/VBoxVolInfo
+%{_libdir}/virtualbox/VBoxHeadless
+%{_libdir}/virtualbox/VBoxSDL
+%{_libdir}/virtualbox/VBoxNetDHCP
+%{_libdir}/virtualbox/VBoxNetAdpCtl
+%{_libdir}/virtualbox/VirtualBox
 %{_datadir}/pixmaps/*
 %{_datadir}/icons/*
 %{_datadir}/mime/*
