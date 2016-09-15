@@ -119,6 +119,7 @@ BuildRequires:  libXinerama-devel
 BuildRequires:  libvncserver-devel
 %endif
 
+%{?systemd_requires}
 BuildRequires: systemd
 
 # Plague-specific weirdness
@@ -500,13 +501,15 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
 getent group vboxusers >/dev/null || groupadd -r vboxusers
 
 %if %{with webservice}
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+    %systemd_post vboxweb-httpd.service
 %endif
 
-# Desktop databases
+# Icon Cache
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-/usr/bin/update-desktop-database &>/dev/null || :
-/usr/bin/update-mime-database %{_datadir}/mime &>/dev/null || :
+# mimeinfo F23 only
+/bin/touch --no-create %{_datadir}/mime/packages &>/dev/null || :
+# Desktop databases F23 and F24 only
+/usr/bin/update-desktop-database &> /dev/null || :
 
 # Assign USB devices
 if /sbin/udevadm control --reload-rules >/dev/null 2>&1
@@ -519,34 +522,40 @@ fi
 /bin/systemctl restart systemd-modules-load.service >/dev/null 2>&1 || :
 
 %preun
-if [ $1 -eq 0 ] ; then
-    # Package removal, not upgrade
-    /bin/systemctl --no-reload disable vboxweb.service > /dev/null 2>&1 || :
-    /bin/systemctl stop vboxweb.service > /dev/null 2>&1 || :
-fi
+%if %{with webservice}
+    %systemd_preun vboxweb.service
+%endif
 
 %postun
 if [ $1 -eq 0 ] ; then
     # Package upgrade, not uninstall
-    # Web service
-    # Run these because the SysV package being removed won't do them
-    /sbin/chkconfig --del vboxweb-service >/dev/null 2>&1 || :
+    # Icon Cache
+    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
+    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+    # mimeinfo F23 only
+    /usr/bin/update-mime-database %{_datadir}/mime &> /dev/null || :
 fi
 
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%if %{with webservice}
+    %systemd_postun_with_restart vboxweb.service
+%endif
 
-/usr/bin/update-desktop-database &>/dev/null || :
-/usr/bin/update-mime-database %{_datadir}/mime &>/dev/null || :
+# Desktop databases F23 and F24 only
+/usr/bin/update-desktop-database &> /dev/null || :
 
 %posttrans
+# Icon Cache
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+# mimeinfo F23 only
+/usr/bin/update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 
 # Guest additions install
 %post guest-additions
 /sbin/ldconfig
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-# should be in kmod package, not here
+# should be in kmod package, not here, but we need modules loaded to start
+# vboxservice
 /bin/systemctl restart systemd-modules-load.service >/dev/null 2>&1 || :
+%systemd_post vboxservice.service
 /bin/systemctl enable vboxservice.service >/dev/null 2>&1 || :
 /bin/systemctl restart vboxservice.service >/dev/null 2>&1 || :
 ## This is the LSB version of useradd and should work on recent
@@ -577,15 +586,11 @@ fi
 
 
 %preun guest-additions
-if [ $1 -eq 0 ] ; then
-    # Package removal, not upgrade
-    /bin/systemctl --no-reload disable vboxservice.service > /dev/null 2>&1 || :
-    /bin/systemctl stop vboxservice.service > /dev/null 2>&1 || :
-fi
+%systemd_preun vboxservice.service
 
 %postun guest-additions
 /sbin/ldconfig
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%systemd_postun_with_restart vboxservice.service
 
 %files
 %doc doc/*cpp doc/VMM
@@ -674,6 +679,7 @@ fi
 %{_sbindir}/VBoxService
 %{_sbindir}/mount.vboxsf
 %{_libdir}/security/pam_vbox.so
+# do not use xorg module drive
 #{_libdir}/xorg/modules/drivers/*
 %{_libdir}/VBox*.so
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
