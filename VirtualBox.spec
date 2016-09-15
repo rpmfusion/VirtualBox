@@ -756,8 +756,14 @@ fi
 * Wed Mar 30 2016 Sérgio Basto <sergio@serjux.com> - 5.0.17-4.106108
 - Remove vboxvideo.ko for VirtualBox-guest r106140
 
+* Thu Mar 24 2016 Sérgio Basto <sergio@serjux.com> - 5.0.17-3.106108
+- Use upstream patch VirtualBox-5.0.17-r106108-r106140.patch
+
 * Mon Mar 21 2016 Sérgio Basto <sergio@serjux.com> - 5.0.17-2.106108
 - Add one upstream patch VirtualBox-5.0.17-r106108-r106114.patch
+
+* Sat Mar 19 2016 Sérgio Basto <sergio@serjux.com> - 5.0.17-1.106108
+- Building new Guest Additions for Linux guests.
 
 * Sat Mar 12 2016 Sérgio Basto <sergio@serjux.com> - 5.0.16-3
 - Package review with upstream RPM, better organization.
