@@ -26,7 +26,7 @@
 Name:       VirtualBox
 Version:    5.1.6
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 Group:      Development/Tools
@@ -693,6 +693,11 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Sep 15 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-2
+- Set attributes on make install
+- Packaging:Scriptlets review Systemd, Icon Cache, mimeinfo and
+  desktop-database
+
 * Tue Sep 13 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-1
 - Update VBox to 5.1.6
 
