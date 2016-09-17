@@ -39,6 +39,8 @@ Source6:    VirtualBox.modules
 Source7:    VirtualBox-guest.modules
 Source10:   vboxweb.service
 Source11:   vboxservice.service
+Source20:   os_mageia.png
+Source21:   os_mageia_64.png
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
@@ -54,6 +56,9 @@ Patch29:    29-fix-ftbfs-as-needed.patch
 Patch34:    VirtualBox-5.0.16-glibc.patch
 Patch35:    VirtualBox-5.0.22-guest_soname.patch
 Patch37:    smap.diff
+# from Mageia
+Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
+Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998
@@ -224,6 +229,8 @@ which is generated during the build of main package.
 %prep
 %setup -q
 find -name '*.py[co]' -delete
+# add Mageia images
+cp -a %{SOURCE20} %{SOURCE21} src/VBox/Frontends/VirtualBox/images/
 
 # Remove prebuilt binary tools
 rm -r kBuild/
@@ -260,16 +267,11 @@ rm -r src/libs/zlib-1.2.8/
 %endif
 %patch35 -p1 -b .soname
 %patch37 -p1 -b .kernel4.7-smap
+%patch50 -p1 -b .mageia-support
+%patch51 -p1 -b .revert-VBox.sh
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
-
-# Fix the library path in wrapper script for 64-bit; otherwise, it will
-# find itself as the VirtualBox executable, and end up in endless call
-# loop...
-%ifarch x86_64
-sed -i 's@/usr/lib@/usr/lib64@' src/VBox/Installer/linux/VBox.sh
-%endif
 
 %build
 ./configure --disable-kmods \
@@ -728,6 +730,8 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 - Upstream rules:
     60-vboxguest.rules change user to vboxadd security reasons
     Add a group "vboxsf" for Shared Folders access
+- Add Mageia fix revert-VBox.sh.patch
+- Add Mageia support
 
 * Tue Sep 13 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-1
 - Update VBox to 5.1.6
