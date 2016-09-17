@@ -132,6 +132,11 @@ ExclusiveArch:  i386 x86_64
 %endif
 
 Requires:   %{name}-kmod = %{version}
+%if 0%{?fedora} > 0
+Recommends:   %{name}-qt = %{version}
+%else
+Requires:     %{name}-qt = %{version}
+%endif
 Provides:   %{name}-kmod-common = %{version}-%{release}
 Conflicts:  %{name}-guest <= %{version}-%{release}
 Conflicts:  %{name}-guest-additions <= %{version}-%{release}
@@ -140,6 +145,25 @@ Conflicts:  %{name}-guest-additions <= %{version}-%{release}
 A general-purpose full virtualizer and emulator for 32-bit and
 64-bit x86 based PC-compatible machines.
 
+%package qt
+Summary:        Qt GUI part for %{name}
+Group:          System/Emulators/PC
+Requires:       %{name} = %{version}
+Provides:       %{name}-gui = %{version}
+
+%description qt
+Qt GUI part for %{name}.
+
+%if %{with webservice}
+%package webservice
+Summary:        WebService GUI part for %{name}
+Group:          System/Emulators/PC
+Requires:       %{name} = %{version}
+Provides:       %{name}-gui = %{version}
+
+%description webservice
+webservice GUI part for %{name}.
+%endif
 
 %package devel
 Summary:    %{name} SDK
@@ -259,6 +283,7 @@ sed -i 's@/usr/lib@/usr/lib64@' src/VBox/Installer/linux/VBox.sh
   --disable-docs \
 %endif
 
+#--enable-vde
 #--build-headless --build-libxml2
 #--disable-java
 #--disable-xpcom
@@ -327,18 +352,15 @@ install -p -m 0755 obj/bin/VBox.sh %{buildroot}%{_bindir}/VBox
 install -p -m 0755 -t %{buildroot}%{_bindir} \
     obj/bin/VBoxTunctl
 
-# Executables with special permissions
-install -p -m 4511 -t %{buildroot}%{_libdir}/virtualbox \
+# Executables
+install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
+    obj/bin/VirtualBox  \
     obj/bin/VBoxHeadless    \
     obj/bin/VBoxNetDHCP \
     obj/bin/VBoxNetNAT \
     obj/bin/VBoxNetAdpCtl   \
     obj/bin/VBoxVolInfo \
     obj/bin/VBoxSDL     \
-    obj/bin/VirtualBox
-
-# Executables
-install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/SUPInstall \
     obj/bin/SUPLoggerCtl \
     obj/bin/SUPUninstall \
@@ -500,10 +522,6 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
 # Group for USB devices
 getent group vboxusers >/dev/null || groupadd -r vboxusers
 
-%if %{with webservice}
-    %systemd_post vboxweb-httpd.service
-%endif
-
 # Icon Cache
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 # mimeinfo F23 only
@@ -521,8 +539,13 @@ fi
 # should be in kmod package, not here
 /bin/systemctl restart systemd-modules-load.service >/dev/null 2>&1 || :
 
-%preun
 %if %{with webservice}
+%post webservice
+    %systemd_post vboxweb-httpd.service
+%endif
+
+%if %{with webservice}
+%preun webservice
     %systemd_preun vboxweb.service
 %endif
 
@@ -537,6 +560,7 @@ if [ $1 -eq 0 ] ; then
 fi
 
 %if %{with webservice}
+%postun webservice
     %systemd_postun_with_restart vboxweb.service
 %endif
 
@@ -609,25 +633,19 @@ fi
 %{_bindir}/VBoxSDL
 %{_bindir}/VBoxTunctl
 %{_bindir}/virtualbox
-%{_bindir}/VirtualBox
 %{_bindir}/VBoxAutostart
 %{_bindir}/vboxautostart
 %{_bindir}/VBoxDTrace
 %{_bindir}/vboxdtrace
 %{_bindir}/vbox-img
-%if %{with webservice}
-%{_bindir}/vboxwebsrv
-%endif
 %{_bindir}/VBoxVRDP
 %dir %{_libdir}/virtualbox
 %{_libdir}/virtualbox/*.[^p]*
-%{_libdir}/virtualbox/*.py*
+%exclude %{_libdir}/virtualbox/VirtualBox.so
 %{_libdir}/virtualbox/components
-%{_libdir}/virtualbox/nls
 %{_libdir}/virtualbox/VBoxExtPackHelperApp
 %{_libdir}/virtualbox/VBoxManage
 %{_libdir}/virtualbox/VBoxSVC
-%{_libdir}/virtualbox/VBoxTestOGL
 %{_libdir}/virtualbox/VBoxXPCOMIPCD
 %{_libdir}/virtualbox/VBoxBalloonCtrl
 %{_libdir}/virtualbox/SUPInstall
@@ -637,39 +655,48 @@ fi
 %{_libdir}/virtualbox/VBoxVMMPreload
 %{_libdir}/virtualbox/VBoxDTrace
 %{_libdir}/virtualbox/vbox-img
-%if %{with webservice}
-%{_libdir}/virtualbox/vboxwebsrv
-%{_libdir}/virtualbox/webtest
-%endif
-%{_libdir}/virtualbox/VBoxNetNAT
-%{_libdir}/virtualbox/VBoxVolInfo
-%{_libdir}/virtualbox/VBoxHeadless
-%{_libdir}/virtualbox/VBoxSDL
-%{_libdir}/virtualbox/VBoxNetDHCP
-%{_libdir}/virtualbox/VBoxNetAdpCtl
-%{_libdir}/virtualbox/VirtualBox
-%{_datadir}/pixmaps/*
+# This permissions have to be here, before generator of debuginfo need
+# permissions to read this files
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetNAT
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxVolInfo
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxHeadless
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxSDL
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
+%attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
+%attr(4511,root,root) %{_libdir}/virtualbox/VirtualBox
 %{_datadir}/icons/*
 %{_datadir}/mime/*
-%{_datadir}/applications/*.desktop
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
 %{_udevrulesdir}/90-vboxdrv.rules
 %{_prefix}/lib/modules-load.d/%{name}.conf
-%if %{with webservice}
-%{_unitdir}/vboxweb.service
-%endif
 %{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 
+%files qt
+%{_bindir}/VirtualBox
+%{_libdir}/virtualbox/VBoxTestOGL
+%{_libdir}/virtualbox/nls
+%{_libdir}/virtualbox/VirtualBox.so
+%{_datadir}/pixmaps/*
+%{_datadir}/applications/*.desktop
+
+%if %{with webservice}
+%files webservice
+%{_bindir}/vboxwebsrv
+%{_unitdir}/vboxweb.service
+%{_libdir}/virtualbox/vboxwebsrv
+%{_libdir}/virtualbox/webtest
+%endif
 
 %files devel
 %{_libdir}/virtualbox/sdk
-
+%exclude %{_libdir}/virtualbox/sdk/bindings/xpcom/python
 
 %files -n python-%{name}
+%{_libdir}/virtualbox/*.py*
 %{python2_sitelib}/virtualbox
 %{python2_sitelib}/vboxapi*
-
+%{_libdir}/virtualbox/sdk/bindings/xpcom/python
 
 %files guest-additions
 %license COPYING*
@@ -694,9 +721,11 @@ fi
 
 %changelog
 * Thu Sep 15 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-2
-- Set attributes on make install
-- Packaging:Scriptlets review Systemd, Icon Cache, mimeinfo and
-  desktop-database
+- Packaging:Scriptlets review Systemd, Icon Cache, mimeinfo and desktop-database
+- Add back RPMFusion strings to VBox.sh it is used on /usr/bin/VBox
+- Create VirtualBox-qt sub-package rfbz#1169
+- Create VirtualBox-webservice in a sub-package
+- Add python things to python sub-package
 
 * Tue Sep 13 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-1
 - Update VBox to 5.1.6
