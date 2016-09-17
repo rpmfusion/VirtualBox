@@ -147,8 +147,17 @@ Conflicts:  %{name}-guest <= %{version}-%{release}
 Conflicts:  %{name}-guest-additions <= %{version}-%{release}
 
 %description
-A general-purpose full virtualizer and emulator for 32-bit and
-64-bit x86 based PC-compatible machines.
+VirtualBox is a powerful x86 and AMD64/Intel64 virtualization product for
+enterprise as well as home use. Not only is VirtualBox an extremely feature
+rich, high performance product for enterprise customers, it is also the only
+professional solution that is freely available as Open Source Software under
+the terms of the GNU General Public License (GPL) version 2.
+
+Presently, VirtualBox runs on Windows, Linux, Macintosh, and Solaris hosts and
+supports a large number of guest operating systems including but not limited to
+Windows (NT 4.0, 2000, XP, Server 2003, Vista, Windows 7, Windows 8, Windows
+10), DOS/Windows 3.x, Linux (2.4, 2.6, 3.x and 4.x), Solaris and OpenSolaris,
+OS/2, and OpenBSD.
 
 %package qt
 Summary:        Qt GUI part for %{name}
@@ -208,13 +217,14 @@ Conflicts:  %{name} <= %{version}-%{release}
 
 
 %description guest-additions
-Important note: VirtualBox-guest can't be installed on Host (master) system because
-contains X11 and OpenGL drives that will mess up with your X11 configurations.
+Important note: VirtualBox-guest-additions can't be installed on Host (master)
+system because contains X11 and OpenGL drives that will mess up with your X11
+configurations.
 This subpackage replace Oracle Linux Guest Addition but just for Fedora,
 therefore should be installed only when we have one Fedora as a guest system.
-Tools that use kernel modules for supporting integration
-with the Host, including file sharing, clipboard sharing,
-X.org X11 video and mouse driver, USB and webcam proxy and Seamless mode.
+Tools that use kernel modules for supporting integration with the Host,
+including file sharing, clipboard sharing, X.org X11 video and mouse driver,
+USB and webcam proxy and Seamless mode.
 
 
 %package kmodsrc
@@ -238,10 +248,13 @@ rm -r tools/
 # Remove bundle X11 sources and some lib sources, before patching.
 rm -r src/VBox/Additions/x11/x11include/
 rm -r src/VBox/Additions/x11/x11stubs/
-#rm -r src/VBox/GuestHost/OpenGL/include/GL
 rm include/VBox/HostServices/glext.h
 rm include/VBox/HostServices/glxext.h
+
+# wglext.h has typedefs for Windows-specific extensions
 #rm include/VBox/HostServices/wglext.h
+# src/VBox/GuestHost/OpenGL/include/GL/glext.h have VBOX definitions
+#rm -r src/VBox/GuestHost/OpenGL/include/GL
 
 #rm -rf src/libs/liblzf-3.4/
 rm -r src/libs/libxml2-2.9.2/
@@ -732,6 +745,7 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
     Add a group "vboxsf" for Shared Folders access
 - Add Mageia fix revert-VBox.sh.patch
 - Add Mageia support
+- Update descriptions
 
 * Tue Sep 13 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-1
 - Update VBox to 5.1.6
