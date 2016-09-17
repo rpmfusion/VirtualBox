@@ -518,10 +518,11 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
 #
 # vboxautostart-service
 
-%post
+%pre
 # Group for USB devices
 getent group vboxusers >/dev/null || groupadd -r vboxusers
 
+%post
 # Icon Cache
 /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 # mimeinfo F23 only
@@ -573,6 +574,16 @@ fi
 # mimeinfo F23 only
 /usr/bin/update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 
+%pre guest-additions
+# This is the LSB version of useradd and should work on recent
+# distributions
+getent passwd vboxadd >/dev/null || useradd -d /var/run/vboxadd -g 1 -r -s /bin/false vboxadd 2>&1
+
+# Add a group "vboxsf" for Shared Folders access
+# All users which want to access the auto-mounted Shared Folders have to
+# be added to this group.
+getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
+
 # Guest additions install
 %post guest-additions
 /sbin/ldconfig
@@ -582,18 +593,7 @@ fi
 %systemd_post vboxservice.service
 /bin/systemctl enable vboxservice.service >/dev/null 2>&1 || :
 /bin/systemctl restart vboxservice.service >/dev/null 2>&1 || :
-## This is the LSB version of useradd and should work on recent
-## distributions
-#useradd -d /var/run/vboxadd -g 1 -r -s /bin/false vboxadd >/dev/null 2>&1
-## And for the others, we choose a UID ourselves
-#useradd -d /var/run/vboxadd -g 1 -u 501 -o -s /bin/false vboxadd >/dev/null 2>&1
-#
-## Add a group "vboxsf" for Shared Folders access
-## All users which want to access the auto-mounted Shared Folders have to
-## be added to this group.
-#groupadd -r -f vboxsf >/dev/null 2>&1
-#echo "KERNEL=${udev_fix}\"vboxguest\", NAME=\"vboxguest\", OWNER=\"vboxadd\", MODE=\"0660\"" > /etc/udev/rules.d/60-vboxadd.rules
-#echo "KERNEL=${udev_fix}\"vboxuser\", NAME=\"vboxuser\", OWNER=\"vboxadd\", MODE=\"0666\"" >> /etc/udev/rules.d/60-vboxadd.rules
+
 #chcon -u system_u -t mount_exec_t "$lib_path/$PACKAGE/mount.vboxsf" > /dev/null 2>&1
 # for i in "$lib_path"/*.so
 # do
@@ -607,7 +607,6 @@ fi
 # completely irrelevant on the target system.
 #chcon -t unconfined_execmem_exec_t '/usr/bin/VBoxClient' > /dev/null 2>&1
 #semanage fcontext -a -t unconfined_execmem_exec_t '/usr/bin/VBoxClient' > /dev/null 2>&1
-
 
 %preun guest-additions
 %systemd_preun vboxservice.service
@@ -726,6 +725,9 @@ fi
 - Create VirtualBox-qt sub-package rfbz#1169
 - Create VirtualBox-webservice in a sub-package
 - Add python things to python sub-package
+- Upstream rules:
+    60-vboxguest.rules change user to vboxadd security reasons
+    Add a group "vboxsf" for Shared Folders access
 
 * Tue Sep 13 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-1
 - Update VBox to 5.1.6
