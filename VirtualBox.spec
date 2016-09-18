@@ -39,6 +39,7 @@ Source6:    VirtualBox.modules
 Source7:    VirtualBox-guest.modules
 Source10:   vboxweb.service
 Source11:   vboxservice.service
+Source12:   96-vbox.preset
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
@@ -492,6 +493,9 @@ install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
     %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
+mkdir -p %{buildroot}%{_prefix}/lib/systemd/system-preset
+install -pm 0644 %{SOURCE12} %{buildroot}%{_prefix}/lib/systemd/system-preset/
+
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
 cp -al obj/bin/src/vbox* obj/bin/additions/src/vbox* %{name}-kmod-%{version}
@@ -606,8 +610,6 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 # vboxservice
 /bin/systemctl restart systemd-modules-load.service >/dev/null 2>&1 || :
 %systemd_post vboxservice.service
-/bin/systemctl enable vboxservice.service >/dev/null 2>&1 || :
-/bin/systemctl restart vboxservice.service >/dev/null 2>&1 || :
 
 #chcon -u system_u -t mount_exec_t "$lib_path/$PACKAGE/mount.vboxsf" > /dev/null 2>&1
 # for i in "$lib_path"/*.so
@@ -728,6 +730,7 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_udevrulesdir}/60-vboxguest.rules
 %{_prefix}/lib/modules-load.d/%{name}-guest.conf
 %{_unitdir}/vboxservice.service
+%{_prefix}/lib/systemd/system-preset/96-vbox.preset
 
 
 %files kmodsrc
@@ -746,6 +749,8 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 - Add Mageia fix revert-VBox.sh.patch
 - Add Mageia support
 - Update descriptions
+- Review Scriptlets for starting vboxservice.service in guest-additions
+  https://fedoraproject.org/wiki/Starting_services_by_default
 
 * Tue Sep 13 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-1
 - Update VBox to 5.1.6
