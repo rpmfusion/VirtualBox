@@ -33,7 +33,7 @@ Group:      Development/Tools
 License:    GPLv2 or (GPLv2 and CDDL)
 URL:        http://www.virtualbox.org/wiki/VirtualBox
 Source0:    http://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
-Source3:    VirtualBox-90-vboxdrv.rules
+Source3:    VirtualBox-60-vboxdrv.rules
 Source5:    VirtualBox-60-vboxguest.rules
 Source6:    VirtualBox.modules
 Source7:    VirtualBox-guest.modules
@@ -84,6 +84,7 @@ BuildRequires:  java-devel >= 1.6
 %if %{with docs}
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  docbook-dtds
+BuildRequires:  docbook-style-xsl
 BuildRequires:  doxygen-latex
 BuildRequires:  texlive-collection-fontsrecommended
 BuildRequires:  texlive-ec
@@ -314,24 +315,38 @@ sed -i 's/\r//' COPYING
 # really been installed to. Therefore we do not override any of
 # the installation paths, but install the tree with the default
 # layout under 'obj' and shuffle files around in %%install.
-kmk %{_smp_mflags} \
-    KBUILD_VERBOSE=2 TOOL_YASM_AS=yasm PATH_OUT="$PWD/obj"      \
+kmk %{_smp_mflags}    \
+    KBUILD_VERBOSE=2   \
+    TOOL_YASM_AS=yasm   \
+    PATH_OUT="$PWD/obj"      \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox         \
     VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox        \
     VBOX_WITH_TESTCASES= \
     VBOX_WITH_VALIDATIONKIT= \
     VBOX_WITH_VBOX_IMG=1 \
+    VBOX_WITH_SYSFS_BY_DEFAULT=1 \
+    VBOX_WITH_VMSVGA3D=1 \
     VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
 %if %{with docs}
     VBOX_WITH_DOCS=1 \
+# doc/manual/fr_FR/ missing man_VBoxManage-debugvm.xml and man_VBoxManage-extpack.xml
+#    VBOX_WITH_DOCS_TRANSLATIONS=1 \
+# we can't build CHM DOCS we need hhc.exe which is not in source and we need
+# also install wine:
+# wine: cannot find
+# '/builddir/build/BUILD/VirtualBox-5.1.6/tools/win.x86/HTML_Help_Workshop/v1.3//hhc.exe'
+#    VBOX_WITH_DOCS_CHM=1 \
 %endif
     VBOX_PATH_DOCBOOK_DTD=/usr/share/sgml/docbook/xml-dtd-4.5/ \
+    VBOX_PATH_DOCBOOK=/usr/share/sgml/docbook/xsl-stylesheets/ \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
-#    VBOX_WITH_DOCS_CHM=1 \
-#VBOX_WITH_DOCS_TRANSLATIONS=1
+#    VBOX_WITH_ADDITION_DRIVERS = \
+#    VBOX_WITH_INSTALLER = 1 \
+#    VBOX_WITH_LINUX_ADDITIONS = 1 \
+#    VBOX_WITH_X11_ADDITIONS = 1 \
 #VBOX_WITH_LIGHTDM_GREETER=1 \
 
 
@@ -409,6 +424,8 @@ ln -s VBox %{buildroot}%{_bindir}/VBoxHeadless
 ln -s VBox %{buildroot}%{_bindir}/vboxheadless
 ln -s VBox %{buildroot}%{_bindir}/VBoxDTrace
 ln -s VBox %{buildroot}%{_bindir}/vboxdtrace
+ln -s VBox %{buildroot}%{_bindir}/VBoxBugReport
+ln -s VBox %{buildroot}%{_bindir}/vboxbugreport
 ln -s VBox %{buildroot}%{_bindir}/VBoxBalloonCtrl
 ln -s VBox %{buildroot}%{_bindir}/vboxballoonctrl
 ln -s VBox %{buildroot}%{_bindir}/VBoxAutostart
@@ -416,7 +433,7 @@ ln -s VBox %{buildroot}%{_bindir}/vboxautostart
 %if %{with webservice}
 ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
 %endif
-ln -s ../../%{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
+ln -s ../..%{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
 
 # Components , preserve symlinks
 cp -a obj/bin/components/* %{buildroot}%{_libdir}/virtualbox/components/
@@ -489,12 +506,12 @@ install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
     %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 ln -s ../..%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh \
     %{buildroot}%{_bindir}/VBoxClient-all
-install -m 0644 -D src/VBox/Additions/x11/Installer/vboxclient.desktop \
-    %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+desktop-file-install --dir=%{buildroot}%{_sysconfdir}/xdg/autostart/ \
+    --remove-key=Encoding src/VBox/Additions/x11/Installer/vboxclient.desktop
 desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
 mkdir -p %{buildroot}%{_prefix}/lib/systemd/system-preset
-install -pm 0644 %{SOURCE12} %{buildroot}%{_prefix}/lib/systemd/system-preset/
+install -pm 0644 %{SOURCE12} %{buildroot}%{_prefix}/lib/systemd/system-preset/96-vbox.preset
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
@@ -514,7 +531,7 @@ echo 'INSTALL_DIR=%{_libdir}/virtualbox' > %{buildroot}%{_sysconfdir}/vbox/vbox.
 
 # Install udev rules
 install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh %{buildroot}%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
-install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_udevrulesdir}/90-vboxdrv.rules
+install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_udevrulesdir}/60-vboxdrv.rules
 install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_udevrulesdir}/60-vboxguest.rules
 
 # Install modules load script
@@ -523,8 +540,10 @@ install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_prefix}/lib/modules-load.d/%{nam
 
 # Menu entry
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
-    --remove-key=DocPath --vendor='' obj/bin/virtualbox.desktop
+    --remove-key=Encoding obj/bin/virtualbox.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/virtualbox.desktop
 
+#    --remove-key=DocPath
 # to review:
 #if [ -d ExtensionPacks/VNC ]; then
 #  install -m 755 -d $RPM_BUILD_ROOT/usr/lib/virtualbox/ExtensionPacks
@@ -638,26 +657,29 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %doc obj/bin/UserManual*.pdf
 %endif
 %license COPYING*
+%{_bindir}/VBoxManage
+%{_bindir}/vboxmanage
+%{_bindir}/VBoxSDL
+%{_bindir}/vboxsdl
 %{_bindir}/VBox
-%{_bindir}/vboxballoonctrl
-%{_bindir}/VBoxBalloonCtrl
+%{_bindir}/VBoxVRDP
 %{_bindir}/vboxheadless
 %{_bindir}/VBoxHeadless
-%{_bindir}/vboxmanage
-%{_bindir}/VBoxManage
-%{_bindir}/vboxsdl
-%{_bindir}/VBoxSDL
-%{_bindir}/VBoxTunctl
-%{_bindir}/virtualbox
-%{_bindir}/VBoxAutostart
-%{_bindir}/vboxautostart
 %{_bindir}/VBoxDTrace
 %{_bindir}/vboxdtrace
+%{_bindir}/VBoxBugReport
+%{_bindir}/vboxbugreport
+%{_bindir}/VBoxBalloonCtrl
+%{_bindir}/vboxballoonctrl
+%{_bindir}/VBoxAutostart
+%{_bindir}/vboxautostart
 %{_bindir}/vbox-img
-%{_bindir}/VBoxVRDP
+%{_bindir}/VBoxTunctl
 %dir %{_libdir}/virtualbox
 %{_libdir}/virtualbox/*.[^p]*
 %exclude %{_libdir}/virtualbox/VirtualBox.so
+%exclude %{_libdir}/virtualbox/VBoxDbg.so
+%exclude %{_libdir}/virtualbox/VBoxPython2_7.so
 %{_libdir}/virtualbox/components
 %{_libdir}/virtualbox/VBoxExtPackHelperApp
 %{_libdir}/virtualbox/VBoxManage
@@ -684,15 +706,17 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/mime/*
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
-%{_udevrulesdir}/90-vboxdrv.rules
+%{_udevrulesdir}/60-vboxdrv.rules
 %{_prefix}/lib/modules-load.d/%{name}.conf
 %{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 
 %files qt
 %{_bindir}/VirtualBox
+%{_bindir}/virtualbox
 %{_libdir}/virtualbox/VBoxTestOGL
-%{_libdir}/virtualbox/nls
 %{_libdir}/virtualbox/VirtualBox.so
+%{_libdir}/virtualbox/VBoxDbg.so
+%{_libdir}/virtualbox/nls
 %{_datadir}/pixmaps/*
 %{_datadir}/applications/*.desktop
 
@@ -712,6 +736,7 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_libdir}/virtualbox/*.py*
 %{python2_sitelib}/virtualbox
 %{python2_sitelib}/vboxapi*
+%{_libdir}/virtualbox/VBoxPython2_7.so
 %{_libdir}/virtualbox/sdk/bindings/xpcom/python
 
 %files guest-additions
@@ -732,7 +757,6 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_unitdir}/vboxservice.service
 %{_prefix}/lib/systemd/system-preset/96-vbox.preset
 
-
 %files kmodsrc
 %{_datadir}/%{name}-kmod-%{version}
 
@@ -751,6 +775,10 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 - Update descriptions
 - Review Scriptlets for starting vboxservice.service in guest-additions
   https://fedoraproject.org/wiki/Starting_services_by_default
+- Adjust vboxdrv.rules and move to 60-vboxdrv.rules as has upstream.
+- Remove Encoding key on .desktop files, Encoding key is deprectated.
+- Add a new luncher, VBoxBugReport and reorder lunchers as upstream spec
+- Move more files to sub-packages.
 
 * Tue Sep 13 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-1
 - Update VBox to 5.1.6
