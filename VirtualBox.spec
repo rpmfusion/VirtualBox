@@ -25,10 +25,9 @@
 Name:       VirtualBox
 Version:    5.1.6
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
-Group:      Development/Tools
 License:    GPLv2 or (GPLv2 and CDDL)
 URL:        http://www.virtualbox.org/wiki/VirtualBox
 Source0:    http://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
@@ -137,17 +136,23 @@ ExclusiveArch:  i586 x86_64
 ExclusiveArch:  i386 x86_64
 %endif
 
+Group:      System/Emulators/PC
+Requires:   %{name}-server%{?isa} = %{version}
+Provides:   %{name}-gui = %{version}
+Obsoletes:  %{name}-qt
+
+%description
+Qt GUI part for %{name}.
+
+%package server
+Summary:    core part (host server) for %{name}
+Group:      Development/Tools
 Requires:   %{name}-kmod = %{version}
-%if 0%{?fedora} > 0
-Recommends:   %{name}-qt = %{version}
-%else
-Requires:     %{name}-qt = %{version}
-%endif
 Provides:   %{name}-kmod-common = %{version}-%{release}
 Conflicts:  %{name}-guest <= %{version}-%{release}
 Conflicts:  %{name}-guest-additions <= %{version}-%{release}
 
-%description
+%description server
 VirtualBox is a powerful x86 and AMD64/Intel64 virtualization product for
 enterprise as well as home use. Not only is VirtualBox an extremely feature
 rich, high performance product for enterprise customers, it is also the only
@@ -159,15 +164,6 @@ supports a large number of guest operating systems including but not limited to
 Windows (NT 4.0, 2000, XP, Server 2003, Vista, Windows 7, Windows 8, Windows
 10), DOS/Windows 3.x, Linux (2.4, 2.6, 3.x and 4.x), Solaris and OpenSolaris,
 OS/2, and OpenBSD.
-
-%package qt
-Summary:        Qt GUI part for %{name}
-Group:          System/Emulators/PC
-Requires:       %{name} = %{version}
-Provides:       %{name}-gui = %{version}
-
-%description qt
-Qt GUI part for %{name}.
 
 %if %{with webservice}
 %package webservice
@@ -650,7 +646,7 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 /sbin/ldconfig
 %systemd_postun_with_restart vboxservice.service
 
-%files
+%files server
 %doc doc/*cpp doc/VMM
 %if %{with docs}
 %doc obj/bin/UserManual*.pdf
@@ -709,7 +705,7 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_prefix}/lib/modules-load.d/%{name}.conf
 %{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 
-%files qt
+%files
 %{_bindir}/VirtualBox
 %{_bindir}/virtualbox
 %{_libdir}/virtualbox/VBoxTestOGL
@@ -760,6 +756,13 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Oct 08 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-3
+- rfbz#1169 v2, use another sub-package schema.
+  Core sub-package now is called server and main package is Qt part (as end user
+  expect). Also is more simple deal with dependencies.
+- Add vboxpci to rmmod instructions.
+- Remove one line that belongs to akmods process.
+
 * Thu Sep 15 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-2
 - Packaging:Scriptlets review Systemd, Icon Cache, mimeinfo and desktop-database
 - Add back RPMFusion strings to VBox.sh it is used on /usr/bin/VBox
