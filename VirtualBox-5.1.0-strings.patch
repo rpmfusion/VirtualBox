@@ -24,7 +24,7 @@ Replace some strings with ones that (sometimes) make more sense.
      "VirtualBox. The installation of VirtualBox was apparently not "
      "successful. Executing<br/><br/>"
 -    "  <font color=blue>'/sbin/vboxconfig'</font><br/><br/>"
-+    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxdrv; systemctl restart systemd-modules-load.service</font> as root<br/><br/>"
++    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxpci vboxdrv; systemctl restart systemd-modules-load.service</font> as root<br/><br/>"
      "may correct this. Make sure that you do not mix the "
 -    "OSE version and the PUEL version of VirtualBox."
 +    "RPMFusion version and the Oracle version of VirtualBox."
