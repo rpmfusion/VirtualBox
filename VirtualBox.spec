@@ -15,7 +15,7 @@
 %global prereltag %{?prerel:-%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 %bcond_without webservice
-%if 0%{?rhel}
+%if 0%{?rhel} || 0%{?fedora} > 25
     %bcond_with docs
 %else
     %bcond_without docs
@@ -44,14 +44,13 @@ Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
-Patch23:    VirtualBox-4.3.10-xserver_guest.patch
-Patch24:    VirtualBox-4.3.0-VBoxGuestLib.patch
+Patch23:    VirtualBox-5.0.18-xserver_guest.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
 Patch29:    29-fix-ftbfs-as-needed.patch
-# Patch34 just applied to Fedora 25+
+# glibc is just applied to Fedora 25+ but Oracle opt by another fix
 Patch34:    VirtualBox-5.0.16-glibc.patch
 Patch35:    VirtualBox-5.0.22-guest_soname.patch
 Patch37:    smap.diff
@@ -265,7 +264,6 @@ rm -r src/libs/zlib-1.2.8/
 %patch22 -p1 -b .gsoap
 %endif
 %patch23 -p1 -b .xserver_guest
-%patch24 -p1 -b .guestlib
 %patch26 -p1 -b .nobundles
 #patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
@@ -300,6 +298,7 @@ sed -i 's/\r//' COPYING
 #--disable-java
 #--disable-xpcom
 . ./env.sh
+umask 0022
 
 #TODO fix publisher in copr
 %global publisher _%{?vendor:%(echo "%{vendor}" | \
@@ -762,6 +761,8 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
   expect). Also is more simple deal with dependencies.
 - Add vboxpci to rmmod instructions.
 - Remove one line that belongs to akmods process.
+- Just building kernel driver for X.Org Server fix building with X.Org Server
+  1.19 (guest-additions).
 
 * Thu Sep 15 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-2
 - Packaging:Scriptlets review Systemd, Icon Cache, mimeinfo and desktop-database

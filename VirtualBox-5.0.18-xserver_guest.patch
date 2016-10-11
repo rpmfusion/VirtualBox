@@ -1,3 +1,4 @@
+We also should use VBOX_USE_SYSTEM_XORG_HEADERS here:
 Just compile with X11 system source and we may remove bundle X11 source code.
 
 --- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.mesa	2012-09-13 09:26:18.000000000 +0100
@@ -41,3 +42,28 @@ Just compile with X11 system source and we may remove bundle X11 source code.
   ifdef VBoxOGL_FAKEDRI
    ifeq ($(KBUILD_TARGET), freebsd)
      VBoxOGL_LIBS += \
+--- ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk.orig	2014-10-11 13:03:35.000000000 +0100
++++ ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk	2014-10-12 00:11:00.925507543 +0100
+@@ -40,9 +40,11 @@ LIBRARIES += \
+ 	VBoxGuestR3LibShared
+ ifndef VBOX_ONLY_VALIDATIONKIT
+  if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd)
++ ifndef VBOX_USE_SYSTEM_XORG_HEADERS
+   LIBRARIES += \
+   	VBoxGuestR3LibXFree86
+  endif
++ endif
+  if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris)
+   LIBRARIES += \
+   	VBoxGuestR3LibXOrg
+--- ./src/VBox/Additions/x11/vboxvideo/Makefile.kmk.orig	2016-10-11 02:49:23.184986182 +0100
++++ ./src/VBox/Additions/x11/vboxvideo/Makefile.kmk	2016-10-11 02:49:39.879176964 +0100
+@@ -376,7 +376,7 @@ vboxvideo_drv_118_SOURCES := $(vboxvideo
+ 
+ ifdef VBOX_USE_SYSTEM_XORG_HEADERS
+  # Build using local X.Org headers.  We assume X.Org Server 1.7 or later.
+- DLLS    := $(filter-out vboxvideo_drv_%,$(DLLS)) vboxvideo_drv_system
++ DLLS    := $(filter-out vboxvideo_drv_%,$(DLLS))
+  SYSMODS := $(filter-out vboxvideo_drv%,$(SYSMODS))
+  vboxvideo_drv_system_TEMPLATE = VBOXGUESTR3XORGMOD
+  vboxvideo_drv_system_CFLAGS := \
