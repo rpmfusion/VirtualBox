@@ -25,7 +25,7 @@
 Name:       VirtualBox
 Version:    5.1.6
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -50,7 +50,8 @@ Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
 Patch29:    29-fix-ftbfs-as-needed.patch
-# glibc is just applied to Fedora 25+ but Oracle opt by another fix
+# glibc fix is just for glibc-2.24 (Fedora 25+) but Oracle opt by another fix
+# https://www.virtualbox.org/ticket/15205
 Patch34:    VirtualBox-5.0.16-glibc.patch
 Patch35:    VirtualBox-5.0.22-guest_soname.patch
 Patch37:    smap.diff
@@ -137,21 +138,9 @@ ExclusiveArch:  i386 x86_64
 
 Group:      System/Emulators/PC
 Requires:   %{name}-server%{?isa} = %{version}
-Provides:   %{name}-gui = %{version}
 Obsoletes:  %{name}-qt
 
 %description
-Qt GUI part for %{name}.
-
-%package server
-Summary:    core part (host server) for %{name}
-Group:      Development/Tools
-Requires:   %{name}-kmod = %{version}
-Provides:   %{name}-kmod-common = %{version}-%{release}
-Conflicts:  %{name}-guest <= %{version}-%{release}
-Conflicts:  %{name}-guest-additions <= %{version}-%{release}
-
-%description server
 VirtualBox is a powerful x86 and AMD64/Intel64 virtualization product for
 enterprise as well as home use. Not only is VirtualBox an extremely feature
 rich, high performance product for enterprise customers, it is also the only
@@ -164,12 +153,22 @@ Windows (NT 4.0, 2000, XP, Server 2003, Vista, Windows 7, Windows 8, Windows
 10), DOS/Windows 3.x, Linux (2.4, 2.6, 3.x and 4.x), Solaris and OpenSolaris,
 OS/2, and OpenBSD.
 
+%package server
+Summary:    core part (host server) for %{name}
+Group:      Development/Tools
+Requires:   %{name}-kmod = %{version}
+Provides:   %{name}-kmod-common = %{version}-%{release}
+Conflicts:  %{name}-guest <= %{version}-%{release}
+Conflicts:  %{name}-guest-additions <= %{version}-%{release}
+
+%description server
+%{name} without Qt GUI part.
+
 %if %{with webservice}
 %package webservice
 Summary:        WebService GUI part for %{name}
 Group:          System/Emulators/PC
-Requires:       %{name} = %{version}
-Provides:       %{name}-gui = %{version}
+Requires:       %{name}-server%{?isa} = %{version}
 
 %description webservice
 webservice GUI part for %{name}.
@@ -178,8 +177,8 @@ webservice GUI part for %{name}.
 %package devel
 Summary:    %{name} SDK
 Group:      Development/Libraries
-Requires:   %{name} = %{version}-%{release}
-Requires:   python-%{name} = %{version}-%{release}
+Requires:   %{name}-server%{?isa} = %{version}-%{release}
+Requires:   python-%{name}%{?isa} = %{version}-%{release}
 
 %description devel
 %{name} Software Development Kit.
@@ -188,7 +187,7 @@ Requires:   python-%{name} = %{version}-%{release}
 %package -n python-%{name}
 Summary:    Python bindings for %{name}
 Group:      Development/Libraries
-Requires:   %{name}%{?_isa} = %{version}-%{release}
+Requires:   %{name}-server%{?_isa} = %{version}-%{release}
 %{?python_provide:%python_provide python2-%{srcname}}
 
 %description -n python-%{name}
@@ -755,6 +754,13 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Oct 12 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-4
+- Some fixes:
+  Add full description on %{name} package.
+  Fix requires on sub-packages to %{name}-server.
+  Add %{?_isa}.
+  Do not provide %{name}-gui, we don't use it and it is ambiguous.
+
 * Sat Oct 08 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-3
 - rfbz#1169 v2, use another sub-package schema.
   Core sub-package now is called server and main package is Qt part (as end user
