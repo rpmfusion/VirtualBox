@@ -1,44 +1,94 @@
-We also should use VBOX_USE_SYSTEM_XORG_HEADERS here:
-Just compile with X11 system source and we may remove bundle X11 source code.
+Copyright (c) 2016 Sérgio Basto
 
---- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.mesa	2012-09-13 09:26:18.000000000 +0100
-+++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2012-09-23 01:08:36.032101751 +0100
-@@ -68,18 +68,12 @@ VBoxOGL_TEMPLATE       = VBOXCROGLR3GUES
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+The MIT License is to allow be in included in VirtualBox source code.
+
+Using also VBOX_USE_SYSTEM_XORG_HEADERS to build guest additions parts,
+just compile with X11 system source and we may remove all bundle X11 source code.
+
+when we use VBOX_USE_SYSTEM_XORG_HEADERS, we don't need compile the very old
+VBoxGuestR3LibXFree86 for use with old servers where the C library is not
+available and becasue fail to build when we unbundle all X11 sources, files like
+xf86_ansic.h doesn't exist anymore.
+
+--- ./Config.kmk.orig	2016-10-12 02:27:19.650378571 +0100
++++ ./Config.kmk	2016-10-12 02:29:40.308912309 +0100
+@@ -2362,6 +2362,7 @@ ifdef VBOX_WITH_CROGL
+  endif
+ 
+  if1of ($(KBUILD_TARGET), freebsd linux solaris)
++ ifndef VBOX_USE_SYSTEM_XORG_HEADERS
+  # VBOX_PATH_MESA_SOURCE = $(PATH_ROOT)/src/libs/mesa-7.2
+   VBOX_PATH_MESA_SOURCE = $(VBOX_PATH_X11_ROOT)/mesa-7.2
+   VBOX_MESA_INCS = \
+@@ -2372,6 +2373,7 @@ ifdef VBOX_WITH_CROGL
+         $(VBOX_PATH_MESA_SOURCE)/src/mesa/main \
+         $(VBOX_PATH_MESA_SOURCE)/src/mesa/drivers/dri/common
+  endif
++ endif
+ 
+  VBOX_DARWIN_OPENGL_INST     = obj/VBoxOGL/GL/
+  VBOX_DARWIN_OPENGL_HEADERS  = gl.h glu.h
+--- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.orig	2016-10-12 02:45:13.748143934 +0100
++++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2016-10-12 02:51:58.881590957 +0100
+@@ -67,6 +67,15 @@ endif
+ VBoxOGL_TEMPLATE       = VBOXCROGLR3GUESTDLL
  VBoxOGL_INCS           = .
  if1of ($(KBUILD_TARGET), linux solaris freebsd)
-  VBoxOGL_INCS     += \
--	$(VBOX_PATH_X11_ROOT)/libXdamage-1.1 \
--	$(VBOX_PATH_X11_ROOT)/libXcomposite-0.4.0 \
--	$(VBOX_PATH_X11_ROOT)/libXext-1.3.1 \
--	$(VBOX_PATH_X11_ROOT)/libXfixes-4.0.3 \
--	$(VBOX_PATH_X11_ROOT)/damageproto-1.1.0 \
--	$(VBOX_PATH_X11_ROOT)/compositeproto-0.4 \
--	$(VBOX_PATH_X11_ROOT)/fixesproto-4.0 \
--	$(VBOX_PATH_X11_ROOT)/libx11-1.1.5-other \
--	$(VBOX_PATH_X11_ROOT)/xextproto-7.1.1 \
--	$(VBOX_PATH_X11_ROOT)/xproto-7.0.18 \
++ ifdef VBOX_USE_SYSTEM_XORG_HEADERS
++ VBoxOGL_INCS     += \
 +	/usr/include/x11 \
 +	/usr/include/xorg \
 +	/usr/include/pixman-1 \
- 	$(VBOX_MESA_INCS) \
--	$(PATH_ROOT)/src/VBox/Additions/x11/x11include/libdrm-2.4.13
++ 	$(VBOX_MESA_INCS) \
 +	/usr/include/drm \
 +	/usr/include/libdrm
++ else
+  VBoxOGL_INCS     += \
+ 	$(VBOX_PATH_X11_ROOT)/libXdamage-1.1 \
+ 	$(VBOX_PATH_X11_ROOT)/libXcomposite-0.4.0 \
+@@ -81,6 +90,7 @@ if1of ($(KBUILD_TARGET), linux solaris f
+ 	$(VBOX_MESA_INCS) \
+ 	$(PATH_ROOT)/src/VBox/Additions/x11/x11include/libdrm-2.4.13
   VBoxOGL_DEFS     += VBOX_NO_NATIVEGL
++ endif
  endif
  
-@@ -214,10 +208,10 @@
+ ifdef VBoxOGL_DRI
+@@ -213,11 +223,19 @@ VBoxOGL_LIBS.win += \
+ 	$(PATH_STAGE_LIB)/additions/VBoxCrHgsmi$(VBOX_SUFF_LIB)
  
  if1of ($(KBUILD_TARGET), linux solaris freebsd)
-  VBoxOGL_LIBS += \
-- 	$(PATH_STAGE_LIB)/libXcomposite.so \
-- 	$(PATH_STAGE_LIB)/libXdamage.so \
-- 	$(PATH_STAGE_LIB)/libXfixes.so \
-- 	$(PATH_STAGE_LIB)/libXext.so
-+ 	Xcomposite \
-+ 	Xdamage \
-+ 	Xfixes \
-+ 	Xext
+- VBoxOGL_LIBS += \
++ ifdef VBOX_USE_SYSTEM_XORG_HEADERS
++   VBoxOGL_LIBS += \
++     Xcomposite \
++     Xdamage \
++     Xfixes \
++     Xext
++ else
++   VBoxOGL_LIBS += \
+  	$(PATH_STAGE_LIB)/libXcomposite.so \
+  	$(PATH_STAGE_LIB)/libXdamage.so \
+  	$(PATH_STAGE_LIB)/libXfixes.so \
+  	$(PATH_STAGE_LIB)/libXext.so
++endif
   ifdef VBoxOGL_FAKEDRI
    ifeq ($(KBUILD_TARGET), freebsd)
      VBoxOGL_LIBS += \
