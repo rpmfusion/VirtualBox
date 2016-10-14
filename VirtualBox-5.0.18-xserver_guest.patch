@@ -117,3 +117,15 @@ xf86_ansic.h doesn't exist anymore.
   SYSMODS := $(filter-out vboxvideo_drv%,$(SYSMODS))
   vboxvideo_drv_system_TEMPLATE = VBOXGUESTR3XORGMOD
   vboxvideo_drv_system_CFLAGS := \
+--- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.orig	2016-10-12 02:45:13.748143934 +0100
++++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2016-10-13 23:20:27.876516475 +0100
+@@ -709,7 +709,9 @@ $(VBOX_PATH_CROGL_GENFILES)/feedbackspu_
+ 
+ VBoxEGL_TEMPLATE       = VBOXCROGLR3GUESTDLL
+ VBoxEGL_SOURCES        = egl.c
++ifndef VBOX_USE_SYSTEM_XORG_HEADERS
+ VBoxEGL_INCS           = $(VBOX_PATH_X11_ROOT)/mesa-11.0.7
++endif
+ VBoxEGL_LIBS           = $(VBOX_LIB_OGL) $(VBOX_LIB_IPRT_GUEST_R3_SHARED)
+ VBoxEGL_SONAME.linux   = libEGL.so.1
+ 

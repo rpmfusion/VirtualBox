@@ -25,7 +25,7 @@
 Name:       VirtualBox
 Version:    5.1.6
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    4%{?dist}
+Release:    5%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -754,12 +754,18 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Oct 13 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-5
+- Add more one ifdef in VirtualBox-5.0.18-xserver_guest.patch
+
 * Wed Oct 12 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-4
 - Some fixes:
   Add full description on %{name} package.
   Fix requires on sub-packages to %{name}-server.
   Add %{?_isa}.
   Do not provide %{name}-gui, we don't use it and it is ambiguous.
+- Refactor the patch VirtualBox-5.0.18-xserver_guest.patch
+  using VBOX_USE_SYSTEM_XORG_HEADERS instead drop and replace code, for
+  include upstream, also add MIT License.
 
 * Sat Oct 08 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-3
 - rfbz#1169 v2, use another sub-package schema.
