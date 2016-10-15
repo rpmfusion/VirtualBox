@@ -45,25 +45,17 @@ xf86_ansic.h doesn't exist anymore.
  
   VBOX_DARWIN_OPENGL_INST     = obj/VBoxOGL/GL/
   VBOX_DARWIN_OPENGL_HEADERS  = gl.h glu.h
---- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.orig	2016-10-12 02:45:13.748143934 +0100
-+++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2016-10-12 02:51:58.881590957 +0100
-@@ -67,6 +67,15 @@ endif
+--- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.orig	2016-10-15 16:06:41.137161024 +0100
++++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2016-10-15 16:09:48.477540551 +0100
+@@ -67,6 +67,7 @@ endif
  VBoxOGL_TEMPLATE       = VBOXCROGLR3GUESTDLL
  VBoxOGL_INCS           = .
  if1of ($(KBUILD_TARGET), linux solaris freebsd)
-+ ifdef VBOX_USE_SYSTEM_XORG_HEADERS
-+ VBoxOGL_INCS     += \
-+	/usr/include/X11 \
-+	/usr/include/xorg \
-+	/usr/include/pixman-1 \
-+ 	$(VBOX_MESA_INCS) \
-+	/usr/include/drm \
-+	/usr/include/libdrm
-+ else
++ ifndef VBOX_USE_SYSTEM_XORG_HEADERS
   VBoxOGL_INCS     += \
  	$(VBOX_PATH_X11_ROOT)/libXdamage-1.1 \
  	$(VBOX_PATH_X11_ROOT)/libXcomposite-0.4.0 \
-@@ -81,6 +90,7 @@ if1of ($(KBUILD_TARGET), linux solaris f
+@@ -81,6 +82,7 @@ if1of ($(KBUILD_TARGET), linux solaris f
  	$(VBOX_MESA_INCS) \
  	$(PATH_ROOT)/src/VBox/Additions/x11/x11include/libdrm-2.4.13
   VBoxOGL_DEFS     += VBOX_NO_NATIVEGL
@@ -71,17 +63,13 @@ xf86_ansic.h doesn't exist anymore.
  endif
  
  ifdef VBoxOGL_DRI
-@@ -213,11 +223,19 @@ VBoxOGL_LIBS.win += \
+@@ -213,11 +215,15 @@ VBoxOGL_LIBS.win += \
  	$(PATH_STAGE_LIB)/additions/VBoxCrHgsmi$(VBOX_SUFF_LIB)
  
  if1of ($(KBUILD_TARGET), linux solaris freebsd)
 - VBoxOGL_LIBS += \
 + ifdef VBOX_USE_SYSTEM_XORG_HEADERS
-+   VBoxOGL_LIBS += \
-+     Xcomposite \
-+     Xdamage \
-+     Xfixes \
-+     Xext
++   VBoxOGL_LIBS += Xcomposite Xdamage Xfixes Xext
 + else
 +   VBoxOGL_LIBS += \
   	$(PATH_STAGE_LIB)/libXcomposite.so \
@@ -92,6 +80,16 @@ xf86_ansic.h doesn't exist anymore.
   ifdef VBoxOGL_FAKEDRI
    ifeq ($(KBUILD_TARGET), freebsd)
      VBoxOGL_LIBS += \
+@@ -709,7 +715,9 @@ $(VBOX_PATH_CROGL_GENFILES)/feedbackspu_
+ 
+ VBoxEGL_TEMPLATE       = VBOXCROGLR3GUESTDLL
+ VBoxEGL_SOURCES        = egl.c
++ifndef VBOX_USE_SYSTEM_XORG_HEADERS
+ VBoxEGL_INCS           = $(VBOX_PATH_X11_ROOT)/mesa-11.0.7
++endif
+ VBoxEGL_LIBS           = $(VBOX_LIB_OGL) $(VBOX_LIB_IPRT_GUEST_R3_SHARED)
+ VBoxEGL_SONAME.linux   = libEGL.so.1
+ 
 --- ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk.orig	2014-10-11 13:03:35.000000000 +0100
 +++ ./src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk	2014-10-12 00:11:00.925507543 +0100
 @@ -40,9 +40,11 @@ LIBRARIES += \
@@ -117,15 +115,11 @@ xf86_ansic.h doesn't exist anymore.
   SYSMODS := $(filter-out vboxvideo_drv%,$(SYSMODS))
   vboxvideo_drv_system_TEMPLATE = VBOXGUESTR3XORGMOD
   vboxvideo_drv_system_CFLAGS := \
---- ./src/VBox/Additions/common/crOpenGL/Makefile.kmk.orig	2016-10-12 02:45:13.748143934 +0100
-+++ ./src/VBox/Additions/common/crOpenGL/Makefile.kmk	2016-10-13 23:20:27.876516475 +0100
-@@ -709,7 +709,9 @@ $(VBOX_PATH_CROGL_GENFILES)/feedbackspu_
- 
- VBoxEGL_TEMPLATE       = VBOXCROGLR3GUESTDLL
- VBoxEGL_SOURCES        = egl.c
-+ifndef VBOX_USE_SYSTEM_XORG_HEADERS
- VBoxEGL_INCS           = $(VBOX_PATH_X11_ROOT)/mesa-11.0.7
-+endif
- VBoxEGL_LIBS           = $(VBOX_LIB_OGL) $(VBOX_LIB_IPRT_GUEST_R3_SHARED)
- VBoxEGL_SONAME.linux   = libEGL.so.1
- 
+@@ -384,7 +384,6 @@ ifdef VBOX_USE_SYSTEM_XORG_HEADERS
+  vboxvideo_drv_system_DEFS := $(filter-out _XORG_SERVER_H_ _DIX_CONFIG_H_, $(vboxvideo_15_DEFS))
+  vboxvideo_drv_system_INCS += \
+         $(PATH_ROOT)/src/VBox/Runtime/include \
+-        /usr/include/x11 \
+         /usr/include/xorg \
+         /usr/include/pixman-1
+  vboxvideo_drv_system_SOURCES := $(vboxvideo_drv_17_SOURCES)
