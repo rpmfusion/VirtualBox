@@ -53,7 +53,7 @@ xf86_ansic.h doesn't exist anymore.
  if1of ($(KBUILD_TARGET), linux solaris freebsd)
 + ifdef VBOX_USE_SYSTEM_XORG_HEADERS
 + VBoxOGL_INCS     += \
-+	/usr/include/x11 \
++	/usr/include/X11 \
 +	/usr/include/xorg \
 +	/usr/include/pixman-1 \
 + 	$(VBOX_MESA_INCS) \

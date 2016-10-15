@@ -25,7 +25,7 @@
 Name:       VirtualBox
 Version:    5.1.6
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    5%{?dist}
+Release:    6%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -49,7 +49,6 @@ Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
-Patch29:    29-fix-ftbfs-as-needed.patch
 # glibc fix is just for glibc-2.24 (Fedora 25+) but Oracle opt by another fix
 # https://www.virtualbox.org/ticket/15205
 Patch34:    VirtualBox-5.0.16-glibc.patch
@@ -268,7 +267,6 @@ rm -r src/libs/zlib-1.2.8/
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
-%patch29 -p1 -b .as_need
 %if 0%{?fedora} > 24
 #patch34 -p1 -b .glibc
 %endif
@@ -754,6 +752,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Oct 15 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-6
+- Minor issues
+
 * Thu Oct 13 2016 Sérgio Basto <sergio@serjux.com> - 5.1.6-5
 - Add more one ifdef in VirtualBox-5.0.18-xserver_guest.patch
 
