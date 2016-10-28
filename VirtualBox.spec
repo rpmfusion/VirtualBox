@@ -25,7 +25,7 @@
 Name:       VirtualBox
 Version:    5.1.8
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -45,6 +45,7 @@ Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-5.0.18-xserver_guest.patch
+Patch24:    VirtualBox-5.0.18-xserver_guest_xorg19.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-gcc.patch
 # from Debian
@@ -262,6 +263,9 @@ rm -r src/libs/zlib-1.2.8/
 %patch22 -p1 -b .gsoap
 %endif
 %patch23 -p1 -b .xserver_guest
+%if 0%{?fedora}
+%patch24 -p1 -b .xserver_guest_xorg19
+%endif
 %patch26 -p1 -b .nobundles
 #patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
@@ -467,8 +471,10 @@ install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 #
 # [1] https://www.virtualbox.org/changeset/43588/vbox
 
-#install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
-#    %{buildroot}%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
+%if 0%{?rhel}
+install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
+    %{buildroot}%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
+%endif
 
 # Guest-additions tools
 install -m 0755 -t %{buildroot}%{_sbindir}   \
@@ -738,8 +744,10 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_sbindir}/VBoxService
 %{_sbindir}/mount.vboxsf
 %{_libdir}/security/pam_vbox.so
-# do not use xorg module drive
-#{_libdir}/xorg/modules/drivers/*
+%if 0%{?rhel}
+# do not use xorg module drive in newer versions
+%{_libdir}/xorg/modules/drivers/*
+%endif
 %{_libdir}/VBox*.so
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
@@ -752,6 +760,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Oct 19 2016 Sérgio Basto <sergio@serjux.com> - 5.1.8-2
+- Fixes for EL7 and X.org-1.19
+
 * Tue Oct 18 2016 Sérgio Basto <sergio@serjux.com> - 5.1.8-1
 - Update VBox to 5.1.8
 

@@ -1,6 +1,9 @@
 [Unit]
 Description=VirtualBox guest services
-ConditionVirtualization=oracle
+#RHEL7 says that Virtualization is kvm !?
+ConditionVirtualization=|kvm
+ConditionVirtualization=|oracle
+
 
 [Service]
 ExecStart=/usr/sbin/VBoxService -f

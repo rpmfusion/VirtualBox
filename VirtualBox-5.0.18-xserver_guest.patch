@@ -106,15 +106,6 @@ xf86_ansic.h doesn't exist anymore.
    	VBoxGuestR3LibXOrg
 --- ./src/VBox/Additions/x11/vboxvideo/Makefile.kmk.orig	2016-10-11 02:49:23.184986182 +0100
 +++ ./src/VBox/Additions/x11/vboxvideo/Makefile.kmk	2016-10-11 02:49:39.879176964 +0100
-@@ -376,7 +376,7 @@ vboxvideo_drv_118_SOURCES := $(vboxvideo
- 
- ifdef VBOX_USE_SYSTEM_XORG_HEADERS
-  # Build using local X.Org headers.  We assume X.Org Server 1.7 or later.
-- DLLS    := $(filter-out vboxvideo_drv_%,$(DLLS)) vboxvideo_drv_system
-+ DLLS    := $(filter-out vboxvideo_drv_%,$(DLLS))
-  SYSMODS := $(filter-out vboxvideo_drv%,$(SYSMODS))
-  vboxvideo_drv_system_TEMPLATE = VBOXGUESTR3XORGMOD
-  vboxvideo_drv_system_CFLAGS := \
 @@ -384,7 +384,6 @@ ifdef VBOX_USE_SYSTEM_XORG_HEADERS
   vboxvideo_drv_system_DEFS := $(filter-out _XORG_SERVER_H_ _DIX_CONFIG_H_, $(vboxvideo_15_DEFS))
   vboxvideo_drv_system_INCS += \
