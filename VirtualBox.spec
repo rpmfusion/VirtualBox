@@ -23,9 +23,9 @@
 %bcond_with vnc
 
 Name:       VirtualBox
-Version:    5.1.8
+Version:    5.1.10
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -760,6 +760,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Nov 22 2016 Sérgio Basto <sergio@serjux.com> - 5.1.10-1
+- New upstream release, 5.1.10
+
 * Wed Oct 19 2016 Sérgio Basto <sergio@serjux.com> - 5.1.8-2
 - Fixes for EL7 and X.org-1.19
 

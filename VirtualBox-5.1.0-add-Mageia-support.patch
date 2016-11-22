@@ -86,8 +86,8 @@ diff -Nurp VirtualBox-5.1.0.p9/src/VBox/Installer/linux/distributions_rpm Virtua
 +mga2            = MAGEIA_2
 +mga1            = MAGEIA_1
  mdv2011.0       = MANDRIVA_2011_0
+ fedora25        = FEDORA_25
  fedora24        = FEDORA_24
- fedora22        = FEDORA_22
 diff -Nurp VirtualBox-5.1.0.p9/src/VBox/Installer/linux/VBoxSysInfo.sh VirtualBox-5.1.0.p13/src/VBox/Installer/linux/VBoxSysInfo.sh
 --- VirtualBox-5.1.0.p9/src/VBox/Installer/linux/VBoxSysInfo.sh	2016-07-12 17:54:27.000000000 +0300
 +++ VirtualBox-5.1.0.p13/src/VBox/Installer/linux/VBoxSysInfo.sh	2016-07-13 01:03:14.387225695 +0300
