@@ -25,7 +25,7 @@
 Name:       VirtualBox
 Version:    5.1.10
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -158,6 +158,8 @@ Summary:    core part (host server) for %{name}
 Group:      Development/Tools
 Requires:   %{name}-kmod = %{version}
 Provides:   %{name}-kmod-common = %{version}-%{release}
+Conflicts:  %{name}-guest <= %{version}-%{release}
+Conflicts:  %{name}-guest-additions <= %{version}-%{release}
 
 %description server
 %{name} without Qt GUI part.
@@ -206,6 +208,7 @@ Requires:   %(xserver-sdk-abi-requires ansic)
 Requires:   %(xserver-sdk-abi-requires videodrv)
 Requires:   %(xserver-sdk-abi-requires xinput)
 %endif
+Conflicts:  %{name} <= %{version}-%{release}
 
 
 %description guest-additions
@@ -607,13 +610,6 @@ fi
 /usr/bin/update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 
 %pre guest-additions
-if [ $(systemd-detect-virt | grep -iP "oracle|kvm" -c) -eq 0 ]; then
-echo "This package it is only to install in one Oracle VM VirtualBox."
-echo "You are trying install VirtualBox guest-additions but it hasn't been \
-detected that your system is running in a VirtualBox virtualization, so we \
-forced the installation to fail."
-exit 1
-fi
 # This is the LSB version of useradd and should work on recent
 # distributions
 getent passwd vboxadd >/dev/null || useradd -d /var/run/vboxadd -g 1 -r -s /bin/false vboxadd 2>&1
@@ -764,12 +760,6 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
-* Mon Nov 28 2016 Sérgio Basto <sergio@serjux.com> - 5.1.10-2
-- Use systemd-detect-virt to detect if we can install
-  VirtualBox-guest-additions, which fix an old problem which made not possible
-  install VirtualBox in a guest machine.
-  Removed conflicts between main package and guest-additions.
-
 * Tue Nov 22 2016 Sérgio Basto <sergio@serjux.com> - 5.1.10-1
 - New upstream release, 5.1.10
 
