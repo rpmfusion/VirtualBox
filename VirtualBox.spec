@@ -25,7 +25,7 @@
 Name:       VirtualBox
 Version:    5.1.14
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -43,7 +43,6 @@ Source21:   os_mageia_64.png
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
-Patch22:    VirtualBox-OSE-4.1.12-gsoap.patch
 Patch23:    VirtualBox-5.0.18-xserver_guest.patch
 Patch24:    VirtualBox-5.0.18-xserver_guest_xorg19.patch
 Patch26:    VirtualBox-4.3.0-no-bundles.patch
@@ -259,9 +258,6 @@ rm -r src/libs/zlib-1.2.8/
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
 %patch18 -p1 -b .aiobug
-%if 0%{?fedora} < 16
-%patch22 -p1 -b .gsoap
-%endif
 %patch23 -p1 -b .xserver_guest
 %if 0%{?fedora}
 %patch24 -p1 -b .xserver_guest_xorg19
@@ -760,6 +756,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Jan 23 2017 Sérgio Basto <sergio@serjux.com> - 5.1.14-2
+- Drop VirtualBox-OSE-4.1.12-gsoap.patch, was for Fedora 15
+
 * Tue Jan 17 2017 Sérgio Basto <sergio@serjux.com> - 5.1.14-1
 - Update VBox to 5.1.14
 
