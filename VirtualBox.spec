@@ -23,9 +23,9 @@
 %bcond_with vnc
 
 Name:       VirtualBox
-Version:    5.1.14
+Version:    5.1.16
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -251,7 +251,7 @@ rm include/VBox/HostServices/glxext.h
 #rm -r src/VBox/GuestHost/OpenGL/include/GL
 
 #rm -rf src/libs/liblzf-3.4/
-rm -r src/libs/libxml2-2.9.2/
+rm -r src/libs/libxml2-2.9.*/
 rm -r src/libs/libpng-1.2.*/
 rm -r src/libs/zlib-1.2.8/
 
@@ -263,7 +263,7 @@ rm -r src/libs/zlib-1.2.8/
 %patch24 -p1 -b .xserver_guest_xorg19
 %endif
 %patch26 -p1 -b .nobundles
-#patch27 -p1 -b .gcc
+%patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
@@ -756,6 +756,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Mar 08 2017 Sérgio Basto <sergio@serjux.com> - 5.1.16-1
+- Update VBox to 5.1.16
+
 * Mon Jan 23 2017 Sérgio Basto <sergio@serjux.com> - 5.1.14-2
 - Drop VirtualBox-OSE-4.1.12-gsoap.patch, was for Fedora 15
 
