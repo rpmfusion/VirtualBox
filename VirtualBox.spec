@@ -23,7 +23,7 @@
 %bcond_with vnc
 
 Name:       VirtualBox
-Version:    5.1.16
+Version:    5.1.18
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
@@ -756,6 +756,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Mar 16 2017 Sérgio Basto <sergio@serjux.com> - 5.1.18-1
+- Update VirtualBox to 5.1.18
+
 * Wed Mar 08 2017 Sérgio Basto <sergio@serjux.com> - 5.1.16-1
 - Update VBox to 5.1.16
 
