@@ -25,7 +25,7 @@
 Name:       VirtualBox
 Version:    5.1.18
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -756,6 +756,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Mar 18 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 5.1.18-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
 * Thu Mar 16 2017 Sérgio Basto <sergio@serjux.com> - 5.1.18-1
 - Update VirtualBox to 5.1.18
 
