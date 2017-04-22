@@ -25,7 +25,7 @@
 Name:       VirtualBox
 Version:    5.1.20
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -156,6 +156,7 @@ OS/2, and OpenBSD.
 Summary:    core part (host server) for %{name}
 Group:      Development/Tools
 Requires:   %{name}-kmod = %{version}
+Requires:   hicolor-icon-theme
 Provides:   %{name}-kmod-common = %{version}-%{release}
 Conflicts:  %{name}-guest <= %{version}-%{release}
 Conflicts:  %{name}-guest-additions <= %{version}-%{release}
@@ -695,7 +696,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
 %attr(4511,root,root) %{_libdir}/virtualbox/VirtualBox
-%{_datadir}/icons/*
+%{_datadir}/icons/hicolor/*/apps/*.png
+%{_datadir}/icons/hicolor/*/mimetypes/*.png
+%{_datadir}/icons/hicolor/scalable/mimetypes/virtualbox.svg
 %{_datadir}/mime/*
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
@@ -710,7 +713,7 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_libdir}/virtualbox/VirtualBox.so
 %{_libdir}/virtualbox/VBoxDbg.so
 %{_libdir}/virtualbox/nls
-%{_datadir}/pixmaps/*
+%{_datadir}/pixmaps/*.png
 %{_datadir}/applications/*.desktop
 
 %if %{with webservice}
@@ -756,6 +759,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Apr 22 2017 Sérgio Basto <sergio@serjux.com> - 5.1.20-2
+- Fix owning /usr/share/icons (rfbz#4509), thanks to Vasiliy N. Glazov
+
 * Wed Apr 19 2017 Sérgio Basto <sergio@serjux.com> - 5.1.20-1
 - Update VBox to 5.1.20, security fixes
 
