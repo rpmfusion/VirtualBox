@@ -15,7 +15,8 @@
 %global prereltag %{?prerel:-%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 %bcond_without webservice
-%if 0%{?rhel} || 0%{?fedora} > 25
+# el7 doesn't have all texlive requirements
+%if 0%{?rhel}
     %bcond_with docs
 %else
     %bcond_without docs
@@ -25,7 +26,7 @@
 Name:       VirtualBox
 Version:    5.1.20
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -759,6 +760,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun Apr 23 2017 Sérgio Basto <sergio@serjux.com> - 5.1.20-3
+- Build pdf doc on f26+
+
 * Sat Apr 22 2017 Sérgio Basto <sergio@serjux.com> - 5.1.20-2
 - Fix owning /usr/share/icons (rfbz#4509), thanks to Vasiliy N. Glazov
 
