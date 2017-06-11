@@ -31,6 +31,13 @@ Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
 URL:        http://www.virtualbox.org/wiki/VirtualBox
+
+ExclusiveArch:  i686 x86_64
+
+Group:      System/Emulators/PC
+Requires:   %{name}-server%{?isa} = %{version}
+Obsoletes:  %{name}-qt
+
 Source0:    http://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}a%{?prereltag}.tar.bz2
 Source3:    VirtualBox-60-vboxdrv.rules
 Source5:    VirtualBox-60-vboxguest.rules
@@ -126,19 +133,6 @@ BuildRequires:  libvncserver-devel
 
 %{?systemd_requires}
 BuildRequires: systemd
-
-# Plague-specific weirdness
-%if 0%{?fedora} > 11 || 0%{?rhel} > 5
-ExclusiveArch:  i686 x86_64
-%else %if 0%{?fedora} > 10
-ExclusiveArch:  i586 x86_64
-%else
-ExclusiveArch:  i386 x86_64
-%endif
-
-Group:      System/Emulators/PC
-Requires:   %{name}-server%{?isa} = %{version}
-Obsoletes:  %{name}-qt
 
 %description
 VirtualBox is a powerful x86 and AMD64/Intel64 virtualization product for
