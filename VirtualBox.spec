@@ -24,9 +24,9 @@
 %bcond_with vnc
 
 Name:       VirtualBox
-Version:    5.1.20
+Version:    5.1.22
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    3%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -38,7 +38,7 @@ Group:      System/Emulators/PC
 Requires:   %{name}-server%{?isa} = %{version}
 Obsoletes:  %{name}-qt
 
-Source0:    http://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}a%{?prereltag}.tar.bz2
+Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
 Source3:    VirtualBox-60-vboxdrv.rules
 Source5:    VirtualBox-60-vboxguest.rules
 Source6:    VirtualBox.modules
@@ -754,6 +754,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Jun 14 2017 Sérgio Basto <sergio@serjux.com> - 5.1.22-1
+- Update VBox to 5.1.22
+
 * Sun Apr 23 2017 Sérgio Basto <sergio@serjux.com> - 5.1.20-3
 - Build pdf doc on f26+
 
