@@ -255,7 +255,7 @@ rm -r src/libs/zlib-1.2.8/
 %patch24 -p1 -b .xserver_guest_xorg19
 %endif
 %patch26 -p1 -b .nobundles
-%patch27 -p1 -b .gcc
+#patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
