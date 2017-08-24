@@ -26,7 +26,7 @@
 Name:       VirtualBox
 Version:    5.1.26
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -57,11 +57,11 @@ Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
+# from RPMFusion
 Patch35:    VirtualBox-5.0.22-guest_soname.patch
 # from Mageia
 Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
-
 
 BuildRequires:  kBuild >= 0.1.9998
 BuildRequires:  SDL-devel xalan-c-devel
@@ -104,8 +104,11 @@ BuildRequires:  makeself
 
 # for 32bit on 64
 %ifarch x86_64
-BuildRequires:  libstdc++-static(x86-32) glibc(x86-32) glibc-devel(x86-32) libgcc(x86-32)
+BuildRequires:  libstdc++-static(x86-32) libgcc(x86-32)
 BuildRequires:  libstdc++-static(x86-64)
+BuildRequires:  glibc-devel(x86-32)
+# Quick fix for https://pagure.io/releng/issue/6958 and https://bugzilla.redhat.com/show_bug.cgi?id=1484849
+BuildRequires:  nss-softokn-freebl(x86-32)
 %else
 BuildRequires:  libstdc++-static
 %endif
@@ -302,9 +305,9 @@ kmk %{_smp_mflags}    \
     VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox        \
     VBOX_WITH_TESTCASES= \
     VBOX_WITH_VALIDATIONKIT= \
+    VBOX_WITH_EXTPACK_VBOXDTRACE= \
     VBOX_WITH_VBOX_IMG=1 \
     VBOX_WITH_SYSFS_BY_DEFAULT=1 \
-    VBOX_WITH_VMSVGA3D=1 \
     VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
 %if %{with docs}
@@ -746,6 +749,12 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun Aug 06 2017 Sérgio Basto <sergio@serjux.com> - 5.1.26-2
+- Some improvements based on new virtualbox-guest-additions for Fedora
+  rhbz #1481630 and rfbz #4617
+- VMSVGA3D from Config.kmk is windows only
+- VBOX_WITH_EXTPACK_VBOXDTRACE fails to build with glibc >= 2.26-2.fc27
+
 * Thu Jul 27 2017 Sérgio Basto <sergio@serjux.com> - 5.1.26-1
 - Update VBox to 5.1.26
 
