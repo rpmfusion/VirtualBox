@@ -24,9 +24,9 @@
 %bcond_with vnc
 
 Name:       VirtualBox
-Version:    5.1.26
+Version:    5.1.28
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -62,6 +62,7 @@ Patch35:    VirtualBox-5.0.22-guest_soname.patch
 # from Mageia
 Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
+
 
 BuildRequires:  kBuild >= 0.1.9998
 BuildRequires:  SDL-devel xalan-c-devel
@@ -146,6 +147,7 @@ Windows (NT 4.0, 2000, XP, Server 2003, Vista, Windows 7, Windows 8, Windows
 10), DOS/Windows 3.x, Linux (2.4, 2.6, 3.x and 4.x), Solaris and OpenSolaris,
 OS/2, and OpenBSD.
 
+
 %package server
 Summary:    core part (host server) for %{name}
 Group:      Development/Tools
@@ -158,6 +160,7 @@ Conflicts:  %{name}-guest-additions <= %{version}-%{release}
 %description server
 %{name} without Qt GUI part.
 
+
 %if %{with webservice}
 %package webservice
 Summary:        WebService GUI part for %{name}
@@ -167,6 +170,7 @@ Requires:       %{name}-server%{?isa} = %{version}
 %description webservice
 webservice GUI part for %{name}.
 %endif
+
 
 %package devel
 Summary:    %{name} SDK
@@ -749,6 +753,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Sep 14 2017 Sérgio Basto <sergio@serjux.com> - 5.1.28-1
+- Update VBox to 5.1.28
+
 * Sun Aug 06 2017 Sérgio Basto <sergio@serjux.com> - 5.1.26-2
 - Some improvements based on new virtualbox-guest-additions for Fedora
   rhbz #1481630 and rfbz #4617
