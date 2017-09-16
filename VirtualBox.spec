@@ -22,11 +22,12 @@
     %bcond_without docs
 %endif
 %bcond_with vnc
+%bcond_with vboxvideo_drv
 
 Name:       VirtualBox
 Version:    5.1.28
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -258,7 +259,7 @@ rm -r src/libs/zlib-1.2.8/
 %patch2 -p1 -b .strings
 %patch18 -p1 -b .aiobug
 %patch23 -p1 -b .xserver_guest
-%if 0%{?fedora}
+%if ! %{with vboxvideo_drv}
 %patch24 -p1 -b .xserver_guest_xorg19
 %endif
 %patch26 -p1 -b .nobundles
@@ -462,7 +463,7 @@ install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 #
 # [1] https://www.virtualbox.org/changeset/43588/vbox
 
-%if 0%{?rhel}
+%if %{with vboxvideo_drv}
 install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
     %{buildroot}%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 %endif
@@ -737,7 +738,7 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_sbindir}/VBoxService
 %{_sbindir}/mount.vboxsf
 %{_libdir}/security/pam_vbox.so
-%if 0%{?rhel}
+%if %{with vboxvideo_drv}
 # do not use xorg module drive in newer versions
 %{_libdir}/xorg/modules/drivers/*
 %endif
@@ -753,6 +754,10 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Sep 16 2017 Sérgio Basto <sergio@serjux.com> - 5.1.28-2
+- Epel 7 with X 1.19 don't need vboxvideo_drv
+  https://forums.virtualbox.org/viewtopic.php?f=15&t=84201
+
 * Thu Sep 14 2017 Sérgio Basto <sergio@serjux.com> - 5.1.28-1
 - Update VBox to 5.1.28
 
