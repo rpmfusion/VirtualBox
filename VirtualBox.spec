@@ -25,9 +25,9 @@
 %bcond_with vboxvideo_drv
 
 Name:       VirtualBox
-Version:    5.1.28
+Version:    5.1.30
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -754,6 +754,9 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Oct 27 2017 Sérgio Basto <sergio@serjux.com> - 5.1.30-1
+- Update VBox to 5.1.30
+
 * Sat Sep 16 2017 Sérgio Basto <sergio@serjux.com> - 5.1.28-2
 - Epel 7 with X 1.19 don't need vboxvideo_drv
   https://forums.virtualbox.org/viewtopic.php?f=15&t=84201
