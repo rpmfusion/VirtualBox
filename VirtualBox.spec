@@ -1,3 +1,5 @@
+%global __provides_exclude_from %{_libdir}/VBoxGuestAdditions
+
 # Standard compiler flags, without:
 # -Wall        -- VirtualBox takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
@@ -41,12 +43,13 @@ Obsoletes:  %{name}-qt
 
 Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
 Source3:    VirtualBox-60-vboxdrv.rules
+Source4:    VirtualBox.modules
 Source5:    VirtualBox-60-vboxguest.rules
-Source6:    VirtualBox.modules
-Source7:    VirtualBox-guest.modules
+Source6:    VirtualBox-guest.modules
+Source7:    vboxservice.service
+Source8:    96-vbox.preset
+Source9:    VBoxOGLRun.sh
 Source10:   vboxweb.service
-Source11:   vboxservice.service
-Source12:   96-vbox.preset
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
@@ -58,8 +61,6 @@ Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
-# from RPMFusion
-Patch35:    VirtualBox-5.0.22-guest_soname.patch
 # from Mageia
 Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
@@ -118,9 +119,7 @@ BuildRequires:  libstdc++-static
 # For the X11 module
 BuildRequires:  libdrm-devel
 BuildRequires:  libpciaccess-devel
-BuildRequires:  mesa-libGL-devel
 BuildRequires:  mesa-libOSMesa-devel
-BuildRequires:  mesa-libEGL-devel
 BuildRequires:  pixman-devel
 BuildRequires:  xorg-x11-proto-devel
 BuildRequires:  xorg-x11-server-devel
@@ -128,6 +127,11 @@ BuildRequires:  libXcursor-devel
 BuildRequires:  libXcomposite-devel
 BuildRequires:  libXmu-devel
 BuildRequires:  libXinerama-devel
+BuildRequires:  libXrandr-devel
+BuildRequires:  libXt-devel
+BuildRequires:  mesa-libEGL-devel
+BuildRequires:  mesa-libGL-devel
+BuildRequires:  mesa-libGLU-devel
 %if %{with vnc}
 BuildRequires:  libvncserver-devel
 %endif
@@ -214,12 +218,14 @@ Conflicts:  %{name} <= %{version}-%{release}
 Important note: VirtualBox-guest-additions can't be installed on Host (master)
 system because contains X11 and OpenGL drives that will mess up with your X11
 configurations.
+
 This subpackage replace Oracle Linux Guest Addition but just for Fedora,
 therefore should be installed only when we have one Fedora as a guest system.
 Tools that use kernel modules for supporting integration with the Host,
 including file sharing, clipboard sharing, X.org X11 video and mouse driver,
 USB and webcam proxy and Seamless mode.
 
+To use OpenGL pass-through mode run apps using "VBoxOGLRun foo -opt1 -opt2".
 
 %package kmodsrc
 Summary:    %{name} kernel module source code
@@ -232,11 +238,11 @@ which is generated during the build of main package.
 
 %prep
 %setup -q
-find -name '*.py[co]' -delete
 # add Mageia images
 cp -a %{SOURCE20} %{SOURCE21} src/VBox/Frontends/VirtualBox/images/
 
 # Remove prebuilt binary tools
+find -name '*.py[co]' -delete
 rm -r kBuild/
 rm -r tools/
 # Remove bundle X11 sources and some lib sources, before patching.
@@ -267,7 +273,6 @@ rm -r src/libs/zlib-1.2.8/
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
-%patch35 -p1 -b .soname
 %patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
 
@@ -304,10 +309,8 @@ umask 0022
 # layout under 'obj' and shuffle files around in %%install.
 kmk %{_smp_mflags}    \
     KBUILD_VERBOSE=2   \
-    TOOL_YASM_AS=yasm   \
     PATH_OUT="$PWD/obj"      \
-    VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox         \
-    VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox        \
+    TOOL_YASM_AS=yasm   \
     VBOX_WITH_TESTCASES= \
     VBOX_WITH_VALIDATIONKIT= \
     VBOX_WITH_EXTPACK_VBOXDTRACE= \
@@ -452,6 +455,9 @@ done
 install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 
 # Guest X.Org drivers
+mkdir -p %{buildroot}%{_libdir}/security
+mkdir -p %{buildroot}%{_libdir}/VBoxGuestAdditions
+
 # Michael Thayer from Oracle wrote: I have applied the patch [1] I posted so that you
 # can build with VBOX_USE_SYSTEM_XORG_HEADERS=1 set in future to only
 # build the X.Org drivers against the installed system headers.
@@ -472,35 +478,32 @@ install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
 install -m 0755 -t %{buildroot}%{_sbindir}   \
     obj/bin/additions/VBoxService       \
     obj/bin/additions/mount.vboxsf
-
 install -m 0755 -t %{buildroot}%{_bindir}    \
     obj/bin/additions/VBoxClient        \
     obj/bin/additions/VBoxControl
 
-install -m 0644 -D %{SOURCE11} \
-    %{buildroot}%{_unitdir}/vboxservice.service
-
 # Guest libraries
-install -m 0755 -t %{buildroot}%{_libdir}    \
-    obj/bin/additions/VBox*.so
-# New guest additions dropped vboxvideo_dri.so
-#install -d %{buildroot}%{_libdir}/dri
-#ln -sf ../VBoxOGL.so %{buildroot}%{_libdir}/dri/vboxvideo_dri.so
-install -d %{buildroot}%{_libdir}/security
 install -m 0755 -t %{buildroot}%{_libdir}/security \
     obj/bin/additions/pam_vbox.so
+install -m 0755 -t %{buildroot}%{_libdir}/VBoxGuestAdditions \
+    obj/bin/additions/VBoxOGL*.so
+ln -s VBoxOGL.so %{buildroot}%{_libdir}/VBoxGuestAdditions/libGL.so.1
 
 # init/vboxadd-x11 code near call the function install_x11_startup_app
-install -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
+install -p -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
     %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 ln -s ../..%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh \
     %{buildroot}%{_bindir}/VBoxClient-all
 desktop-file-install --dir=%{buildroot}%{_sysconfdir}/xdg/autostart/ \
     --remove-key=Encoding src/VBox/Additions/x11/Installer/vboxclient.desktop
-desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
+desktop-file-validate \
+    %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
-mkdir -p %{buildroot}%{_prefix}/lib/systemd/system-preset
-install -pm 0644 %{SOURCE12} %{buildroot}%{_prefix}/lib/systemd/system-preset/96-vbox.preset
+install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_unitdir}/vboxservice.service
+install -p -m 0644 -D %{SOURCE8} %{buildroot}%{_presetdir}/96-vbox.preset
+install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_udevrulesdir}/60-vboxguest.rules
+install -p -m 0755 -D %{SOURCE9} %{buildroot}%{_bindir}/VBoxOGLRun
+install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
@@ -521,11 +524,9 @@ echo 'INSTALL_DIR=%{_libdir}/virtualbox' > %{buildroot}%{_sysconfdir}/vbox/vbox.
 # Install udev rules
 install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh %{buildroot}%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_udevrulesdir}/60-vboxdrv.rules
-install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_udevrulesdir}/60-vboxguest.rules
 
 # Install modules load script
-install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}.conf
-install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
+install -p -m 0644 -D %{SOURCE4} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}.conf
 
 # Menu entry
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
@@ -602,14 +603,13 @@ fi
 /usr/bin/update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 
 %pre guest-additions
-# This is the LSB version of useradd and should work on recent
-# distributions
-getent passwd vboxadd >/dev/null || useradd -d /var/run/vboxadd -g 1 -r -s /bin/false vboxadd 2>&1
-
 # Add a group "vboxsf" for Shared Folders access
 # All users which want to access the auto-mounted Shared Folders have to
 # be added to this group.
 getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
+getent passwd vboxadd >/dev/null || \
+    useradd -r -g 1 -d /var/run/vboxadd -s /sbin/nologin vboxadd 2>&1
+
 
 # Guest additions install
 %post guest-additions
@@ -735,6 +735,7 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
 %{_bindir}/VBoxClient-all
+%{_bindir}/VBoxOGLRun
 %{_sbindir}/VBoxService
 %{_sbindir}/mount.vboxsf
 %{_libdir}/security/pam_vbox.so
@@ -742,13 +743,13 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 # do not use xorg module drive in newer versions
 %{_libdir}/xorg/modules/drivers/*
 %endif
-%{_libdir}/VBox*.so
+%{_libdir}/VBoxGuestAdditions
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %{_udevrulesdir}/60-vboxguest.rules
 %{_prefix}/lib/modules-load.d/%{name}-guest.conf
 %{_unitdir}/vboxservice.service
-%{_prefix}/lib/systemd/system-preset/96-vbox.preset
+%{_presetdir}/96-vbox.preset
 
 %files kmodsrc
 %{_datadir}/%{name}-kmod-%{version}
@@ -756,6 +757,10 @@ getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 %changelog
 * Fri Oct 27 2017 Sérgio Basto <sergio@serjux.com> - 5.1.30-1
 - Update VBox to 5.1.30
+- Some updates on VirtualBox-guest-addition based on VirtualBox-guest-addition.spec in review rhbz #1481630, with
+  proper fix for VirtualBox-5.0.22-guest_soname.patch
+
+- TODO check python3 and clean obsoleted scriptlets
 
 * Sat Sep 16 2017 Sérgio Basto <sergio@serjux.com> - 5.1.28-2
 - Epel 7 with X 1.19 don't need vboxvideo_drv
