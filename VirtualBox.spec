@@ -29,7 +29,7 @@
 Name:       VirtualBox
 Version:    5.1.30
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -311,6 +311,8 @@ kmk %{_smp_mflags}    \
     KBUILD_VERBOSE=2   \
     PATH_OUT="$PWD/obj"      \
     TOOL_YASM_AS=yasm   \
+    VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox \
+    VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox    \
     VBOX_WITH_TESTCASES= \
     VBOX_WITH_VALIDATIONKIT= \
     VBOX_WITH_EXTPACK_VBOXDTRACE= \
@@ -755,6 +757,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Nov 08 2017 Sérgio Basto <sergio@serjux.com> - 5.1.30-2
+- Restore kmk configurations VBOX_PATH_APP_PRIVATE and VBOX_PATH_APP_DOCS
+  rfbz(#4701)
+
 * Fri Oct 27 2017 Sérgio Basto <sergio@serjux.com> - 5.1.30-1
 - Update VBox to 5.1.30
 - Some updates on VirtualBox-guest-addition based on VirtualBox-guest-addition.spec in review rhbz #1481630, with
