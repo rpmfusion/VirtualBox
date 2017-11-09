@@ -16,7 +16,11 @@
 #global prerel 106108
 %global prereltag %{?prerel:-%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%bcond_without webservice
+%ifarch x86_64
+    %bcond_without webservice
+%else
+    %bcond_with webservice
+%endif
 # el7 doesn't have all texlive requirements
 %if 0%{?rhel}
     %bcond_with docs
