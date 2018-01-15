@@ -1,4 +1,5 @@
 VERSION=5.1.30
+REL=2
 git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
 spectool -g VirtualBox.spec
@@ -26,18 +27,19 @@ echo Press enter to continue; read dummy;
 rfpkg push && rfpkg build --nowait
 
 echo Press enter to continue; read dummy;
-koji-rpmfusion tag-build f27-free-override VirtualBox-$VERSION-1.fc27
-koji-rpmfusion wait-repo f27-free-build --build=VirtualBox-$VERSION-1.fc27
+#koji-rpmfusion watch-task
+koji-rpmfusion tag-build f27-free-override VirtualBox-$VERSION-$REL.fc27
+koji-rpmfusion wait-repo f27-free-build --build=VirtualBox-$VERSION-$REL.fc27
 git checkout f27 && git merge master && git push && rfpkg build --nowait; git checkout master
 echo Press enter to continue; read dummy;
-koji-rpmfusion tag-build f26-free-override VirtualBox-$VERSION-1.fc26
-koji-rpmfusion wait-repo f26-free-build --build=VirtualBox-$VERSION-1.fc26
+koji-rpmfusion tag-build f26-free-override VirtualBox-$VERSION-$REL.fc26
+koji-rpmfusion wait-repo f26-free-build --build=VirtualBox-$VERSION-$REL.fc26
 git checkout f26 && git merge master && git push && rfpkg build --nowait; git checkout master
 echo Press enter to continue; read dummy;
-koji-rpmfusion tag-build f25-free-override VirtualBox-$VERSION-1.fc25
-koji-rpmfusion wait-repo f25-free-build --build=VirtualBox-$VERSION-1.fc25
+koji-rpmfusion tag-build f25-free-override VirtualBox-$VERSION-$REL.fc25
+koji-rpmfusion wait-repo f25-free-build --build=VirtualBox-$VERSION-$REL.fc25
 git checkout f25 && git merge master && git push && rfpkg build --nowait; git checkout master
 echo Press enter to continue; read dummy;
-koji-rpmfusion tag-build el7-free-override VirtualBox-$VERSION-1.el7
-koji-rpmfusion wait-repo el7-free-build --build=VirtualBox-$VERSION-1.el7
+koji-rpmfusion tag-build el7-free-override VirtualBox-$VERSION-$REL.el7
+koji-rpmfusion wait-repo el7-free-build --build=VirtualBox-$VERSION-$REL.el7
 git checkout el7 && git merge master && git push && rfpkg build --nowait; git checkout master
