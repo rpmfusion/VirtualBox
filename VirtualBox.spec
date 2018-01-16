@@ -31,9 +31,9 @@
 %bcond_with vboxvideo_drv
 
 Name:       VirtualBox
-Version:    5.1.30
+Version:    5.2.4
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -114,8 +114,6 @@ BuildRequires:  makeself
 BuildRequires:  libstdc++-static(x86-32) libgcc(x86-32)
 BuildRequires:  libstdc++-static(x86-64)
 BuildRequires:  glibc-devel(x86-32)
-# Quick fix for https://pagure.io/releng/issue/6958 and https://bugzilla.redhat.com/show_bug.cgi?id=1484849
-BuildRequires:  nss-softokn-freebl(x86-32)
 %else
 BuildRequires:  libstdc++-static
 %endif
@@ -272,7 +270,7 @@ rm -r src/libs/zlib-1.2.8/
 %if ! %{with vboxvideo_drv}
 %patch24 -p1 -b .xserver_guest_xorg19
 %endif
-%patch26 -p1 -b .nobundles
+#patch26 -p1 -b .nobundles
 #patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
@@ -324,6 +322,14 @@ kmk %{_smp_mflags}    \
     VBOX_WITH_SYSFS_BY_DEFAULT=1 \
     VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
+    VBOX_USE_SYSTEM_GL_HEADERS=1                               \
+    VBOX_NO_LEGACY_XORG_X11=1                                  \
+    SDK_VBOX_LIBPNG_INCS=/usr/include/libpng16                 \
+    SDK_VBOX_LIBXML2_INCS=/usr/include/libxml2                 \
+    SDK_VBOX_OPENSSL_INCS=                                     \
+    SDK_VBOX_OPENSSL_LIBS="ssl crypto"                     \
+    SDK_VBOX_ZLIB_INCS=                                        \
+
 %if %{with docs}
     VBOX_WITH_DOCS=1 \
 # doc/manual/fr_FR/ missing man_VBoxManage-debugvm.xml and man_VBoxManage-extpack.xml
@@ -761,6 +767,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Jan 15 2018 Sérgio Basto <sergio@serjux.com> - 5.2.4-1
+- Update VBox to 5.2.4
+
 * Wed Nov 08 2017 Sérgio Basto <sergio@serjux.com> - 5.1.30-2
 - Restore kmk configurations VBOX_PATH_APP_PRIVATE and VBOX_PATH_APP_DOCS
   rfbz(#4701)
