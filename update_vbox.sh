@@ -1,5 +1,5 @@
-VERSION=5.1.30
-REL=2
+VERSION=5.2.6
+REL=1
 git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
 spectool -g VirtualBox.spec

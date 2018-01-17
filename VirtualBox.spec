@@ -31,7 +31,7 @@
 %bcond_with vboxvideo_drv
 
 Name:       VirtualBox
-Version:    5.2.4
+Version:    5.2.6
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
@@ -767,6 +767,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Jan 17 2018 Sérgio Basto <sergio@serjux.com> - 5.2.6-1
+- Update VBox to 5.2.6
+
 * Mon Jan 15 2018 Sérgio Basto <sergio@serjux.com> - 5.2.4-1
 - Update VBox to 5.2.4
 
