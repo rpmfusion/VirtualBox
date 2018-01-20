@@ -33,7 +33,7 @@
 Name:       VirtualBox
 Version:    5.2.6
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -232,6 +232,7 @@ To use OpenGL pass-through mode run apps using "VBoxOGLRun foo -opt1 -opt2".
 %package kmodsrc
 Summary:    %{name} kernel module source code
 Group:      System Environment/Kernel
+BuildArch:  noarch
 
 %description kmodsrc
 Source tree used for building kernel module packages (%{name}-kmod)
@@ -767,6 +768,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Jan 19 2018 Sérgio Basto <sergio@serjux.com> - 5.2.6-2
+- Make sub-package VirtualBox-kmodsrc noarch
+
 * Wed Jan 17 2018 Sérgio Basto <sergio@serjux.com> - 5.2.6-1
 - Update VBox to 5.2.6
 
