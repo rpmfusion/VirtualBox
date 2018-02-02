@@ -33,7 +33,7 @@
 Name:       VirtualBox
 Version:    5.2.6
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -768,6 +768,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Feb 02 2018 Leigh Scott <leigh123linux@googlemail.com> - 5.2.6-3
+- Rebuild for boost-1.66
+
 * Fri Jan 19 2018 Sérgio Basto <sergio@serjux.com> - 5.2.6-2
 - Make sub-package VirtualBox-kmodsrc noarch
 
