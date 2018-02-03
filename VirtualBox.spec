@@ -272,7 +272,7 @@ rm -r src/libs/zlib-1.2.8/
 %patch24 -p1 -b .xserver_guest_xorg19
 %endif
 #patch26 -p1 -b .nobundles
-#patch27 -p1 -b .gcc
+%patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
@@ -325,10 +325,10 @@ kmk %{_smp_mflags}    \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
     VBOX_NO_LEGACY_XORG_X11=1                                  \
-    SDK_VBOX_LIBPNG_INCS=/usr/include/libpng16                 \
-    SDK_VBOX_LIBXML2_INCS=/usr/include/libxml2                 \
-    SDK_VBOX_OPENSSL_INCS=                                     \
-    SDK_VBOX_OPENSSL_LIBS="ssl crypto"                     \
+    SDK_VBOX_LIBPNG_INCS="$(pkgconf --cflags libpng)"          \
+    SDK_VBOX_LIBXML2_INCS="$(pkgconf --cflags libxml-2.0)"     \
+    SDK_VBOX_OPENSSL_INCS="$(pkgconf --cflags openssl)"        \
+    SDK_VBOX_OPENSSL_LIBS="$(pkgconf --libs openssl)"          \
     SDK_VBOX_ZLIB_INCS=                                        \
 
 %if %{with docs}
@@ -768,7 +768,11 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
-* Fri Feb 02 2018 Leigh Scott <leigh123linux@googlemail.com> - 5.2.6-3
+* Sat Feb 03 2018 Sérgio Basto <sergio@serjux.com> - 5.2.6-3
+- Enable GCC 8 support
+- Use pkgconfig to get include/libs instead of hardcoding
+
+* Fri Feb 02 2018 Leigh Scott <leigh123linux@googlemail.com>
 - Rebuild for boost-1.66
 
 * Fri Jan 19 2018 Sérgio Basto <sergio@serjux.com> - 5.2.6-2
@@ -801,7 +805,8 @@ getent passwd vboxadd >/dev/null || \
 * Sun Aug 06 2017 Sérgio Basto <sergio@serjux.com> - 5.1.26-2
 - Some improvements based on new virtualbox-guest-additions for Fedora
   rhbz #1481630 and rfbz #4617
-- VMSVGA3D from Config.kmk is windows only
+- Drop VirtualBox-4.3.0-no-bundles.patch, set make variables instead
+- Remove VMSVGA3D from Config.kmk is windows only
 - VBOX_WITH_EXTPACK_VBOXDTRACE fails to build with glibc >= 2.26-2.fc27
 
 * Thu Jul 27 2017 Sérgio Basto <sergio@serjux.com> - 5.1.26-1

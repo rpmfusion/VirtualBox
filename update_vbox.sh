@@ -1,10 +1,10 @@
 VERSION=5.2.6
-REL=1
+REL=2
 git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
 spectool -g VirtualBox.spec
 rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2
-rfpkg clog && rfpkg commit -F clog && /bin/rm clog && git show
+rfpkg ci -c && git show
 echo Press enter to continue; read dummy;
 rfpkg push && rfpkg build --nowait
 echo Press enter to continue; read dummy;
@@ -19,7 +19,7 @@ git checkout el7 && git merge master && git push && rfpkg build --nowait; git ch
 cd ../VirtualBox-kmod/
 git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox-kmod.spec
-rfpkg clog && rfpkg commit -F clog && /bin/rm clog && git show
+rfpkg ci -c && git show
 #cp VirtualBox-kmod.spec VirtualBox-kmod.spec.new
 #git reset HEAD~1
 #git rm kernel-4.10.0-0.rc5.lnkops.v2.patch
