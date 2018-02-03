@@ -325,10 +325,10 @@ kmk %{_smp_mflags}    \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
     VBOX_NO_LEGACY_XORG_X11=1                                  \
-    SDK_VBOX_LIBPNG_INCS="$(pkgconf --cflags libpng)"          \
-    SDK_VBOX_LIBXML2_INCS="$(pkgconf --cflags libxml-2.0)"     \
-    SDK_VBOX_OPENSSL_INCS="$(pkgconf --cflags openssl)"        \
-    SDK_VBOX_OPENSSL_LIBS="$(pkgconf --libs openssl)"          \
+    SDK_VBOX_LIBPNG_INCS=/usr/include/libpng16                 \
+    SDK_VBOX_LIBXML2_INCS=/usr/include/libxml2                 \
+    SDK_VBOX_OPENSSL_INCS=                                     \
+    SDK_VBOX_OPENSSL_LIBS="ssl crypto"                         \
     SDK_VBOX_ZLIB_INCS=                                        \
 
 %if %{with docs}
