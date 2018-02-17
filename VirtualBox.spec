@@ -770,7 +770,6 @@ getent passwd vboxadd >/dev/null || \
 %changelog
 * Sat Feb 03 2018 Sérgio Basto <sergio@serjux.com> - 5.2.6-3
 - Enable GCC 8 support
-- Use pkgconfig to get include/libs instead of hardcoding
 
 * Fri Feb 02 2018 Leigh Scott <leigh123linux@googlemail.com>
 - Rebuild for boost-1.66
