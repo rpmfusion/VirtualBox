@@ -31,9 +31,9 @@
 %bcond_with vboxvideo_drv
 
 Name:       VirtualBox
-Version:    5.2.6
+Version:    5.2.8
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    5%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -768,6 +768,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Mar 01 2018 Sérgio Basto <sergio@serjux.com> - 5.2.8-1
+- Update VBox to 5.2.8
+
 * Wed Feb 28 2018 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 5.2.6-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
