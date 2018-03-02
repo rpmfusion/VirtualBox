@@ -28,7 +28,7 @@
     %bcond_without docs
 %endif
 %bcond_with vnc
-%bcond_with vboxvideo_drv
+%bcond_with legacy_vboxvideo_drv
 
 Name:       VirtualBox
 Version:    5.2.8
@@ -60,8 +60,6 @@ Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch23:    VirtualBox-5.0.18-xserver_guest.patch
-Patch24:    VirtualBox-5.0.18-xserver_guest_xorg19.patch
-Patch26:    VirtualBox-4.3.0-no-bundles.patch
 Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
@@ -268,10 +266,6 @@ rm -r src/libs/zlib-1.2.8/
 %patch2 -p1 -b .strings
 %patch18 -p1 -b .aiobug
 %patch23 -p1 -b .xserver_guest
-%if ! %{with vboxvideo_drv}
-%patch24 -p1 -b .xserver_guest_xorg19
-%endif
-#patch26 -p1 -b .nobundles
 %patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
@@ -324,7 +318,7 @@ kmk %{_smp_mflags}    \
     VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
-    VBOX_NO_LEGACY_XORG_X11=1                                  \
+%{!?legacy_vboxvideo_drv:   VBOX_NO_LEGACY_XORG_X11=1 }        \
     SDK_VBOX_LIBPNG_INCS=/usr/include/libpng16                 \
     SDK_VBOX_LIBXML2_INCS=/usr/include/libxml2                 \
     SDK_VBOX_OPENSSL_INCS=                                     \
@@ -482,7 +476,7 @@ mkdir -p %{buildroot}%{_libdir}/VBoxGuestAdditions
 #
 # [1] https://www.virtualbox.org/changeset/43588/vbox
 
-%if %{with vboxvideo_drv}
+%if %{with legacy_vboxvideo_drv}
 install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
     %{buildroot}%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
 %endif
@@ -752,8 +746,7 @@ getent passwd vboxadd >/dev/null || \
 %{_sbindir}/VBoxService
 %{_sbindir}/mount.vboxsf
 %{_libdir}/security/pam_vbox.so
-%if %{with vboxvideo_drv}
-# do not use xorg module drive in newer versions
+%if %{with legacy_vboxvideo_drv}
 %{_libdir}/xorg/modules/drivers/*
 %endif
 %{_libdir}/VBoxGuestAdditions
@@ -770,6 +763,8 @@ getent passwd vboxadd >/dev/null || \
 %changelog
 * Thu Mar 01 2018 Sérgio Basto <sergio@serjux.com> - 5.2.8-1
 - Update VBox to 5.2.8
+- Review the new kmk configurations, drop some patches and sent
+  VirtualBox-5.0.18-xserver_guest.patch to upstream
 
 * Wed Feb 28 2018 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 5.2.6-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
@@ -800,7 +795,6 @@ getent passwd vboxadd >/dev/null || \
 - Update VBox to 5.1.30
 - Some updates on VirtualBox-guest-addition based on VirtualBox-guest-addition.spec in review rhbz #1481630, with
   proper fix for VirtualBox-5.0.22-guest_soname.patch
-
 - TODO check python3 and clean obsoleted scriptlets
 
 * Sat Sep 16 2017 Sérgio Basto <sergio@serjux.com> - 5.1.28-2
