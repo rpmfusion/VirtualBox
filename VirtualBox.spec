@@ -68,7 +68,7 @@ Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 
 
-BuildRequires:  kBuild >= 0.1.9998
+BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  SDL-devel xalan-c-devel
 BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
@@ -765,6 +765,7 @@ getent passwd vboxadd >/dev/null || \
 - Update VBox to 5.2.8
 - Review the new kmk configurations, drop some patches and sent
   VirtualBox-5.0.18-xserver_guest.patch to upstream
+- Update the required version of kbuild
 
 * Wed Feb 28 2018 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 5.2.6-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
