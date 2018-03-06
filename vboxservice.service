@@ -1,6 +1,6 @@
 [Unit]
 Description=VirtualBox guest services
-#RHEL7 says that Virtualization is kvm !?
+#RHEL7 says that Virtualization is kvm!?
 ConditionVirtualization=|kvm
 ConditionVirtualization=|oracle
 
