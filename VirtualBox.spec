@@ -33,7 +33,7 @@
 Name:       VirtualBox
 Version:    5.2.8
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -159,8 +159,6 @@ Group:      Development/Tools
 Requires:   %{name}-kmod = %{version}
 Requires:   hicolor-icon-theme
 Provides:   %{name}-kmod-common = %{version}-%{release}
-Conflicts:  %{name}-guest <= %{version}-%{release}
-Conflicts:  %{name}-guest-additions <= %{version}-%{release}
 
 %description server
 %{name} without Qt GUI part.
@@ -211,14 +209,9 @@ Requires:   %(xserver-sdk-abi-requires ansic)
 Requires:   %(xserver-sdk-abi-requires videodrv)
 Requires:   %(xserver-sdk-abi-requires xinput)
 %endif
-Conflicts:  %{name} <= %{version}-%{release}
 
 
 %description guest-additions
-Important note: VirtualBox-guest-additions can't be installed on a Host (master)
-system because it contains X11 and OpenGL drivers that will mess up your X11
-configurations.
-
 This subpackage is like the VirtualBox Guest Additions but just for Fedora,
 therefore it should be installed only in a Fedora guest system.
 This subpackage provides tools that use kernel modules for supporting
@@ -761,6 +754,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Mar 07 2018 Sérgio Basto <sergio@serjux.com> - 5.2.8-2
+- Fix minor spelling mistakes
+- Remove Conflicts between subpackages server and guest-additions
+
 * Thu Mar 01 2018 Sérgio Basto <sergio@serjux.com> - 5.2.8-1
 - Update VBox to 5.2.8
 - Review the new kmk configurations, drop some patches and sent
