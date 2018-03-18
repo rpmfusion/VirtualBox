@@ -27,13 +27,13 @@
 %else
     %bcond_without docs
 %endif
-%bcond_with vnc
+%bcond_without vnc
 %bcond_with legacy_vboxvideo_drv
 
 Name:       VirtualBox
 Version:    5.2.8
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -67,12 +67,19 @@ Patch28:    02-gsoap-build-fix.patch
 Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 
+Patch60:    VirtualBox-5.2.6-xclient.patch
+Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
+
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
-BuildRequires:  SDL-devel xalan-c-devel
+BuildRequires:  SDL-devel
 BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
-BuildRequires:  iasl libxslt-devel xerces-c-devel libIDL-devel
+BuildRequires:  iasl
+BuildRequires:  libxslt-devel
+BuildRequires:  xalan-c-devel
+BuildRequires:  xerces-c-devel
+BuildRequires:  libIDL-devel
 BuildRequires:  yasm
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  python2-devel
@@ -109,24 +116,25 @@ BuildRequires:  makeself
 
 # for 32bit on 64
 %ifarch x86_64
-BuildRequires:  libstdc++-static(x86-32) libgcc(x86-32)
-BuildRequires:  libstdc++-static(x86-64)
 BuildRequires:  glibc-devel(x86-32)
+BuildRequires:  libgcc(x86-32)
+BuildRequires:  libstdc++-static(x86-32)
+BuildRequires:  libstdc++-static(x86-64)
 %else
 BuildRequires:  libstdc++-static
 %endif
 
 # For the X11 module
 BuildRequires:  libdrm-devel
+%if %{with legacy_vboxvideo_drv}
 BuildRequires:  libpciaccess-devel
-BuildRequires:  mesa-libOSMesa-devel
 BuildRequires:  pixman-devel
+%endif
 BuildRequires:  xorg-x11-proto-devel
-BuildRequires:  xorg-x11-server-devel
-BuildRequires:  libXcursor-devel
 BuildRequires:  libXcomposite-devel
-BuildRequires:  libXmu-devel
+BuildRequires:  libXcursor-devel
 BuildRequires:  libXinerama-devel
+BuildRequires:  libXmu-devel
 BuildRequires:  libXrandr-devel
 BuildRequires:  libXt-devel
 BuildRequires:  mesa-libEGL-devel
@@ -179,19 +187,23 @@ webservice GUI part for %{name}.
 Summary:    %{name} SDK
 Group:      Development/Libraries
 Requires:   %{name}-server%{?isa} = %{version}-%{release}
-Requires:   python-%{name}%{?isa} = %{version}-%{release}
+Requires:   python2-%{name}%{?isa} = %{version}-%{release}
 
 %description devel
 %{name} Software Development Kit.
 
 
-%package -n python-%{name}
+%package -n python2-%{name}
 Summary:    Python bindings for %{name}
 Group:      Development/Libraries
 Requires:   %{name}-server%{?_isa} = %{version}-%{release}
-%{?python_provide:%python_provide python2-%{srcname}}
+%{?python_provide:%python_provide python2-%{name}}
+# Remove before F30
+Provides:       python-VirtualBox = %{version}-%{release}
+Provides:       python-VirtualBox%{?_isa} = %{version}-%{release}
+Obsoletes:      python-VirtualBox < %{version}-%{release}
 
-%description -n python-%{name}
+%description -n python2-%{name}
 Python XPCOM bindings to %{name}.
 
 
@@ -244,7 +256,6 @@ rm -r src/VBox/Additions/x11/x11include/
 rm -r src/VBox/Additions/x11/x11stubs/
 rm include/VBox/HostServices/glext.h
 rm include/VBox/HostServices/glxext.h
-
 # wglext.h has typedefs for Windows-specific extensions
 #rm include/VBox/HostServices/wglext.h
 # src/VBox/GuestHost/OpenGL/include/GL/glext.h have VBOX definitions
@@ -265,6 +276,8 @@ rm -r src/libs/zlib-1.2.8/
 %endif
 %patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
+%patch60 -p1 -b .xclient
+%patch61 -p1 -b .automount
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -314,10 +327,9 @@ kmk %{_smp_mflags}    \
 %{!?legacy_vboxvideo_drv:   VBOX_NO_LEGACY_XORG_X11=1 }        \
     SDK_VBOX_LIBPNG_INCS=/usr/include/libpng16                 \
     SDK_VBOX_LIBXML2_INCS=/usr/include/libxml2                 \
-    SDK_VBOX_OPENSSL_INCS=                                     \
+    SDK_VBOX_OPENSSL_INCS=""                                   \
     SDK_VBOX_OPENSSL_LIBS="ssl crypto"                         \
     SDK_VBOX_ZLIB_INCS=                                        \
-
 %if %{with docs}
     VBOX_WITH_DOCS=1 \
 # doc/manual/fr_FR/ missing man_VBoxManage-debugvm.xml and man_VBoxManage-extpack.xml
@@ -435,7 +447,7 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
 # SDK
 pushd obj/bin/sdk/installer
 VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
-    python vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
+    %{__python2} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
 popd
 cp -rp obj/bin/sdk/. %{buildroot}%{_libdir}/virtualbox/sdk
 rm -rf %{buildroot}%{_libdir}/virtualbox/sdk/installer
@@ -504,10 +516,19 @@ install -p -m 0644 -D %{SOURCE8} %{buildroot}%{_presetdir}/96-vbox.preset
 install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_udevrulesdir}/60-vboxguest.rules
 install -p -m 0755 -D %{SOURCE9} %{buildroot}%{_bindir}/VBoxOGLRun
 install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
+%if 0%{?fedora}
+#sed -i s/vboxvideo/d %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
+sed -i 's/vboxvideo/#vboxvideo/' %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
+%endif
+%if 0%{?fedora} > 27
+#sed -i s/vboxguest/d %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
+sed -i 's/vboxguest/#vboxguest/' %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
+%endif
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
 cp -al obj/bin/src/vbox* obj/bin/additions/src/vbox* %{name}-kmod-%{version}
+#rm -r %{name}-kmod-%{version}/vboxvideo/
 install -d %{buildroot}%{_datadir}/%{name}-kmod-%{version}
 tar --use-compress-program xz -cf %{buildroot}%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.xz \
     %{name}-kmod-%{version}
@@ -723,7 +744,7 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/sdk
 %exclude %{_libdir}/virtualbox/sdk/bindings/xpcom/python
 
-%files -n python-%{name}
+%files -n python2-%{name}
 %{_libdir}/virtualbox/*.py*
 %{python2_sitelib}/virtualbox
 %{python2_sitelib}/vboxapi*
@@ -754,6 +775,12 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Mar 17 2018 Sérgio Basto <sergio@serjux.com> - 5.2.8-3
+- Add patches from virtualbox-guest-additions of Fedora proper
+- python-VirtualBox renamed to python2-VirtualBox
+  See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3
+- Enable vnc
+
 * Wed Mar 07 2018 Sérgio Basto <sergio@serjux.com> - 5.2.8-2
 - Fix minor spelling mistakes
 - Remove Conflicts between subpackages server and guest-additions
