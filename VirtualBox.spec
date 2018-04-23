@@ -31,9 +31,9 @@
 %bcond_with legacy_vboxvideo_drv
 
 Name:       VirtualBox
-Version:    5.2.8
+Version:    5.2.10
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    3%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -66,8 +66,8 @@ Patch28:    02-gsoap-build-fix.patch
 # from Mageia
 Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
-
-Patch60:    VirtualBox-5.2.6-xclient.patch
+# from Fedora
+Patch60:    VirtualBox-5.2.10-xclient.patch
 Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 
 
@@ -775,6 +775,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Apr 19 2018 Sérgio Basto <sergio@serjux.com> - 5.2.10-1
+- Update VBox to 5.2.10
+
 * Sat Mar 17 2018 Sérgio Basto <sergio@serjux.com> - 5.2.8-3
 - Add patches from virtualbox-guest-additions of Fedora proper
 - python-VirtualBox renamed to python2-VirtualBox
