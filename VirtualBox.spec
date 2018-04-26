@@ -177,7 +177,6 @@ Provides:   %{name}-kmod-common = %{version}-%{release}
 %{name} without Qt GUI part.
 
 
-%if %{with webservice}
 %package webservice
 Summary:        WebService GUI part for %{name}
 Group:          System/Emulators/PC
@@ -185,7 +184,6 @@ Requires:       %{name}-server%{?isa} = %{version}
 
 %description webservice
 webservice GUI part for %{name}.
-%endif
 
 
 %package devel
