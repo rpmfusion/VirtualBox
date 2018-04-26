@@ -29,11 +29,16 @@
 %endif
 %bcond_without vnc
 %bcond_with legacy_vboxvideo_drv
+%if 0%{?fedora} > 27
+    %bcond_with guest_additions
+%else
+    %bcond_without guest_additions
+%endif
 
 Name:       VirtualBox
 Version:    5.2.10
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -466,6 +471,7 @@ do
 done
 install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 
+%if %{with guest_additions}
 # Guest X.Org drivers
 mkdir -p %{buildroot}%{_libdir}/security
 mkdir -p %{buildroot}%{_libdir}/VBoxGuestAdditions
@@ -523,6 +529,7 @@ sed -i 's/vboxvideo/#vboxvideo/' %{buildroot}%{_prefix}/lib/modules-load.d/%{nam
 %if 0%{?fedora} > 27
 #sed -i s/vboxguest/d %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
 sed -i 's/vboxguest/#vboxguest/' %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
+%endif
 %endif
 
 # Module Source Code
@@ -589,15 +596,11 @@ fi
 # should be in kmod package, not here
 /bin/systemctl restart systemd-modules-load.service >/dev/null 2>&1 || :
 
-%if %{with webservice}
 %post webservice
-    %systemd_post vboxweb-httpd.service
-%endif
+%systemd_post vboxweb-httpd.service
 
-%if %{with webservice}
 %preun webservice
-    %systemd_preun vboxweb.service
-%endif
+%systemd_preun vboxweb.service
 
 %postun
 if [ $1 -eq 0 ] ; then
@@ -609,10 +612,8 @@ if [ $1 -eq 0 ] ; then
     /usr/bin/update-mime-database %{_datadir}/mime &> /dev/null || :
 fi
 
-%if %{with webservice}
 %postun webservice
-    %systemd_postun_with_restart vboxweb.service
-%endif
+%systemd_postun_with_restart vboxweb.service
 
 # Desktop databases F23 and F24 only
 /usr/bin/update-desktop-database &> /dev/null || :
@@ -751,6 +752,7 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/VBoxPython2_7.so
 %{_libdir}/virtualbox/sdk/bindings/xpcom/python
 
+%if %{with guest_additions}
 %files guest-additions
 %license COPYING*
 %{_bindir}/VBoxClient
@@ -770,11 +772,15 @@ getent passwd vboxadd >/dev/null || \
 %{_prefix}/lib/modules-load.d/%{name}-guest.conf
 %{_unitdir}/vboxservice.service
 %{_presetdir}/96-vbox.preset
+%endif
 
 %files kmodsrc
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Apr 26 2018 Sérgio Basto <sergio@serjux.com> - 5.2.10-2
+- Don't build guest-additions for F28+ (now it is available on Fedora proper)
+
 * Thu Apr 19 2018 Sérgio Basto <sergio@serjux.com> - 5.2.10-1
 - Update VBox to 5.2.10
 
