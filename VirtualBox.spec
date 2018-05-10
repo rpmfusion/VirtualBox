@@ -36,9 +36,9 @@
 %endif
 
 Name:       VirtualBox
-Version:    5.2.10
+Version:    5.2.12
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    2%{?dist}
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -61,7 +61,7 @@ Source9:    VBoxOGLRun.sh
 Source10:   vboxweb.service
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
-Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
+#Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch23:    VirtualBox-5.0.18-xserver_guest.patch
@@ -269,7 +269,7 @@ rm -r src/libs/libxml2-2.9.*/
 rm -r src/libs/libpng-1.2.*/
 rm -r src/libs/zlib-1.2.8/
 
-%patch1 -p1 -b .noupdates
+#patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
 %patch18 -p1 -b .aiobug
 %patch23 -p1 -b .xserver_guest
@@ -332,9 +332,16 @@ kmk %{_smp_mflags}    \
     SDK_VBOX_LIBXML2_INCS=/usr/include/libxml2                 \
     SDK_VBOX_OPENSSL_INCS=""                                   \
     SDK_VBOX_OPENSSL_LIBS="ssl crypto"                         \
-    SDK_VBOX_ZLIB_INCS=                                        \
+    SDK_VBOX_ZLIB_INCS=""                                      \
 %if %{with docs}
     VBOX_WITH_DOCS=1 \
+%endif
+    VBOX_PATH_DOCBOOK_DTD=/usr/share/sgml/docbook/xml-dtd-4.5/ \
+    VBOX_PATH_DOCBOOK=/usr/share/sgml/docbook/xsl-stylesheets/ \
+    VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
+    VBOX_WITH_UPDATE_REQUEST=0 \
+    VBOX_BUILD_PUBLISHER=%{publisher}
+
 # doc/manual/fr_FR/ missing man_VBoxManage-debugvm.xml and man_VBoxManage-extpack.xml
 #    VBOX_WITH_DOCS_TRANSLATIONS=1 \
 # we can't build CHM DOCS we need hhc.exe which is not in source and we need
@@ -342,12 +349,6 @@ kmk %{_smp_mflags}    \
 # wine: cannot find
 # '/builddir/build/BUILD/VirtualBox-5.1.6/tools/win.x86/HTML_Help_Workshop/v1.3//hhc.exe'
 #    VBOX_WITH_DOCS_CHM=1 \
-%endif
-    VBOX_PATH_DOCBOOK_DTD=/usr/share/sgml/docbook/xml-dtd-4.5/ \
-    VBOX_PATH_DOCBOOK=/usr/share/sgml/docbook/xsl-stylesheets/ \
-    VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
-    VBOX_BUILD_PUBLISHER=%{publisher}
-
 #    VBOX_WITH_ADDITION_DRIVERS = \
 #    VBOX_WITH_INSTALLER = 1 \
 #    VBOX_WITH_LINUX_ADDITIONS = 1 \
@@ -776,6 +777,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu May 10 2018 Sérgio Basto <sergio@serjux.com> - 5.2.12-1
+- Update VBox to 5.2.12
+
 * Thu Apr 26 2018 Sérgio Basto <sergio@serjux.com> - 5.2.10-2
 - Don't build guest-additions for F28+ (now it is available on Fedora proper)
 

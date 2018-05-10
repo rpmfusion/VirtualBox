@@ -1,4 +1,4 @@
-VERSION=5.2.8
+VERSION=5.2.12
 REL=1
 
 git pull
