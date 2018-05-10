@@ -336,12 +336,12 @@ kmk %{_smp_mflags}    \
 %if %{with docs}
     VBOX_WITH_DOCS=1 \
 %endif
-    VBOX_PATH_DOCBOOK_DTD=/usr/share/sgml/docbook/xml-dtd-4.5/ \
-    VBOX_PATH_DOCBOOK=/usr/share/sgml/docbook/xsl-stylesheets/ \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
     VBOX_WITH_UPDATE_REQUEST=0 \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
+#    VBOX_PATH_DOCBOOK_DTD=/usr/share/sgml/docbook/xml-dtd-4.5/ \
+#    VBOX_PATH_DOCBOOK=/usr/share/sgml/docbook/xsl-stylesheets/ \
 # doc/manual/fr_FR/ missing man_VBoxManage-debugvm.xml and man_VBoxManage-extpack.xml
 #    VBOX_WITH_DOCS_TRANSLATIONS=1 \
 # we can't build CHM DOCS we need hhc.exe which is not in source and we need
@@ -779,6 +779,7 @@ getent passwd vboxadd >/dev/null || \
 %changelog
 * Thu May 10 2018 Sérgio Basto <sergio@serjux.com> - 5.2.12-1
 - Update VBox to 5.2.12
+- Previous bug shows that we don't need VBOX_PATH_DOCBOOK anymore.
 
 * Thu Apr 26 2018 Sérgio Basto <sergio@serjux.com> - 5.2.10-2
 - Don't build guest-additions for F28+ (now it is available on Fedora proper)
