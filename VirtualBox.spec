@@ -333,9 +333,7 @@ kmk %{_smp_mflags}    \
     SDK_VBOX_OPENSSL_INCS=""                                   \
     SDK_VBOX_OPENSSL_LIBS="ssl crypto"                         \
     SDK_VBOX_ZLIB_INCS=""                                      \
-%if %{with docs}
-    VBOX_WITH_DOCS=1 \
-%endif
+%{?with_docs:   VBOX_WITH_DOCS=1 }                             \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
     VBOX_WITH_UPDATE_REQUEST=0 \
     VBOX_BUILD_PUBLISHER=%{publisher}
@@ -524,10 +522,6 @@ install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_prefix}/lib/modules-load.d/%{nam
 %if 0%{?fedora}
 #sed -i s/vboxvideo/d %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
 sed -i 's/vboxvideo/#vboxvideo/' %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
-%endif
-%if 0%{?fedora} > 27
-#sed -i s/vboxguest/d %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
-sed -i 's/vboxguest/#vboxguest/' %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
 %endif
 %endif
 
