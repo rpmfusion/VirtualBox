@@ -36,7 +36,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    5.2.12
+Version:    5.2.14
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
@@ -771,6 +771,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Jul 02 2018 Sérgio Basto <sergio@serjux.com> - 5.2.14-1
+- Update VBox to 5.2.14
+
 * Thu May 10 2018 Sérgio Basto <sergio@serjux.com> - 5.2.12-1
 - Update VBox to 5.2.12
 - Previous bug shows that we don't need VBOX_PATH_DOCBOOK anymore.
