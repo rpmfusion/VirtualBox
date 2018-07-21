@@ -36,7 +36,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    5.2.14
+Version:    5.2.16
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
@@ -118,6 +118,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  libvpx-devel
 BuildRequires:  makeself
+BuildRequires:  opus-devel
 
 # for 32bit on 64
 %ifarch x86_64
@@ -771,6 +772,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Jul 21 2018 Sérgio Basto <sergio@serjux.com> - 5.2.16-1
+- Update VBox to 5.2.16
+
 * Mon Jul 02 2018 Sérgio Basto <sergio@serjux.com> - 5.2.14-1
 - Update VBox to 5.2.14
 
