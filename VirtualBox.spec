@@ -97,7 +97,7 @@ BuildRequires:  qt5-linguist
 BuildRequires:  gsoap-devel
 %endif
 BuildRequires:  pam-devel
-BuildRequires:  mkisofs
+BuildRequires:  genisoimage
 BuildRequires:  java-devel >= 1.6
 %if %{with docs}
 BuildRequires:  /usr/bin/pdflatex
