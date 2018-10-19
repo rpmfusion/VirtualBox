@@ -36,7 +36,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    5.2.18
+Version:    5.2.20
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
@@ -387,6 +387,9 @@ install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox \
 install -p -m 0755 obj/bin/VBox.sh %{buildroot}%{_bindir}/VBox
 install -p -m 0755 -t %{buildroot}%{_bindir} \
     obj/bin/VBoxTunctl
+
+# Fixes ERROR: ambiguous python shebang in F30
+sed -i '1s:#!/usr/bin/env python:#!/usr/bin/env python2:' obj/bin/vboxshell.py
 
 # Executables
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
@@ -772,6 +775,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Oct 18 2018 Sérgio Basto <sergio@serjux.com> - 5.2.20-1
+- Update VBox to 5.2.20
+
 * Fri Aug 24 2018 Sérgio Basto <sergio@serjux.com> - 5.2.18-1
 - Update VBox to 5.2.18
 

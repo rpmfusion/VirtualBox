@@ -1,9 +1,25 @@
-VERSION=5.2.18
+VERSION=5.2.20
 REL=1
+if [ -z "$1" ]
+then
+      stage=0
+else
+      stage=$1
+fi
 
+if test $stage -le 0
+then
+echo STAGE 0
 git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
 spectool -g VirtualBox.spec
+rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-$VERSION-$REL.fc30.src.rpm
+echo Press enter to continue; read dummy;
+fi
+
+if test $stage -le 1
+then
+echo STAGE 1
 rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2
 rfpkg ci -c && git show
 echo Press enter to continue; read dummy;
@@ -46,3 +62,4 @@ Press enter to continue; read dummy;
 koji-rpmfusion tag-build el7-free-override VirtualBox-$VERSION-$REL.el7
 koji-rpmfusion wait-repo el7-free-build --build=VirtualBox-$VERSION-$REL.el7
 git checkout el7 && git merge master && git push && rfpkg build --nowait; git checkout master"
+fi
