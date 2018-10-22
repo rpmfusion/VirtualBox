@@ -1,5 +1,6 @@
 VERSION=5.2.20
 REL=1
+RAWHIDE=30
 if [ -z "$1" ]
 then
       stage=0
@@ -13,7 +14,7 @@ echo STAGE 0
 git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
 spectool -g VirtualBox.spec
-rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-$VERSION-$REL.fc30.src.rpm
+rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-$VERSION-$REL.fc$RAWHIDE.src.rpm
 echo Press enter to continue; read dummy;
 fi
 
@@ -25,6 +26,11 @@ rfpkg ci -c && git show
 echo Press enter to continue; read dummy;
 rfpkg push && rfpkg build --nowait
 echo Press enter to continue; read dummy;
+fi
+
+if test $stage -le 2
+then
+echo STAGE 2
 git checkout f29 && git merge master && git push && rfpkg build --nowait; git checkout master
 echo Press enter to continue; read dummy;
 git checkout f28 && git merge master && git push && rfpkg build --nowait; git checkout master
@@ -32,10 +38,15 @@ echo Press enter to continue; read dummy;
 git checkout f27 && git merge master && git push && rfpkg build --nowait; git checkout master
 echo Press enter to continue; read dummy;
 git checkout el7 && git merge master && git push && rfpkg build --nowait; git checkout master
+fi
 
 cd ../VirtualBox-kmod/
+if test $stage -le 5
+then
+echo STAGE 5
 git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox-kmod.spec
+rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-kmod-$VERSION-$REL.fc$RAWHIDE.src.rpm
 rfpkg ci -c && git show
 #cp VirtualBox-kmod.spec VirtualBox-kmod.spec.new
 #git reset HEAD~1
