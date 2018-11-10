@@ -1,0 +1,193 @@
+Index: VirtualBox-5.2.20/src/VBox/HostDrivers/VBoxNetAdp/linux/VBoxNetAdp-linux.c
+===================================================================
+--- VirtualBox-5.2.20.orig/src/VBox/HostDrivers/VBoxNetAdp/linux/VBoxNetAdp-linux.c
++++ VirtualBox-5.2.20/src/VBox/HostDrivers/VBoxNetAdp/linux/VBoxNetAdp-linux.c
+@@ -84,8 +84,11 @@ static long VBoxNetAdpLinuxIOCtlUnlocked
+ #endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 36) */
+ 
+ static void vboxNetAdpEthGetDrvinfo(struct net_device *dev, struct ethtool_drvinfo *info);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
++static int vboxNetAdpEthGetSettings(struct net_device *pNetDev, struct ethtool_link_ksettings *link_ksettings);
++#else
+ static int vboxNetAdpEthGetSettings(struct net_device *dev, struct ethtool_cmd *cmd);
+-
++#endif
+ 
+ /*********************************************************************************************************************************
+ *   Global Variables                                                                                                             *
+@@ -129,7 +132,11 @@ static struct miscdevice g_CtlDev =
+ static const struct ethtool_ops gEthToolOpsVBoxNetAdp =
+ {
+     .get_drvinfo        = vboxNetAdpEthGetDrvinfo,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
++    .get_link_ksettings = vboxNetAdpEthGetSettings,
++#else
+     .get_settings       = vboxNetAdpEthGetSettings,
++#endif
+     .get_link           = ethtool_op_get_link,
+ };
+ 
+@@ -200,10 +207,64 @@ static void vboxNetAdpEthGetDrvinfo(stru
+                 "N/A");
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
++static bool
++convert_link_ksettings_to_legacy_settings(
++	struct ethtool_cmd *legacy_settings,
++	const struct ethtool_link_ksettings *link_ksettings)
++{
++	bool retval = true;
++
++	memset(legacy_settings, 0, sizeof(*legacy_settings));
++	/* this also clears the deprecated fields in legacy structure:
++	 * __u8		transceiver;
++	 * __u32	maxtxpkt;
++	 * __u32	maxrxpkt;
++	 */
++
++	retval &= ethtool_convert_link_mode_to_legacy_u32(
++		&legacy_settings->supported,
++		link_ksettings->link_modes.supported);
++	retval &= ethtool_convert_link_mode_to_legacy_u32(
++		&legacy_settings->advertising,
++		link_ksettings->link_modes.advertising);
++	retval &= ethtool_convert_link_mode_to_legacy_u32(
++		&legacy_settings->lp_advertising,
++		link_ksettings->link_modes.lp_advertising);
++	ethtool_cmd_speed_set(legacy_settings, link_ksettings->base.speed);
++	legacy_settings->duplex
++		= link_ksettings->base.duplex;
++	legacy_settings->port
++		= link_ksettings->base.port;
++	legacy_settings->phy_address
++		= link_ksettings->base.phy_address;
++	legacy_settings->autoneg
++		= link_ksettings->base.autoneg;
++	legacy_settings->mdio_support
++		= link_ksettings->base.mdio_support;
++	legacy_settings->eth_tp_mdix
++		= link_ksettings->base.eth_tp_mdix;
++	legacy_settings->eth_tp_mdix_ctrl
++		= link_ksettings->base.eth_tp_mdix_ctrl;
++	legacy_settings->transceiver
++		= link_ksettings->base.transceiver;
++	return retval;
++}
++#endif
+ 
+ /* ethtool_ops::get_settings */
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
++static int vboxNetAdpEthGetSettings(struct net_device *pNetDev, struct ethtool_link_ksettings *link_ksettings)
++#else
+ static int vboxNetAdpEthGetSettings(struct net_device *pNetDev, struct ethtool_cmd *cmd)
++#endif
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
++    struct ethtool_cmd *cmd = kzalloc(sizeof(struct ethtool_cmd), GFP_KERNEL);
++    if (!cmd)
++    	return 1;
++    convert_link_ksettings_to_legacy_settings(cmd, link_ksettings);
++#endif
+     cmd->supported      = 0;
+     cmd->advertising    = 0;
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27)
+@@ -218,6 +279,9 @@ static int vboxNetAdpEthGetSettings(stru
+     cmd->autoneg        = AUTONEG_DISABLE;
+     cmd->maxtxpkt       = 0;
+     cmd->maxrxpkt       = 0;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
++    kfree(cmd);
++#endif
+     return 0;
+ }
+ 
+Index: VirtualBox-5.2.20/src/VBox/Runtime/r0drv/linux/time-r0drv-linux.c
+===================================================================
+--- VirtualBox-5.2.20.orig/src/VBox/Runtime/r0drv/linux/time-r0drv-linux.c
++++ VirtualBox-5.2.20/src/VBox/Runtime/r0drv/linux/time-r0drv-linux.c
+@@ -171,11 +171,19 @@ RTDECL(PRTTIMESPEC) RTTimeNow(PRTTIMESPE
+ {
+     IPRT_LINUX_SAVE_EFL_AC();
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 16)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
++    struct timespec64 Ts;
++    ktime_get_real_ts64(&Ts);
++#else
+     struct timespec Ts;
+     ktime_get_real_ts(&Ts);
++#endif
+     IPRT_LINUX_RESTORE_EFL_AC();
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
++    return RTTimeSpecSetTimespec64(pTime, &Ts);
++#else
+     return RTTimeSpecSetTimespec(pTime, &Ts);
+-
++#endif
+ #else   /* < 2.6.16 */
+     struct timeval Tv;
+     do_gettimeofday(&Tv);
+Index: VirtualBox-5.2.20/include/iprt/time.h
+===================================================================
+--- VirtualBox-5.2.20.orig/include/iprt/time.h
++++ VirtualBox-5.2.20/include/iprt/time.h
+@@ -54,7 +54,6 @@ typedef struct RTTIMESPEC
+     int64_t     i64NanosecondsRelativeToUnixEpoch;
+ } RTTIMESPEC;
+ 
+-
+ /** @name RTTIMESPEC methods
+  * @{ */
+ 
+@@ -388,6 +387,7 @@ DECLINLINE(PRTTIMESPEC) RTTimeSpecSetTim
+ {
+     return RTTimeSpecAddMicro(RTTimeSpecSetSeconds(pTime, pTimeval->tv_sec), pTimeval->tv_usec);
+ }
++
+ #endif /* various ways of detecting struct timeval */
+ 
+ 
+@@ -427,6 +427,25 @@ DECLINLINE(PRTTIMESPEC) RTTimeSpecSetTim
+ {
+     return RTTimeSpecAddNano(RTTimeSpecSetSeconds(pTime, pTimespec->tv_sec), pTimespec->tv_nsec);
+ }
++
++#ifndef _LINUX_TIME64_H
++/* With kernel 4.20+, the second argument of time routines change from
++ * struct timespec to struct timespec64. This file is built twice, once
++ * in user mode, and once in kernel mode. In user mode, the struct is
++ * undefined, thus the following definition is provided. The guard macro
++ * from the kernels include/linux/time64.h is _LINUX_TIME64_H, thus
++ * the definition of that macro determines whether the struct is defined.
++ */
++struct timespec64 {
++	long long	tv_sec;			/* seconds */
++	long		tv_nsec;		/* nanoseconds */
++};
++#endif
++
++DECLINLINE(PRTTIMESPEC) RTTimeSpecSetTimespec64(PRTTIMESPEC pTime, const struct timespec64 *pTimeval)
++{
++    return RTTimeSpecAddMicro(RTTimeSpecSetSeconds(pTime, pTimeval->tv_sec), 1000 * pTimeval->tv_nsec);
++}
+ #endif /* various ways of detecting struct timespec */
+ 
+ 
+Index: VirtualBox-5.2.20/src/VBox/Additions/linux/drm/vbox_fb.c
+===================================================================
+--- VirtualBox-5.2.20.orig/src/VBox/Additions/linux/drm/vbox_fb.c
++++ VirtualBox-5.2.20/src/VBox/Additions/linux/drm/vbox_fb.c
+@@ -297,8 +297,12 @@ static int vboxfb_create(struct drm_fb_h
+ 	 * The last flag forces a mode set on VT switches even if the kernel
+ 	 * does not think it is needed.
+ 	 */
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
++	info->flags = FBINFO_DEFAULT | FBINFO_MISC_ALWAYS_SETPAR;
++#else
+ 	info->flags = FBINFO_DEFAULT | FBINFO_CAN_FORCE_OUTPUT |
+ 		      FBINFO_MISC_ALWAYS_SETPAR;
++#endif
+ 	info->fbops = &vboxfb_ops;
+ 
+ 	ret = fb_alloc_cmap(&info->cmap, 256, 0);
+
