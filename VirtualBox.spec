@@ -36,7 +36,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    5.2.20
+Version:    5.2.22
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
@@ -274,7 +274,7 @@ rm -r src/libs/zlib-1.2.8/
 %patch2 -p1 -b .strings
 %patch18 -p1 -b .aiobug
 %patch23 -p1 -b .xserver_guest
-%patch27 -p1 -b .gcc
+#patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
@@ -775,6 +775,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Nov 09 2018 Sérgio Basto <sergio@serjux.com> - 5.2.22-1
+- Update VBox to 5.2.22
+
 * Thu Oct 18 2018 Sérgio Basto <sergio@serjux.com> - 5.2.20-1
 - Update VBox to 5.2.20
 
