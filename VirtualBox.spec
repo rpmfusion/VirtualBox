@@ -13,22 +13,19 @@
 # major version number, while the kernel module abi is not guaranteed
 # to be stable. This is so that we force the module update in sync with
 # userspace.
-#global prerel 106108
-%global prereltag %{?prerel:-%(awk 'BEGIN {print toupper("%{prerel}")}')}
+#global prerel RC1
+%global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 %ifarch x86_64
     %bcond_without webservice
 %else
     %bcond_with webservice
 %endif
-# el7 doesn't have all texlive requirements
-%if 0%{?rhel}
-    %bcond_with docs
-%else
-    %bcond_without docs
-%endif
+# Now we use upstream pdf
+%bcond_with docs
 %bcond_without vnc
 %bcond_with legacy_vboxvideo_drv
+
 %if 0%{?fedora} > 27
     %bcond_with guest_additions
 %else
@@ -36,9 +33,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    5.2.22
-#Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Version:    6.0.0
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -51,6 +47,7 @@ Requires:   %{name}-server%{?isa} = %{version}
 Obsoletes:  %{name}-qt
 
 Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
+Source1:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/UserManual.pdf
 Source3:    VirtualBox-60-vboxdrv.rules
 Source4:    VirtualBox.modules
 Source5:    VirtualBox-60-vboxguest.rules
@@ -61,10 +58,9 @@ Source9:    VBoxOGLRun.sh
 Source10:   vboxweb.service
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
-Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
+Patch1:     VirtualBox-6.0.0-noupdate.patch
 Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
-Patch23:    VirtualBox-5.0.18-xserver_guest.patch
 Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
@@ -248,7 +244,7 @@ which is generated during the build of main package.
 
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{?prereltag}
 # add Mageia images
 cp -a %{SOURCE20} %{SOURCE21} src/VBox/Frontends/VirtualBox/images/
 
@@ -274,19 +270,16 @@ rm -r src/libs/zlib-1.2.8/
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
 %patch18 -p1 -b .aiobug
-%patch23 -p1 -b .xserver_guest
 #patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
-%patch50 -p1 -b .mageia-support
+# mageia support not ready for 6.0
+#patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
 %patch61 -p1 -b .automount
-%patch70 -p1 -b .kernel_4.20.patch
-
-# CRLF->LF
-sed -i 's/\r//' COPYING
+#patch70 -p1 -b .kernel_4.20.patch
 
 %build
 ./configure --disable-kmods \
@@ -298,6 +291,10 @@ sed -i 's/\r//' COPYING
 %endif
 %if !%{with docs}
   --disable-docs \
+%endif
+
+%if !%{with docs}
+cp %{SOURCE1} UserManual.pdf
 %endif
 
 #--enable-vde
@@ -327,7 +324,6 @@ kmk %{_smp_mflags}    \
     VBOX_WITH_EXTPACK_VBOXDTRACE= \
     VBOX_WITH_VBOX_IMG=1 \
     VBOX_WITH_SYSFS_BY_DEFAULT=1 \
-    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
 %{!?legacy_vboxvideo_drv:   VBOX_NO_LEGACY_XORG_X11=1 }        \
@@ -337,12 +333,12 @@ kmk %{_smp_mflags}    \
     SDK_VBOX_OPENSSL_LIBS="ssl crypto"                         \
     SDK_VBOX_ZLIB_INCS=""                                      \
 %{?with_docs:   VBOX_WITH_DOCS=1 }                             \
-    VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
-    VBOX_WITH_UPDATE_REQUEST=0 \
+    VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java  \
+    VBOX_WITH_UPDATE_REQUEST=               \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
-#    VBOX_PATH_DOCBOOK_DTD=/usr/share/sgml/docbook/xml-dtd-4.5/ \
-#    VBOX_PATH_DOCBOOK=/usr/share/sgml/docbook/xsl-stylesheets/ \
+#    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
+
 # doc/manual/fr_FR/ missing man_VBoxManage-debugvm.xml and man_VBoxManage-extpack.xml
 #    VBOX_WITH_DOCS_TRANSLATIONS=1 \
 # we can't build CHM DOCS we need hhc.exe which is not in source and we need
@@ -417,6 +413,8 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/vboxshell.py    \
     obj/bin/vbox-img    \
     obj/bin/VBoxDTrace    \
+    obj/bin/VBoxBugReport \
+    obj/bin/VirtualBoxVM    \
 %if %{with webservice}
     obj/bin/vboxwebsrv  \
     obj/bin/webtest     \
@@ -444,6 +442,9 @@ ln -s VBox %{buildroot}%{_bindir}/vboxautostart
 ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
 %endif
 ln -s ../..%{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
+
+#ln -s /usr/share/virtualbox/src/vboxhost $RPM_BUILD_ROOT/usr/src/vboxhost-%VER%
+
 
 # Components, preserve symlinks
 cp -a obj/bin/components/* %{buildroot}%{_libdir}/virtualbox/components/
@@ -567,11 +568,13 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/virtualbox.desktop
 #  mv ExtensionPacks/VNC $RPM_BUILD_ROOT/usr/lib/virtualbox/ExtensionPacks
 #fi
 #set_selinux_permissions /usr/lib/virtualbox /usr/share/virtualbox
-#for i in rdesktop-vrdp.tar.gz rdesktop-vrdp-keymaps; do
-#    mv $i $RPM_BUILD_ROOT/usr/share/virtualbox; done
-#mv rdesktop-vrdp $RPM_BUILD_ROOT/usr/bin
-#
 # vboxautostart-service
+
+install -d  %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps
+install -D obj/bin/rdesktop-vrdp-keymaps/* %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps
+install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox obj/bin/rdesktop-vrdp.tar.gz
+install -p -m 0755 -t %{buildroot}%{_bindir} obj/bin/rdesktop-vrdp
+
 
 %pre
 # Group for USB devices
@@ -665,6 +668,8 @@ getent passwd vboxadd >/dev/null || \
 %doc doc/*cpp doc/VMM
 %if %{with docs}
 %doc obj/bin/UserManual*.pdf
+%else
+%doc UserManual.pdf
 %endif
 %license COPYING*
 %{_bindir}/VBoxManage
@@ -685,9 +690,9 @@ getent passwd vboxadd >/dev/null || \
 %{_bindir}/vboxautostart
 %{_bindir}/vbox-img
 %{_bindir}/VBoxTunctl
+%{_bindir}/rdesktop-vrdp
 %dir %{_libdir}/virtualbox
 %{_libdir}/virtualbox/*.[^p]*
-%exclude %{_libdir}/virtualbox/VirtualBox.so
 %exclude %{_libdir}/virtualbox/VBoxDbg.so
 %exclude %{_libdir}/virtualbox/VBoxPython2_7.so
 %{_libdir}/virtualbox/components
@@ -701,8 +706,10 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/SUPUninstall
 %{_libdir}/virtualbox/VBoxAutostart
 %{_libdir}/virtualbox/VBoxVMMPreload
+%{_libdir}/virtualbox/VBoxBugReport
 %{_libdir}/virtualbox/VBoxDTrace
 %{_libdir}/virtualbox/vbox-img
+%{_libdir}/virtualbox/rdesktop-vrdp-keymaps
 # This permissions have to be here, before generator of debuginfo need
 # permissions to read this files
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetNAT
@@ -711,7 +718,8 @@ getent passwd vboxadd >/dev/null || \
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxSDL
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
-%attr(4511,root,root) %{_libdir}/virtualbox/VirtualBox
+%attr(4511,root,root) %{_libdir}/virtualbox/VirtualBoxVM
+%{_libdir}/virtualbox/VirtualBox
 %{_datadir}/icons/hicolor/*/apps/*.png
 %{_datadir}/icons/hicolor/*/mimetypes/*.png
 %{_datadir}/icons/hicolor/scalable/mimetypes/virtualbox.svg
@@ -726,7 +734,6 @@ getent passwd vboxadd >/dev/null || \
 %{_bindir}/VirtualBox
 %{_bindir}/virtualbox
 %{_libdir}/virtualbox/VBoxTestOGL
-%{_libdir}/virtualbox/VirtualBox.so
 %{_libdir}/virtualbox/VBoxDbg.so
 %{_libdir}/virtualbox/nls
 %{_datadir}/pixmaps/*.png
@@ -777,6 +784,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun Dec 30 2018 Sérgio Basto <sergio@serjux.com> - 6.0.0-1
+- VirtualBox 6.0
+- Patch23 was applied upstream.
+
 * Fri Nov 09 2018 Sérgio Basto <sergio@serjux.com> - 5.2.22-1
 - Update VBox to 5.2.22
 - Reenable noupdate.patch
