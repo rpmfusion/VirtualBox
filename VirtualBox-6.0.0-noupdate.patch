@@ -1,0 +1,11 @@
+--- ./src/VBox/Frontends/VirtualBox/src/net/UIUpdateDefs.cpp.orig	2018-11-25 02:08:51.251845574 +0000
++++ ./src/VBox/Frontends/VirtualBox/src/net/UIUpdateDefs.cpp	2018-11-25 02:06:13.964011846 +0000
+@@ -164,7 +164,7 @@ void VBoxUpdateData::decode()
+             if (m_dayList.isEmpty())
+                 populate();
+             PeriodType index = (PeriodType)m_dayList.indexOf(VBoxUpdateDay(QString(), parser[0]));
+-            m_enmPeriodIndex = index == PeriodUndefined ? Period1Day : index;
++            m_enmPeriodIndex = index == PeriodUndefined ? PeriodNever : index;
+         }
+ 
+         /* Parse 'date' value: */
