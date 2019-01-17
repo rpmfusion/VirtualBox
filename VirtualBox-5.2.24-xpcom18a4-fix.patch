@@ -1,0 +1,12 @@
+Index: trunk/src/libs/xpcom18a4/python/src/ErrorUtils.cpp
+===================================================================
+--- a/src/libs/xpcom18a4/python/src/ErrorUtils.cpp
++++ b/src/libs/xpcom18a4/python/src/ErrorUtils.cpp
+@@ -441,5 +441,6 @@
+ 	char *tempResult = PyString_AsString(obResult);
+ #else
+-	char *tempResult = PyUnicode_AsUTF8(obResult);
++    /* PyUnicode_AsUTF8() is const char * as of Python 3.7, char * earlier. */
++	const char *tempResult = (const char *)PyUnicode_AsUTF8(obResult);
+ #endif
+ 	result = (char *)PyMem_Malloc(strlen(tempResult)+1);
