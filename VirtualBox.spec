@@ -34,7 +34,7 @@
 
 Name:       VirtualBox
 Version:    6.0.0
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Release:    1%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -64,10 +64,6 @@ Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
-Patch30:    37-python-3.7-support.patch
-Patch32:    VBoxVNC.fix.patch
-# from ArchLinux
-Patch40:    007-python2-path.patch
 # from Mageia
 Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
@@ -89,7 +85,6 @@ BuildRequires:  libIDL-devel
 BuildRequires:  yasm
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  python2-devel
-BuildRequires:  python3-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
 BuildRequires:  qt5-qtbase-devel
@@ -213,15 +208,6 @@ Obsoletes:      python-VirtualBox < %{version}-%{release}
 Python XPCOM bindings to %{name}.
 
 
-%package -n python3-%{name}
-Summary:    Python3 bindings for %{name}
-Group:      Development/Libraries
-Requires:   %{name}-server%{?_isa} = %{version}-%{release}
-%{?python_provide:%python_provide python3-%{name}}
-
-%description -n python3-%{name}
-Python3 XPCOM bindings to %{name}.
-
 %package guest-additions
 Summary:    %{name} Guest Additions
 Group:      System Environment/Base
@@ -288,9 +274,6 @@ rm -r src/libs/zlib-1.2.8/
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
-%patch30 -p1
-%patch32 -p1
-%patch40 -p1
 # mageia support not ready for 6.0
 #patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
@@ -338,6 +321,7 @@ kmk %{_smp_mflags}    \
     VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox    \
     VBOX_WITH_TESTCASES= \
     VBOX_WITH_VALIDATIONKIT= \
+    VBOX_WITH_EXTPACK_VBOXDTRACE= \
     VBOX_WITH_VBOX_IMG=1 \
     VBOX_WITH_SYSFS_BY_DEFAULT=1 \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
@@ -386,6 +370,7 @@ install -d %{buildroot}%{_datadir}/pixmaps
 install -d %{buildroot}%{_datadir}/mime/packages
 install -d %{buildroot}%{_datadir}/icons
 install -d %{buildroot}%{_prefix}/src/%{name}-kmod-%{version}
+install -d %{buildroot}%{python2_sitelib}/virtualbox
 
 # Libs
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
@@ -400,6 +385,9 @@ install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox \
 install -p -m 0755 obj/bin/VBox.sh %{buildroot}%{_bindir}/VBox
 install -p -m 0755 -t %{buildroot}%{_bindir} \
     obj/bin/VBoxTunctl
+
+# Fixes ERROR: ambiguous python shebang in F30
+sed -i '1s:#!/usr/bin/env python:#!/usr/bin/env python2:' obj/bin/vboxshell.py
 
 # Executables
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
@@ -465,15 +453,11 @@ cp -a obj/bin/components/* %{buildroot}%{_libdir}/virtualbox/components/
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
     obj/bin/nls/*
 
-# Python
+# SDK
 pushd obj/bin/sdk/installer
 VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
     %{__python2} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
-VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
-    %{__python3} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
 popd
-
-# SDK
 cp -rp obj/bin/sdk/. %{buildroot}%{_libdir}/virtualbox/sdk
 rm -rf %{buildroot}%{_libdir}/virtualbox/sdk/installer
 
@@ -587,7 +571,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/virtualbox.desktop
 # vboxautostart-service
 
 install -d  %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps
-install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps obj/bin/rdesktop-vrdp-keymaps/*
+install -D obj/bin/rdesktop-vrdp-keymaps/* %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps
 install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox obj/bin/rdesktop-vrdp.tar.gz
 install -p -m 0755 -t %{buildroot}%{_bindir} obj/bin/rdesktop-vrdp
 
@@ -765,16 +749,14 @@ getent passwd vboxadd >/dev/null || \
 
 %files devel
 %{_libdir}/virtualbox/sdk
+%exclude %{_libdir}/virtualbox/sdk/bindings/xpcom/python
 
 %files -n python2-%{name}
 %{_libdir}/virtualbox/*.py*
+%{python2_sitelib}/virtualbox
 %{python2_sitelib}/vboxapi*
 %{_libdir}/virtualbox/VBoxPython2_7.so
-
-%files -n python3-%{name}
-%{_libdir}/virtualbox/*.py*
-%{python3_sitelib}/vboxapi*
-%{_libdir}/virtualbox/VBoxPython3*.so
+%{_libdir}/virtualbox/sdk/bindings/xpcom/python
 
 %if %{with guest_additions}
 %files guest-additions
@@ -802,12 +784,6 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
-* Mon Jan 07 2019 Sérgio Basto <sergio@serjux.com> - 6.0.0-2
-- Enable Python3 support, move all SDK python files to devel sub-package, they
-  may be used by python2 and 3.
-- Add patch VBoxVNC.fix.patch from Debian
-- Issue with EXTPACK_VBOXDTRACE was fix some time ago.
-
 * Sun Dec 30 2018 Sérgio Basto <sergio@serjux.com> - 6.0.0-1
 - VirtualBox 6.0
 - Patch23 was applied upstream.
