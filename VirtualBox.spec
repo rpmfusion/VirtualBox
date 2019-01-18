@@ -73,6 +73,7 @@ Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 # from Fedora
 Patch60:    VirtualBox-5.2.10-xclient.patch
+Patch65:    VirtualBox-remove-volatile-asm.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -293,6 +294,7 @@ rm -r src/libs/zlib-1.2.8/
 #patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
+%patch65 -p1 -b .asm
 
 %build
 ./configure --disable-kmods \
