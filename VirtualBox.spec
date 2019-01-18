@@ -36,7 +36,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    5.2.22
+Version:    5.2.24
 #Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
@@ -46,7 +46,6 @@ URL:        http://www.virtualbox.org/wiki/VirtualBox
 
 ExclusiveArch:  i686 x86_64
 
-Group:      System/Emulators/PC
 Requires:   %{name}-server%{?isa} = %{version}
 Obsoletes:  %{name}-qt
 
@@ -64,7 +63,6 @@ Source21:   os_mageia_64.png
 Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
-Patch23:    VirtualBox-5.0.18-xserver_guest.patch
 Patch27:    VirtualBox-gcc.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
@@ -74,7 +72,8 @@ Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 # from Fedora
 Patch60:    VirtualBox-5.2.10-xclient.patch
 Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
-Patch70:    fixes_for_4.20.patch
+# https://www.virtualbox.org/changeset/73153/vbox
+Patch65:    VirtualBox-5.2.24-xpcom18a4-fix.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -274,7 +273,6 @@ rm -r src/libs/zlib-1.2.8/
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
 %patch18 -p1 -b .aiobug
-%patch23 -p1 -b .xserver_guest
 #patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
@@ -283,7 +281,7 @@ rm -r src/libs/zlib-1.2.8/
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
 %patch61 -p1 -b .automount
-%patch70 -p1 -b .kernel_4.20.patch
+%patch65 -p1 -b .xpcom18a4-fix
 
 # CRLF->LF
 sed -i 's/\r//' COPYING
@@ -777,6 +775,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Jan 17 2019 Vasiliy N. Glazov <vascom2@gmail.com> - 5.2.24-1
+- Update to 5.2.24
+
 * Fri Nov 09 2018 Sérgio Basto <sergio@serjux.com> - 5.2.22-1
 - Update VBox to 5.2.22
 - Reenable noupdate.patch
