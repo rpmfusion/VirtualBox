@@ -1,0 +1,54 @@
+Copyright (c) 2018 Sérgio Basto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+The MIT License is to allow be in included in VirtualBox source code.
+
+We don't need compile the very old VBoxGuestR3LibXFree86, latest XFree86/X windows
+server was release is dated of 2007 and because fail to build when
+we unbundle all X11 sources, files like xf86_ansic.h no longer doesn't exist.
+The question is if we use VBOX_USE_SYSTEM_XORG_HEADERS or
+VBOX_USE_SYSTEM_GL_HEADERS or VBOX_NO_LEGACY_XORG_X11
+
+/usr/include/x11 never existed we only have /usr/include/X11 (with capital X),
+IIRC was I that introduce this typo (when we added VBOX_USE_SYSTEM_XORG_HEADERS)
+
+--- ./src/VBox/Additions/common/VBoxGuest/lib/Makefile.kmk.orig	2014-10-11 13:03:35.000000000 +0100
++++ ./src/VBox/Additions/common/VBoxGuest/lib/Makefile.kmk	2014-10-12 00:11:00.925507543 +0100
+@@ -40,9 +40,11 @@ LIBRARIES += \
+ 	VBoxGuestR3LibShared
+ ifndef VBOX_ONLY_VALIDATIONKIT
+  if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd)
++ ifndef VBOX_USE_SYSTEM_XORG_HEADERS
+   LIBRARIES += \
+   	VBoxGuestR3LibXFree86
+  endif
++ endif
+  if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris)
+   LIBRARIES += \
+   	VBoxGuestR3LibXOrg
+--- ./src/VBox/Additions/x11/vboxvideo/Makefile.kmk.orig	2018-01-16 04:16:19.503619778 +0000
++++ ./src/VBox/Additions/x11/vboxvideo/Makefile.kmk	2018-01-16 04:16:44.913900197 +0000
+@@ -406,7 +406,6 @@ ifdef VBOX_USE_SYSTEM_XORG_HEADERS
+  vboxvideo_drv_system_INCS += \
+         $(PATH_ROOT)/src/VBox/Runtime/include \
+         $(VBOX_GRAPHICS_INCS) \
+-        /usr/include/x11 \
+         /usr/include/xorg \
+         /usr/include/pixman-1
+  vboxvideo_drv_system_SOURCES := $(vboxvideo_drv_17_SOURCES)
