@@ -34,7 +34,7 @@
 
 Name:       VirtualBox
 Version:    6.0.2
-Release:    1%{?prerel:.%{prerel}}%{?dist}
+Release:    2%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -73,6 +73,7 @@ Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 # from Fedora
 Patch60:    VirtualBox-5.2.10-xclient.patch
+Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 Patch65:    VirtualBox-remove-volatile-asm.patch
 
 
@@ -294,6 +295,7 @@ rm -r src/libs/zlib-1.2.8/
 #patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
+%patch61 -p1 -b .automount
 %patch65 -p1 -b .asm
 
 %build
@@ -800,6 +802,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Jan 19 2019 Sérgio Basto <sergio@serjux.com> - 6.0.2-2
+- Patch 61 might be useful on el7
+
 * Thu Jan 17 2019 Vasiliy N. Glazov <vascom2@gmail.com> - 6.0.2-1
 - Update to 6.0.2
 
