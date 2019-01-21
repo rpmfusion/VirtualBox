@@ -1,0 +1,27 @@
+From 590355dbdcffa4081c377fd31565e172785b390c Mon Sep 17 00:00:00 2001
+From: vboxsync <vboxsync@cfe28804-0f27-0410-a406-dd0f0b0b656f>
+Date: Thu, 10 Jan 2019 19:49:43 +0000
+Subject: [PATCH] Main/webservice: fixes, bugref:9329 - the line has to be
+ somewhere.
+
+git-svn-id: http://www.virtualbox.org/svn/vbox@76761 cfe28804-0f27-0410-a406-dd0f0b0b656f
+---
+ trunk/src/VBox/Main/webservice/vboxweb.cpp | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/trunk/src/VBox/Main/webservice/vboxweb.cpp b/trunk/src/VBox/Main/webservice/vboxweb.cpp
+index 3665922a7a..2360f67ca2 100644
+--- a/trunk/src/VBox/Main/webservice/vboxweb.cpp
++++ b/trunk/src/VBox/Main/webservice/vboxweb.cpp
+@@ -616,6 +616,11 @@ void SoapThread::process()
+         // keepalive, otherwise stale connections tie up worker threads.
+         m_soap->send_timeout = 60;
+         m_soap->recv_timeout = 60;
++        // Limit the maximum SOAP request size to a generous amount, just to
++        // be on the safe side (SOAP is quite wordy when representing arrays,
++        // and some API uses need to deal with large arrays). Good that binary
++        // data is no longer represented by byte arrays...
++        m_soap->recv_maxlength = _16M;
+         // process the request; this goes into the COM code in methodmaps.cpp
+         do {
+ #ifdef WITH_OPENSSL

@@ -64,6 +64,7 @@ Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
 Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch27:    VirtualBox-gcc.patch
+Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
 # from Mageia
@@ -276,6 +277,9 @@ rm -r src/libs/zlib-1.2.8/
 #patch27 -p1 -b .gcc
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
+%endif
+%if 0%{?fedora} < 28 || 0%{?rhel}
+%patch29 -p2 -R -b .gsoap3
 %endif
 %patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
