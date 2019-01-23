@@ -34,7 +34,7 @@
 
 Name:       VirtualBox
 Version:    6.0.2
-Release:    2%{?prerel:.%{prerel}}%{?dist}
+Release:    3%{?prerel:.%{prerel}}%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -89,7 +89,7 @@ BuildRequires:  libIDL-devel
 BuildRequires:  yasm
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  python2-devel
-BuildRequires:  python3-devel
+BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
 BuildRequires:  qt5-qtbase-devel
@@ -213,13 +213,13 @@ Obsoletes:      python-VirtualBox < %{version}-%{release}
 Python XPCOM bindings to %{name}.
 
 
-%package -n python3-%{name}
+%package -n python%{python3_pkgversion}-%{name}
 Summary:    Python3 bindings for %{name}
 Group:      Development/Libraries
 Requires:   %{name}-server%{?_isa} = %{version}-%{release}
-%{?python_provide:%python_provide python3-%{name}}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
 
-%description -n python3-%{name}
+%description -n python%{python3_pkgversion}-%{name}
 Python3 XPCOM bindings to %{name}.
 
 %package guest-additions
@@ -771,7 +771,7 @@ getent passwd vboxadd >/dev/null || \
 %{python2_sitelib}/vboxapi*
 %{_libdir}/virtualbox/VBoxPython2_7.so
 
-%files -n python3-%{name}
+%files -n python%{python3_pkgversion}-%{name}
 %{_libdir}/virtualbox/*.py*
 %{python3_sitelib}/vboxapi*
 %{_libdir}/virtualbox/VBoxPython3*.so
@@ -802,6 +802,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Jan 23 2019 Sérgio Basto <sergio@serjux.com> - 6.0.2-3
+- python3 on epel7
+
 * Sat Jan 19 2019 Sérgio Basto <sergio@serjux.com> - 6.0.2-2
 - Patch 61 might be useful on el7
 
