@@ -62,6 +62,7 @@ Patch1:     VirtualBox-6.0.0-noupdate.patch
 Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch27:    VirtualBox-gcc.patch
+Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
 Patch30:    37-python-3.7-support.patch
@@ -288,9 +289,12 @@ rm -r src/libs/zlib-1.2.8/
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
-%patch30 -p1
-%patch32 -p1
-%patch40 -p1
+%if 0%{?fedora} < 28 || 0%{?rhel}
+%patch29 -p2 -R -b .gsoap3
+%endif
+%patch30 -p1 -b .python37
+%patch32 -p1 -b .vnc
+%patch40 -p1 -b .python2_path
 # mageia support not ready for 6.0
 #patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
@@ -804,6 +808,7 @@ getent passwd vboxadd >/dev/null || \
 %changelog
 * Wed Jan 23 2019 Sérgio Basto <sergio@serjux.com> - 6.0.2-3
 - python3 on epel7
+- Fix build of webservice
 
 * Sat Jan 19 2019 Sérgio Basto <sergio@serjux.com> - 6.0.2-2
 - Patch 61 might be useful on el7
