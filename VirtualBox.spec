@@ -33,8 +33,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.0.2
-Release:    3%{?prerel:.%{prerel}}%{?dist}
+Version:    6.0.4
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -75,7 +75,6 @@ Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 # from Fedora
 Patch60:    VirtualBox-5.2.10-xclient.patch
 Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
-Patch65:    VirtualBox-remove-volatile-asm.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -300,7 +299,6 @@ rm -r src/libs/zlib-1.2.8/
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
 %patch61 -p1 -b .automount
-%patch65 -p1 -b .asm
 
 %build
 ./configure --disable-kmods \
@@ -806,6 +804,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Jan 28 2019 Sérgio Basto <sergio@serjux.com> - 6.0.4-1
+- Update VBox to 6.0.4
+
 * Wed Jan 23 2019 Sérgio Basto <sergio@serjux.com> - 6.0.2-3
 - python3 on epel7
 - Fix build of webservice
