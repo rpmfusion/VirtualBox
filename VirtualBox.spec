@@ -13,22 +13,19 @@
 # major version number, while the kernel module abi is not guaranteed
 # to be stable. This is so that we force the module update in sync with
 # userspace.
-#global prerel 106108
-%global prereltag %{?prerel:-%(awk 'BEGIN {print toupper("%{prerel}")}')}
+#global prerel RC1
+%global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
 %ifarch x86_64
     %bcond_without webservice
 %else
     %bcond_with webservice
 %endif
-# el7 doesn't have all texlive requirements
-%if 0%{?rhel}
-    %bcond_with docs
-%else
-    %bcond_without docs
-%endif
+# Now we use upstream pdf
+%bcond_with docs
 %bcond_without vnc
 %bcond_with legacy_vboxvideo_drv
+
 %if 0%{?fedora} > 27
     %bcond_with guest_additions
 %else
@@ -36,9 +33,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    5.2.24
-#Release:   1%%{?prerel:.%%{prerel}}%%{?dist}
-Release:    1%{?dist}
+Version:    6.0.4
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -46,10 +42,12 @@ URL:        http://www.virtualbox.org/wiki/VirtualBox
 
 ExclusiveArch:  i686 x86_64
 
+Group:      System/Emulators/PC
 Requires:   %{name}-server%{?isa} = %{version}
 Obsoletes:  %{name}-qt
 
 Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
+Source1:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/UserManual.pdf
 Source3:    VirtualBox-60-vboxdrv.rules
 Source4:    VirtualBox.modules
 Source5:    VirtualBox-60-vboxguest.rules
@@ -60,20 +58,23 @@ Source9:    VBoxOGLRun.sh
 Source10:   vboxweb.service
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
-Patch1:     VirtualBox-OSE-4.1.4-noupdate.patch
+Patch1:     VirtualBox-6.0.0-noupdate.patch
 Patch2:     VirtualBox-5.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch27:    VirtualBox-gcc.patch
+Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
 # from Debian
 Patch28:    02-gsoap-build-fix.patch
+Patch30:    37-python-3.7-support.patch
+Patch32:    VBoxVNC.fix.patch
+# from ArchLinux
+Patch40:    007-python2-path.patch
 # from Mageia
 Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 # from Fedora
 Patch60:    VirtualBox-5.2.10-xclient.patch
 Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
-# https://www.virtualbox.org/changeset/73153/vbox
-Patch65:    VirtualBox-5.2.24-xpcom18a4-fix.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -88,6 +89,7 @@ BuildRequires:  libIDL-devel
 BuildRequires:  yasm
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  python2-devel
+BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
 BuildRequires:  qt5-qtbase-devel
@@ -211,6 +213,15 @@ Obsoletes:      python-VirtualBox < %{version}-%{release}
 Python XPCOM bindings to %{name}.
 
 
+%package -n python%{python3_pkgversion}-%{name}
+Summary:    Python3 bindings for %{name}
+Group:      Development/Libraries
+Requires:   %{name}-server%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
+
+%description -n python%{python3_pkgversion}-%{name}
+Python3 XPCOM bindings to %{name}.
+
 %package guest-additions
 Summary:    %{name} Guest Additions
 Group:      System Environment/Base
@@ -247,12 +258,14 @@ which is generated during the build of main package.
 
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{?prereltag}
 # add Mageia images
 cp -a %{SOURCE20} %{SOURCE21} src/VBox/Frontends/VirtualBox/images/
 
 # Remove prebuilt binary tools
 find -name '*.py[co]' -delete
+rm -r src/VBox/Additions/WINNT
+rm -r src/VBox/Additions/os2
 rm -r kBuild/
 rm -r tools/
 # Remove bundle X11 sources and some lib sources, before patching.
@@ -277,14 +290,17 @@ rm -r src/libs/zlib-1.2.8/
 %if 0%{?fedora} > 20
 %patch28 -p1 -b .gsoap2
 %endif
-%patch50 -p1 -b .mageia-support
+%if 0%{?fedora} < 28 || 0%{?rhel}
+%patch29 -p2 -R -b .gsoap3
+%endif
+%patch30 -p1 -b .python37
+%patch32 -p1 -b .vnc
+%patch40 -p1 -b .python2_path
+# mageia support not ready for 6.0
+#patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
 %patch61 -p1 -b .automount
-%patch65 -p1 -b .xpcom18a4-fix
-
-# CRLF->LF
-sed -i 's/\r//' COPYING
 
 %build
 ./configure --disable-kmods \
@@ -296,6 +312,10 @@ sed -i 's/\r//' COPYING
 %endif
 %if !%{with docs}
   --disable-docs \
+%endif
+
+%if !%{with docs}
+cp %{SOURCE1} UserManual.pdf
 %endif
 
 #--enable-vde
@@ -322,10 +342,8 @@ kmk %{_smp_mflags}    \
     VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox    \
     VBOX_WITH_TESTCASES= \
     VBOX_WITH_VALIDATIONKIT= \
-    VBOX_WITH_EXTPACK_VBOXDTRACE= \
     VBOX_WITH_VBOX_IMG=1 \
     VBOX_WITH_SYSFS_BY_DEFAULT=1 \
-    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
 %{!?legacy_vboxvideo_drv:   VBOX_NO_LEGACY_XORG_X11=1 }        \
@@ -335,12 +353,12 @@ kmk %{_smp_mflags}    \
     SDK_VBOX_OPENSSL_LIBS="ssl crypto"                         \
     SDK_VBOX_ZLIB_INCS=""                                      \
 %{?with_docs:   VBOX_WITH_DOCS=1 }                             \
-    VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java \
-    VBOX_WITH_UPDATE_REQUEST=0 \
+    VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java  \
+    VBOX_WITH_UPDATE_REQUEST=               \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
-#    VBOX_PATH_DOCBOOK_DTD=/usr/share/sgml/docbook/xml-dtd-4.5/ \
-#    VBOX_PATH_DOCBOOK=/usr/share/sgml/docbook/xsl-stylesheets/ \
+#    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
+
 # doc/manual/fr_FR/ missing man_VBoxManage-debugvm.xml and man_VBoxManage-extpack.xml
 #    VBOX_WITH_DOCS_TRANSLATIONS=1 \
 # we can't build CHM DOCS we need hhc.exe which is not in source and we need
@@ -372,7 +390,6 @@ install -d %{buildroot}%{_datadir}/pixmaps
 install -d %{buildroot}%{_datadir}/mime/packages
 install -d %{buildroot}%{_datadir}/icons
 install -d %{buildroot}%{_prefix}/src/%{name}-kmod-%{version}
-install -d %{buildroot}%{python2_sitelib}/virtualbox
 
 # Libs
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
@@ -387,9 +404,6 @@ install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox \
 install -p -m 0755 obj/bin/VBox.sh %{buildroot}%{_bindir}/VBox
 install -p -m 0755 -t %{buildroot}%{_bindir} \
     obj/bin/VBoxTunctl
-
-# Fixes ERROR: ambiguous python shebang in F30
-sed -i '1s:#!/usr/bin/env python:#!/usr/bin/env python2:' obj/bin/vboxshell.py
 
 # Executables
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
@@ -415,6 +429,8 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/vboxshell.py    \
     obj/bin/vbox-img    \
     obj/bin/VBoxDTrace    \
+    obj/bin/VBoxBugReport \
+    obj/bin/VirtualBoxVM    \
 %if %{with webservice}
     obj/bin/vboxwebsrv  \
     obj/bin/webtest     \
@@ -443,6 +459,9 @@ ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
 %endif
 ln -s ../..%{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
 
+#ln -s /usr/share/virtualbox/src/vboxhost $RPM_BUILD_ROOT/usr/src/vboxhost-%VER%
+
+
 # Components, preserve symlinks
 cp -a obj/bin/components/* %{buildroot}%{_libdir}/virtualbox/components/
 
@@ -450,11 +469,15 @@ cp -a obj/bin/components/* %{buildroot}%{_libdir}/virtualbox/components/
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
     obj/bin/nls/*
 
-# SDK
+# Python
 pushd obj/bin/sdk/installer
 VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
     %{__python2} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
+VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
+    %{__python3} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
 popd
+
+# SDK
 cp -rp obj/bin/sdk/. %{buildroot}%{_libdir}/virtualbox/sdk
 rm -rf %{buildroot}%{_libdir}/virtualbox/sdk/installer
 
@@ -565,11 +588,13 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/virtualbox.desktop
 #  mv ExtensionPacks/VNC $RPM_BUILD_ROOT/usr/lib/virtualbox/ExtensionPacks
 #fi
 #set_selinux_permissions /usr/lib/virtualbox /usr/share/virtualbox
-#for i in rdesktop-vrdp.tar.gz rdesktop-vrdp-keymaps; do
-#    mv $i $RPM_BUILD_ROOT/usr/share/virtualbox; done
-#mv rdesktop-vrdp $RPM_BUILD_ROOT/usr/bin
-#
 # vboxautostart-service
+
+install -d  %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps
+install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps obj/bin/rdesktop-vrdp-keymaps/*
+install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox obj/bin/rdesktop-vrdp.tar.gz
+install -p -m 0755 -t %{buildroot}%{_bindir} obj/bin/rdesktop-vrdp
+
 
 %pre
 # Group for USB devices
@@ -663,6 +688,8 @@ getent passwd vboxadd >/dev/null || \
 %doc doc/*cpp doc/VMM
 %if %{with docs}
 %doc obj/bin/UserManual*.pdf
+%else
+%doc UserManual.pdf
 %endif
 %license COPYING*
 %{_bindir}/VBoxManage
@@ -683,9 +710,9 @@ getent passwd vboxadd >/dev/null || \
 %{_bindir}/vboxautostart
 %{_bindir}/vbox-img
 %{_bindir}/VBoxTunctl
+%{_bindir}/rdesktop-vrdp
 %dir %{_libdir}/virtualbox
 %{_libdir}/virtualbox/*.[^p]*
-%exclude %{_libdir}/virtualbox/VirtualBox.so
 %exclude %{_libdir}/virtualbox/VBoxDbg.so
 %exclude %{_libdir}/virtualbox/VBoxPython2_7.so
 %{_libdir}/virtualbox/components
@@ -699,8 +726,10 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/SUPUninstall
 %{_libdir}/virtualbox/VBoxAutostart
 %{_libdir}/virtualbox/VBoxVMMPreload
+%{_libdir}/virtualbox/VBoxBugReport
 %{_libdir}/virtualbox/VBoxDTrace
 %{_libdir}/virtualbox/vbox-img
+%{_libdir}/virtualbox/rdesktop-vrdp-keymaps
 # This permissions have to be here, before generator of debuginfo need
 # permissions to read this files
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetNAT
@@ -709,7 +738,8 @@ getent passwd vboxadd >/dev/null || \
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxSDL
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
-%attr(4511,root,root) %{_libdir}/virtualbox/VirtualBox
+%attr(4511,root,root) %{_libdir}/virtualbox/VirtualBoxVM
+%{_libdir}/virtualbox/VirtualBox
 %{_datadir}/icons/hicolor/*/apps/*.png
 %{_datadir}/icons/hicolor/*/mimetypes/*.png
 %{_datadir}/icons/hicolor/scalable/mimetypes/virtualbox.svg
@@ -724,7 +754,6 @@ getent passwd vboxadd >/dev/null || \
 %{_bindir}/VirtualBox
 %{_bindir}/virtualbox
 %{_libdir}/virtualbox/VBoxTestOGL
-%{_libdir}/virtualbox/VirtualBox.so
 %{_libdir}/virtualbox/VBoxDbg.so
 %{_libdir}/virtualbox/nls
 %{_datadir}/pixmaps/*.png
@@ -740,14 +769,16 @@ getent passwd vboxadd >/dev/null || \
 
 %files devel
 %{_libdir}/virtualbox/sdk
-%exclude %{_libdir}/virtualbox/sdk/bindings/xpcom/python
 
 %files -n python2-%{name}
 %{_libdir}/virtualbox/*.py*
-%{python2_sitelib}/virtualbox
 %{python2_sitelib}/vboxapi*
 %{_libdir}/virtualbox/VBoxPython2_7.so
-%{_libdir}/virtualbox/sdk/bindings/xpcom/python
+
+%files -n python%{python3_pkgversion}-%{name}
+%{_libdir}/virtualbox/*.py*
+%{python3_sitelib}/vboxapi*
+%{_libdir}/virtualbox/VBoxPython3*.so
 
 %if %{with guest_additions}
 %files guest-additions
@@ -775,8 +806,31 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
-* Thu Jan 17 2019 Vasiliy N. Glazov <vascom2@gmail.com> - 5.2.24-1
-- Update to 5.2.24
+* Mon Mar 04 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 6.0.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Mon Jan 28 2019 Sérgio Basto <sergio@serjux.com> - 6.0.4-1
+- Update VBox to 6.0.4
+
+* Wed Jan 23 2019 Sérgio Basto <sergio@serjux.com> - 6.0.2-3
+- python3 on epel7
+- Fix build of webservice
+
+* Sat Jan 19 2019 Sérgio Basto <sergio@serjux.com> - 6.0.2-2
+- Patch 61 might be useful on el7
+
+* Thu Jan 17 2019 Vasiliy N. Glazov <vascom2@gmail.com> - 6.0.2-1
+- Update to 6.0.2
+
+* Mon Jan 07 2019 Sérgio Basto <sergio@serjux.com> - 6.0.0-2
+- Enable Python3 support, move all SDK python files to devel sub-package, they
+  may be used by python2 and python 3.
+- Add patch VBoxVNC.fix.patch from Debian
+- Issue with EXTPACK_VBOXDTRACE was fix some time ago.
+
+* Sun Dec 30 2018 Sérgio Basto <sergio@serjux.com> - 6.0.0-1
+- VirtualBox 6.0
+- Patch23 was applied upstream.
 
 * Fri Nov 09 2018 Sérgio Basto <sergio@serjux.com> - 5.2.22-1
 - Update VBox to 5.2.22
