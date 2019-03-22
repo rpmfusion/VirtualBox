@@ -264,6 +264,8 @@ cp -a %{SOURCE20} %{SOURCE21} src/VBox/Frontends/VirtualBox/images/
 
 # Remove prebuilt binary tools
 find -name '*.py[co]' -delete
+rm -r src/VBox/Additions/WINNT
+rm -r src/VBox/Additions/os2
 rm -r kBuild/
 rm -r tools/
 # Remove bundle X11 sources and some lib sources, before patching.
@@ -822,7 +824,7 @@ getent passwd vboxadd >/dev/null || \
 
 * Mon Jan 07 2019 Sérgio Basto <sergio@serjux.com> - 6.0.0-2
 - Enable Python3 support, move all SDK python files to devel sub-package, they
-  may be used by python2 and 3.
+  may be used by python2 and python 3.
 - Add patch VBoxVNC.fix.patch from Debian
 - Issue with EXTPACK_VBOXDTRACE was fix some time ago.
 
