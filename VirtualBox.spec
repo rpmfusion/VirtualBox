@@ -34,6 +34,7 @@
 
 Name:       VirtualBox
 Version:    6.0.6
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
