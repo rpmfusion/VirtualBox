@@ -33,8 +33,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.0.4
-Release:    2%{?dist}
+Version:    6.0.6
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -59,7 +58,7 @@ Source10:   vboxweb.service
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
 Patch1:     VirtualBox-6.0.0-noupdate.patch
-Patch2:     VirtualBox-5.1.0-strings.patch
+Patch2:     VirtualBox-6.0.6-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch27:    VirtualBox-gcc.patch
 Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
@@ -74,7 +73,6 @@ Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 # from Fedora
 Patch60:    VirtualBox-5.2.10-xclient.patch
-Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -300,7 +298,6 @@ rm -r src/libs/zlib-1.2.8/
 #patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
-%patch61 -p1 -b .automount
 
 %build
 ./configure --disable-kmods \
@@ -806,6 +803,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Apr 17 2019 Vasiliy N. Glazov <vascom2@gmail.com> - 6.0.6-1
+- Update to 6.0.6
+
 * Mon Mar 04 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 6.0.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
