@@ -33,7 +33,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.0.4
+Version:    6.0.6
 Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -59,7 +59,7 @@ Source10:   vboxweb.service
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
 Patch1:     VirtualBox-6.0.0-noupdate.patch
-Patch2:     VirtualBox-5.1.0-strings.patch
+Patch2:     VirtualBox-6.0.6-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch27:    VirtualBox-gcc.patch
 Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
@@ -806,6 +806,12 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Apr 17 2019 Sérgio Basto <sergio@serjux.com> - 6.0.6-2
+- Rebase 0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
+
+* Wed Apr 17 2019 Vasiliy N. Glazov <vascom2@gmail.com> - 6.0.6-1
+- Update to 6.0.6
+
 * Mon Mar 04 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 6.0.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 

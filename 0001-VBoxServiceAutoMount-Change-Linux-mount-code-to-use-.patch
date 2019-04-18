@@ -10,8 +10,8 @@ Signed-off-by: Hans de Goede <hdegoede@redhat.com>
  1 file changed, 8 insertions(+), 54 deletions(-)
 
 diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp
---- ./src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp.orig	2018-11-25 02:36:31.829306539 +0000
-+++ ./src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp	2018-11-25 02:41:41.632973288 +0000
+--- ./src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp.orig	2019-04-16 11:09:11.000000000 +0100
++++ ./src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp	2019-04-17 21:12:19.605885561 +0100
 @@ -40,6 +40,7 @@
  #include <iprt/ctype.h>
  #include <iprt/dir.h>
@@ -20,7 +20,7 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
  #include <iprt/path.h>
  #include <iprt/semaphore.h>
  #include <iprt/sort.h>
-@@ -117,6 +118,9 @@ RT_C_DECLS_END
+@@ -114,6 +115,9 @@ RT_C_DECLS_END
  # define VBOXSERVICE_AUTOMOUNT_MIQF             SHFL_MIQF_PATH
  #endif
  
@@ -30,7 +30,7 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
  
  /*********************************************************************************************************************************
  *   Structures and Typedefs                                                                                                      *
-@@ -398,13 +402,13 @@ static int vbsvcAutoMountSharedFolderOld
+@@ -400,13 +404,13 @@ static int vbsvcAutoMountSharedFolderOld
      int rc = vbsvcAutoMountPrepareMountPointOld(pszMountPoint, pszShareName, &Opts);
      if (RT_SUCCESS(rc))
      {
@@ -47,11 +47,10 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
          int r = mount(pszShareName,
                        pszMountPoint,
                        fFlags | MS_OPTIONSTR,
-@@ -421,34 +425,11 @@ static int vbsvcAutoMountSharedFolderOld
- 
+@@ -424,34 +428,11 @@ static int vbsvcAutoMountSharedFolderOld
  # else /* RT_OS_LINUX */
          unsigned long fFlags = MS_NODEV;
--
+ 
 -        /*const char *szOptions = { "rw" }; - ??? */
 -        struct vbsf_mount_info_new mntinf;
 -        RT_ZERO(mntinf);
@@ -69,7 +68,8 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
 -        mntinf.fmode = Opts.fmode;
 -        mntinf.dmask = Opts.dmask;
 -        mntinf.fmask = Opts.fmask;
--        mntinf.tag[0] = '\0';
+-        mntinf.cMaxIoPages = Opts.cMaxIoPages;
+-        mntinf.szTag[0] = '\0';
 -
 -        strcpy(mntinf.name, pszShareName);
 -        strcpy(mntinf.nls_name, "\0");
@@ -83,7 +83,7 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
          if (r == 0)
          {
              VGSvcVerbose(0, "vbsvcAutoMountWorker: Shared folder '%s' was mounted to '%s'\n", pszShareName, pszMountPoint);
-@@ -481,34 +462,6 @@ static int vbsvcAutoMountSharedFolderOld
+@@ -484,34 +465,6 @@ static int vbsvcAutoMountSharedFolderOld
          }
          else /* r == -1, we got some error in errno.  */
          {
@@ -118,7 +118,7 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
                  switch (errno)
                  {
                      /* If we get EINVAL here, the system already has mounted the Shared Folder to another
-@@ -527,7 +480,6 @@ static int vbsvcAutoMountSharedFolderOld
+@@ -530,7 +483,6 @@ static int vbsvcAutoMountSharedFolderOld
                          rc = RTErrConvertFromErrno(errno);
                          break;
                  }
@@ -126,6 +126,3 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
          }
  # endif
      }
--- 
-2.14.3
-
