@@ -34,7 +34,7 @@
 
 Name:       VirtualBox
 Version:    6.0.6
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -74,6 +74,7 @@ Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 # from Fedora
 Patch60:    VirtualBox-5.2.10-xclient.patch
+Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -299,6 +300,7 @@ rm -r src/libs/zlib-1.2.8/
 #patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
+%patch61 -p1 -b .automount
 
 %build
 ./configure --disable-kmods \
@@ -804,6 +806,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Apr 17 2019 Sérgio Basto <sergio@serjux.com> - 6.0.6-2
+- Rebase 0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
+
 * Wed Apr 17 2019 Vasiliy N. Glazov <vascom2@gmail.com> - 6.0.6-1
 - Update to 6.0.6
 
