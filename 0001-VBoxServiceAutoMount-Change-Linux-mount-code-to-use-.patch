@@ -11,7 +11,7 @@ Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 
 diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp
 --- ./src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp.orig	2019-04-16 11:09:11.000000000 +0100
-+++ ./src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp	2019-04-17 21:12:19.605885561 +0100
++++ ./src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp	2019-04-26 17:10:47.178485356 +0100
 @@ -40,6 +40,7 @@
  #include <iprt/ctype.h>
  #include <iprt/dir.h>
@@ -30,7 +30,7 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
  
  /*********************************************************************************************************************************
  *   Structures and Typedefs                                                                                                      *
-@@ -400,13 +404,13 @@ static int vbsvcAutoMountSharedFolderOld
+@@ -400,13 +399,13 @@ static int vbsvcAutoMountSharedFolderOld
      int rc = vbsvcAutoMountPrepareMountPointOld(pszMountPoint, pszShareName, &Opts);
      if (RT_SUCCESS(rc))
      {
@@ -47,10 +47,11 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
          int r = mount(pszShareName,
                        pszMountPoint,
                        fFlags | MS_OPTIONSTR,
-@@ -424,34 +428,11 @@ static int vbsvcAutoMountSharedFolderOld
+@@ -423,35 +422,11 @@ static int vbsvcAutoMountSharedFolderOld
+ 
  # else /* RT_OS_LINUX */
          unsigned long fFlags = MS_NODEV;
- 
+-
 -        /*const char *szOptions = { "rw" }; - ??? */
 -        struct vbsf_mount_info_new mntinf;
 -        RT_ZERO(mntinf);
@@ -83,7 +84,7 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
          if (r == 0)
          {
              VGSvcVerbose(0, "vbsvcAutoMountWorker: Shared folder '%s' was mounted to '%s'\n", pszShareName, pszMountPoint);
-@@ -484,34 +465,6 @@ static int vbsvcAutoMountSharedFolderOld
+@@ -484,34 +459,6 @@ static int vbsvcAutoMountSharedFolderOld
          }
          else /* r == -1, we got some error in errno.  */
          {
@@ -118,7 +119,7 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
                  switch (errno)
                  {
                      /* If we get EINVAL here, the system already has mounted the Shared Folder to another
-@@ -530,7 +483,6 @@ static int vbsvcAutoMountSharedFolderOld
+@@ -530,7 +477,6 @@ static int vbsvcAutoMountSharedFolderOld
                          rc = RTErrConvertFromErrno(errno);
                          break;
                  }
@@ -126,3 +127,63 @@ diff --git a/src/VBox/Additions/common/VBoxService/VBoxServiceAutoMount.cpp b/sr
          }
  # endif
      }
+@@ -1464,51 +1410,21 @@ static int vbsvcAutomounterMountIt(PVBSV
+     }
+ 
+ #  if defined(RT_OS_LINUX)
+-    /*
+-     * Linux a bit more work...
+-     */
+-    struct vbsf_mount_info_new MntInfo;
+-    RT_ZERO(MntInfo);
+-    struct vbsf_mount_opts MntOpts;
+-    RT_ZERO(MntOpts);
+-    MntInfo.nullchar     = '\0';
+-    MntInfo.signature[0] = VBSF_MOUNT_SIGNATURE_BYTE_0;
+-    MntInfo.signature[1] = VBSF_MOUNT_SIGNATURE_BYTE_1;
+-    MntInfo.signature[2] = VBSF_MOUNT_SIGNATURE_BYTE_2;
+-    MntInfo.length       = sizeof(MntInfo);
+-    MntInfo.ttl          = MntOpts.uid              = -1 /*default*/;
+-    MntInfo.msDirCacheTTL= MntOpts.msDirCacheTTL    = -1 /*default*/;
+-    MntInfo.msInodeTTL   = MntOpts.msInodeTTL       = -1 /*default*/;
+-    MntInfo.cMaxIoPages  = MntOpts.cMaxIoPages      = 0 /*default*/;
+-    MntInfo.cbDirBuf     = MntOpts.cbDirBuf         = 0 /*default*/;
+-    MntInfo.enmCacheMode = MntOpts.enmCacheMode     = kVbsfCacheMode_Default;
+-    MntInfo.uid          = MntOpts.uid   = 0;
+-    MntInfo.gid          = MntOpts.gid   = gidMount;
+-    MntInfo.dmode        = MntOpts.dmode = 0770;
+-    MntInfo.fmode        = MntOpts.fmode = 0770;
+-    MntInfo.dmask        = MntOpts.dmask = 0000;
+-    MntInfo.fmask        = MntOpts.fmask = 0000;
+-    memcpy(MntInfo.szTag, g_szTag, sizeof(g_szTag)); AssertCompile(sizeof(MntInfo.szTag) >= sizeof(g_szTag));
+-    rc = RTStrCopy(MntInfo.name, sizeof(MntInfo.name), pEntry->pszName);
+-    if (RT_FAILURE(rc))
++    unsigned long fFlags = MS_NODEV;
++    char szOpts[MAX_MNTOPT_STR] = { '\0', };
++    ssize_t cchOpts = RTStrPrintf2(szOpts, sizeof(szOpts),
++                                   "uid=0,gid=%d,dmode=0770,fmode=0770,dmask=0000,fmask=0000", gidMount);
++    if (cchOpts <= 0)
+     {
+-        VGSvcError("vbsvcAutomounterMountIt: Share name '%s' is too long for the MntInfo.name field!\n", pEntry->pszName);
+-        return rc;
++        VGSvcError("vbsvcAutomounterMountIt: szOpts overflow! %zd\n", cchOpts);
++        return VERR_BUFFER_OVERFLOW;
+     }
+ 
+-    errno = 0;
+-    unsigned long fFlags = MS_NODEV;
+-    rc = mount(pEntry->pszName, pEntry->pszActualMountPoint, "vboxsf", fFlags, &MntInfo);
++    rc = mount(pEntry->pszName, pEntry->pszActualMountPoint, "vboxsf", fFlags, szOpts);
+     if (rc == 0)
+     {
+         VGSvcVerbose(0, "vbsvcAutomounterMountIt: Successfully mounted '%s' on '%s'\n",
+                      pEntry->pszName, pEntry->pszActualMountPoint);
+-
+-        errno = 0;
+-        rc = vbsfmount_complete(pEntry->pszName, pEntry->pszActualMountPoint, fFlags, &MntOpts);
+-        if (rc != 0) /* Ignorable. /etc/mtab is probably a link to /proc/mounts. */
+-            VGSvcVerbose(1, "vbsvcAutomounterMountIt: vbsfmount_complete failed: %s (%d/%d)\n",
+-                         rc == 1 ? "open_memstream" : rc == 2 ? "setmntent" : rc == 3 ? "addmntent" : "unknown", rc, errno);
+         return VINF_SUCCESS;
+     }
+     else if (errno == EINVAL)

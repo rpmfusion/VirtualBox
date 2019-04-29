@@ -34,7 +34,7 @@
 
 Name:       VirtualBox
 Version:    6.0.6
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -806,6 +806,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Apr 29 2019 Sérgio Basto <sergio@serjux.com> - 6.0.6-3
+- Sync patch 0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use- with
+  Fedora
+
 * Wed Apr 17 2019 Sérgio Basto <sergio@serjux.com> - 6.0.6-2
 - Rebase 0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 
