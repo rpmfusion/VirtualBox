@@ -1,6 +1,6 @@
-VERSION=6.0.4
+VERSION=6.0.8
 REL=1
-RAWHIDE=30
+RAWHIDE=31
 if [ -z "$1" ]
 then
       stage=0
@@ -32,11 +32,11 @@ fi
 if test $stage -le 2
 then
 echo STAGE 2
+git checkout f30 && git merge master && git push && rfpkg build --nowait; git checkout master
+echo Press enter to continue; read dummy;
 git checkout f29 && git merge master && git push && rfpkg build --nowait; git checkout master
 echo Press enter to continue; read dummy;
 git checkout f28 && git merge master && git push && rfpkg build --nowait; git checkout master
-echo Press enter to continue; read dummy;
-git checkout f27 && git merge master && git push && rfpkg build --nowait; git checkout master
 echo Press enter to continue; read dummy;
 git checkout el7 && git merge master && git push && rfpkg build --nowait; git checkout master
 fi
