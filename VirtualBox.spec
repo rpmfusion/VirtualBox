@@ -33,7 +33,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.0.8
+Version:    6.0.10
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -280,8 +280,8 @@ rm include/VBox/HostServices/glxext.h
 
 #rm -rf src/libs/liblzf-3.4/
 rm -r src/libs/libxml2-2.9.*/
-rm -r src/libs/libpng-1.2.*/
-rm -r src/libs/zlib-1.2.8/
+rm -r src/libs/libpng-1.6.*/
+rm -r src/libs/zlib-1.2.*/
 
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
@@ -806,6 +806,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Jul 16 2019 Sérgio Basto <sergio@serjux.com> - 6.0.10-1
+- Update VBox to 6.0.10
+
 * Wed May 15 2019 Sérgio Basto <sergio@serjux.com> - 6.0.8-1
 - Update VBox to 6.0.8
 

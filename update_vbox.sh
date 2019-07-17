@@ -1,4 +1,4 @@
-VERSION=6.0.8
+VERSION=6.0.10
 REL=1
 RAWHIDE=31
 if [ -z "$1" ]
