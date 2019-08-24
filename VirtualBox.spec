@@ -34,7 +34,7 @@
 
 Name:       VirtualBox
 Version:    6.0.10
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -806,6 +806,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Aug 24 2019 Leigh Scott <leigh123linux@gmail.com> - 6.0.10-3
+- Rebuild for python-3.8
+
 * Fri Aug 09 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 6.0.10-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 - Fixes warning with: "It's not recommended to have unversioned Obsoletes: Obsoletes:  VirtualBox-qt"
