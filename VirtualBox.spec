@@ -32,9 +32,15 @@
     %bcond_without guest_additions
 %endif
 
+%if 0%{?fedora} > 30
+    %bcond_with python2
+%else
+    %bcond_without python2
+%endif
+
 Name:       VirtualBox
-Version:    6.0.10
-Release:    3%{?dist}
+Version:    6.0.12
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -75,6 +81,8 @@ Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 # from Fedora
 Patch60:    VirtualBox-5.2.10-xclient.patch
 Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
+# from OpenSuse
+Patch70:    vbox-python-detection.diff
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -88,7 +96,9 @@ BuildRequires:  xerces-c-devel
 BuildRequires:  libIDL-devel
 BuildRequires:  yasm
 BuildRequires:  pulseaudio-libs-devel
+%if %{with python2}
 BuildRequires:  python2-devel
+%endif
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
@@ -175,6 +185,9 @@ Group:      Development/Tools
 Requires:   %{name}-kmod = %{version}
 Requires:   hicolor-icon-theme
 Provides:   %{name}-kmod-common = %{version}-%{release}
+%if ! %{with python2}
+Obsoletes:   python2-%{name}%{?isa} < %{version}-%{release}
+%endif
 
 %description server
 %{name} without Qt GUI part.
@@ -193,7 +206,9 @@ webservice GUI part for %{name}.
 Summary:    %{name} SDK
 Group:      Development/Libraries
 Requires:   %{name}-server%{?isa} = %{version}-%{release}
+%if %{with python2}
 Requires:   python2-%{name}%{?isa} = %{version}-%{release}
+%endif
 
 %description devel
 %{name} Software Development Kit.
@@ -301,6 +316,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
 %patch61 -p1 -b .automount
+%patch70 -p1 -b .python-detection
 
 %build
 ./configure --disable-kmods \
@@ -471,8 +487,10 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
 
 # Python
 pushd obj/bin/sdk/installer
+%if %{with python2}
 VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
     %{__python2} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
+%endif
 VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
     %{__python3} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
 popd
@@ -770,10 +788,12 @@ getent passwd vboxadd >/dev/null || \
 %files devel
 %{_libdir}/virtualbox/sdk
 
+%if %{with python2}
 %files -n python2-%{name}
 %{_libdir}/virtualbox/*.py*
 %{python2_sitelib}/vboxapi*
 %{_libdir}/virtualbox/VBoxPython2_7.so
+%endif
 
 %files -n python%{python3_pkgversion}-%{name}
 %{_libdir}/virtualbox/*.py*
@@ -806,6 +826,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Sep 05 2019 Sérgio Basto <sergio@serjux.com> - 6.0.12-1
+- Update VBox to 6.0.12
+
 * Sat Aug 24 2019 Leigh Scott <leigh123linux@gmail.com> - 6.0.10-3
 - Rebuild for python-3.8
 

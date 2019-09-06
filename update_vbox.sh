@@ -1,6 +1,6 @@
-VERSION=6.0.10
+VERSION=6.0.12
 REL=1
-RAWHIDE=31
+RAWHIDE=32
 if [ -z "$1" ]
 then
       stage=0
@@ -32,14 +32,18 @@ fi
 if test $stage -le 2
 then
 echo STAGE 2
+git checkout f31 && git merge master && git push && rfpkg build --nowait; git checkout master
+echo Press enter to continue; read dummy;
 git checkout f30 && git merge master && git push && rfpkg build --nowait; git checkout master
 echo Press enter to continue; read dummy;
+fi
+if test $stage -le 3
+then
+echo STAGE 3
 git checkout f29 && git merge master && git push && rfpkg build --nowait; git checkout master
-echo Press enter to continue; read dummy;
-git checkout f28 && git merge master && git push && rfpkg build --nowait; git checkout master
+fi
 echo Press enter to continue; read dummy;
 git checkout el7 && git merge master && git push && rfpkg build --nowait; git checkout master
-fi
 
 cd ../VirtualBox-kmod/
 if test $stage -le 5
@@ -48,4 +52,4 @@ echo STAGE 5
 git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox-kmod.spec
 rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-kmod-$VERSION-$REL.fc$RAWHIDE.src.rpm
-echo Continue in ..../VirtualBox-kmod/update_vbox.sh
+echo "Continue in ../VirtualBox-kmod/update_vbox.sh"
