@@ -52,4 +52,5 @@ echo STAGE 5
 git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox-kmod.spec
 rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-kmod-$VERSION-$REL.fc$RAWHIDE.src.rpm
+fi
 echo "Continue in ../VirtualBox-kmod/update_vbox.sh"

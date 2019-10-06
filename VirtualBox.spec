@@ -38,9 +38,15 @@
     %bcond_without python2
 %endif
 
+%if 0%{?fedora} > 31
+    %bcond_with python3
+%else
+    %bcond_without python3
+%endif
+
 Name:       VirtualBox
 Version:    6.0.12
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -99,7 +105,9 @@ BuildRequires:  pulseaudio-libs-devel
 %if %{with python2}
 BuildRequires:  python2-devel
 %endif
+%if %{with python3}
 BuildRequires:  python%{python3_pkgversion}-devel
+%endif
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
 BuildRequires:  qt5-qtbase-devel
@@ -188,6 +196,9 @@ Provides:   %{name}-kmod-common = %{version}-%{release}
 %if ! %{with python2}
 Obsoletes:   python2-%{name}%{?isa} < %{version}-%{release}
 %endif
+%if ! %{with python3}
+Obsoletes:   python%{python3_pkgversion}-%{name}%{?isa} < %{version}-%{release}
+%endif
 
 %description server
 %{name} without Qt GUI part.
@@ -208,6 +219,9 @@ Group:      Development/Libraries
 Requires:   %{name}-server%{?isa} = %{version}-%{release}
 %if %{with python2}
 Requires:   python2-%{name}%{?isa} = %{version}-%{release}
+%endif
+%if %{with python3}
+Requires:   python%{python3_pkgversion}-%{name}%{?isa} = %{version}-%{release}
 %endif
 
 %description devel
@@ -329,6 +343,9 @@ rm -r src/libs/zlib-1.2.*/
 %if !%{with docs}
   --disable-docs \
 %endif
+%if !%{with python2} && !%{with python3}
+  --disable-python \
+%endif
 
 %if !%{with docs}
 cp %{SOURCE1} UserManual.pdf
@@ -442,7 +459,9 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/VBoxVMMPreload \
     obj/bin/VBoxXPCOMIPCD   \
     obj/bin/VBoxSysInfo.sh  \
+%if %{with python2} || %{with python3}
     obj/bin/vboxshell.py    \
+%endif
     obj/bin/vbox-img    \
     obj/bin/VBoxDTrace    \
     obj/bin/VBoxBugReport \
@@ -486,14 +505,18 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
     obj/bin/nls/*
 
 # Python
+%if %{with python2} || %{with python3}
 pushd obj/bin/sdk/installer
 %if %{with python2}
 VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
     %{__python2} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
 %endif
+%if %{with python3}
 VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
     %{__python3} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
+%endif
 popd
+%endif
 
 # SDK
 cp -rp obj/bin/sdk/. %{buildroot}%{_libdir}/virtualbox/sdk
@@ -732,7 +755,12 @@ getent passwd vboxadd >/dev/null || \
 %dir %{_libdir}/virtualbox
 %{_libdir}/virtualbox/*.[^p]*
 %exclude %{_libdir}/virtualbox/VBoxDbg.so
+%if %{with python2}
 %exclude %{_libdir}/virtualbox/VBoxPython2_7.so
+%endif
+%if %{with python3}
+%exclude %{_libdir}/virtualbox/VBoxPython3*.so
+%endif
 %{_libdir}/virtualbox/components
 %{_libdir}/virtualbox/VBoxExtPackHelperApp
 %{_libdir}/virtualbox/VBoxManage
@@ -795,10 +823,12 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/VBoxPython2_7.so
 %endif
 
+%if %{with python3}
 %files -n python%{python3_pkgversion}-%{name}
 %{_libdir}/virtualbox/*.py*
 %{python3_sitelib}/vboxapi*
 %{_libdir}/virtualbox/VBoxPython3*.so
+%endif
 
 %if %{with guest_additions}
 %files guest-additions
@@ -826,6 +856,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun Oct 06 2019 Sérgio Basto <sergio@serjux.com> - 6.0.12-2
+- Disable python bindings on rawhide until we figure out what happened with
+  Python 3.8
+
 * Thu Sep 05 2019 Sérgio Basto <sergio@serjux.com> - 6.0.12-1
 - Update VBox to 6.0.12
 
