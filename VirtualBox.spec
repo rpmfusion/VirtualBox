@@ -45,8 +45,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.0.12
-Release:    2%{?dist}
+Version:    6.0.14
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -856,6 +856,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Oct 17 2019 Sérgio Basto <sergio@serjux.com> - 6.0.14-1
+- Update VBox to 6.0.14
+
 * Sun Oct 06 2019 Sérgio Basto <sergio@serjux.com> - 6.0.12-2
 - Disable python bindings on rawhide until we figure out what happened with
   Python 3.8

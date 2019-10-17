@@ -1,4 +1,4 @@
-VERSION=6.0.12
+VERSION=6.0.14
 REL=1
 RAWHIDE=32
 if [ -z "$1" ]
@@ -11,6 +11,7 @@ fi
 if test $stage -le 0
 then
 echo STAGE 0
+git checkout master
 git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
 rm UserManual.pdf
