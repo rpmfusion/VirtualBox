@@ -38,7 +38,7 @@
     %bcond_without python2
 %endif
 
-%if 0%{?fedora} > 31
+%if 0%{?fedora} < 16
     %bcond_with python3
 %else
     %bcond_without python3
@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.0.14
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -60,6 +60,7 @@ Obsoletes:  %{name}-qt < 5.1.8
 
 Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
 Source1:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/UserManual.pdf
+Source2:    VirtualBox.appdata.xml
 Source3:    VirtualBox-60-vboxdrv.rules
 Source4:    VirtualBox.modules
 Source5:    VirtualBox-60-vboxguest.rules
@@ -159,6 +160,7 @@ BuildRequires:  pixman-devel
 BuildRequires:  xorg-x11-proto-devel
 BuildRequires:  libXcomposite-devel
 BuildRequires:  libXcursor-devel
+BuildRequires:  libXdamage-devel
 BuildRequires:  libXinerama-devel
 BuildRequires:  libXmu-devel
 BuildRequires:  libXrandr-devel
@@ -420,6 +422,7 @@ install -d %{buildroot}%{_libdir}/virtualbox/nls
 install -d %{buildroot}%{_libdir}/virtualbox/ExtensionPacks
 install -d %{buildroot}%{_libdir}/virtualbox/sdk
 install -d %{buildroot}%{_datadir}/pixmaps
+install -d %{buildroot}%{_metainfodir}
 install -d %{buildroot}%{_datadir}/mime/packages
 install -d %{buildroot}%{_datadir}/icons
 install -d %{buildroot}%{_prefix}/src/%{name}-kmod-%{version}
@@ -622,6 +625,8 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
     --remove-key=Encoding obj/bin/virtualbox.desktop
 desktop-file-validate %{buildroot}%{_datadir}/applications/virtualbox.desktop
 
+install -P -m 0644 -D %{SOURCE2} %{buildroot}%{_metainfodir}/%{name}.appdata.xml
+
 #    --remove-key=DocPath
 # to review:
 #if [ -d ExtensionPacks/VNC ]; then
@@ -804,6 +809,7 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/nls
 %{_datadir}/pixmaps/*.png
 %{_datadir}/applications/*.desktop
+%{_metainfodir}/%{name}.appdata.xml
 
 %if %{with webservice}
 %files webservice
@@ -856,6 +862,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Oct 29 2019 Sérgio Basto <sergio@serjux.com> - 6.0.14-2
+- Add appstream file (copied from openSUSE)
+
 * Thu Oct 17 2019 Sérgio Basto <sergio@serjux.com> - 6.0.14-1
 - Update VBox to 6.0.14
 
