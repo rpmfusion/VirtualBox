@@ -1,4 +1,4 @@
-VERSION=6.0.14
+VERSION=6.1.0
 REL=1
 RAWHIDE=32
 if [ -z "$1" ]
@@ -46,12 +46,4 @@ fi
 echo Press enter to continue; read dummy;
 git checkout el7 && git merge master && git push && rfpkg build --nowait; git checkout master
 
-cd ../VirtualBox-kmod/
-if test $stage -le 5
-then
-echo STAGE 5
-git pull
-rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox-kmod.spec
-rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-kmod-$VERSION-$REL.fc$RAWHIDE.src.rpm
-fi
 echo "Continue in ../VirtualBox-kmod/update_vbox.sh"

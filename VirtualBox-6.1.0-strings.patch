@@ -1,7 +1,6 @@
-diff -uNdr VirtualBox-6.0.6_orig/src/VBox/Frontends/VirtualBox/src/main.cpp VirtualBox-6.0.6_new/src/VBox/Frontends/VirtualBox/src/main.cpp
---- VirtualBox-6.0.6_orig/src/VBox/Frontends/VirtualBox/src/main.cpp	2019-04-16 13:16:21.000000000 +0300
-+++ VirtualBox-6.0.6_new/src/VBox/Frontends/VirtualBox/src/main.cpp	2019-04-17 11:53:03.382274383 +0300
-@@ -86,10 +86,12 @@
+--- ./src/VBox/Frontends/VirtualBox/src/main.cpp.orig	2019-12-19 22:58:49.615873442 +0000
++++ ./src/VBox/Frontends/VirtualBox/src/main.cpp	2019-12-19 23:03:23.696288683 +0000
+@@ -86,10 +86,12 @@ QString g_QStrHintLinuxNoMemory = QAppli
      );
  
  QString g_QStrHintLinuxNoDriver = QApplication::tr(
@@ -18,7 +17,7 @@ diff -uNdr VirtualBox-6.0.6_orig/src/VBox/Frontends/VirtualBox/src/main.cpp Virt
      "If your system has EFI Secure Boot enabled you may also need to sign "
      "the kernel modules (vboxdrv, vboxnetflt, vboxnetadp, vboxpci) before "
      "you can load them. Please see your Linux system's documentation for "
-@@ -99,9 +101,12 @@
+@@ -99,26 +101,29 @@ QString g_QStrHintLinuxNoDriver = QAppli
  QString g_QStrHintOtherWrongDriverVersion = QApplication::tr(
      "The VirtualBox kernel modules do not match this version of "
      "VirtualBox. The installation of VirtualBox was apparently not "
@@ -34,7 +33,17 @@ diff -uNdr VirtualBox-6.0.6_orig/src/VBox/Frontends/VirtualBox/src/main.cpp Virt
  
  QString g_QStrHintLinuxWrongDriverVersion = QApplication::tr(
      "The VirtualBox kernel modules do not match this version of "
-@@ -116,9 +121,9 @@
+     "VirtualBox. The installation of VirtualBox was apparently not "
+     "successful. Executing<br/><br/>"
+-    "  <font color=blue>'/sbin/vboxconfig'</font><br/><br/>"
+-    "may correct this. Make sure that you are not mixing builds "
+-    "of VirtualBox from different sources."
++    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxpci vboxdrv; systemctl restart systemd-modules-load.service</font> as root<br/><br/>"
++    "may correct this. Make sure that you do not mix the "
++    "RPMFusion version and the Oracle version of VirtualBox."
+     );
+ 
+ QString g_QStrHintOtherNoDriver = QApplication::tr(
      "Make sure the kernel module has been loaded successfully."
      );
  
@@ -78,10 +87,18 @@ diff -uNdr VirtualBox-6.0.6_orig/src/VBox/Installer/linux/VBox.sh VirtualBox-6.0
  
           You will not be able to start VMs until this problem is fixed.
  EOF
-diff -uNdr VirtualBox-6.0.6_orig/src/VBox/VMM/VMMR3/VM.cpp VirtualBox-6.0.6_new/src/VBox/VMM/VMMR3/VM.cpp
---- VirtualBox-6.0.6_orig/src/VBox/VMM/VMMR3/VM.cpp	2019-04-16 13:17:42.000000000 +0300
-+++ VirtualBox-6.0.6_new/src/VBox/VMM/VMMR3/VM.cpp	2019-04-17 11:53:03.396273870 +0300
-@@ -342,9 +342,9 @@
+--- ./src/VBox/VMM/VMMR3/VM.cpp.orig	2019-12-19 22:54:59.342051984 +0000
++++ ./src/VBox/VMM/VMMR3/VM.cpp	2019-12-19 23:14:50.172146453 +0000
+@@ -266,7 +266,7 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
+                                   "Secure Boot that the modules are signed if necessary in the right "
+                                   "way for your host system.  Then try to recompile and reload the "
+                                   "kernel modules by executing "
+-                                  "'/sbin/vboxconfig' as root");
++                                  "'akmods && systemctl restart systemd-modules-load.service' as root");
+                     break;
+ #endif
+ 
+@@ -332,9 +332,9 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
                      pszError = N_("VirtualBox kernel driver not loaded. The vboxdrv kernel module "
                                    "was either not loaded, /dev/vboxdrv is not set up properly, "
                                    "or you are using EFI Secure Boot and the module is not signed "
@@ -94,7 +111,7 @@ diff -uNdr VirtualBox-6.0.6_orig/src/VBox/VMM/VMMR3/VM.cpp VirtualBox-6.0.6_new/
  #else
                      pszError = N_("VirtualBox kernel driver not loaded");
  #endif
-@@ -386,9 +386,9 @@
+@@ -376,9 +376,9 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
                      pszError = N_("VirtualBox kernel driver not Installed. The vboxdrv kernel module "
                                    "was either not loaded, /dev/vboxdrv is not set up properly, "
                                    "or you are using EFI Secure Boot and the module is not signed "
@@ -103,7 +120,7 @@ diff -uNdr VirtualBox-6.0.6_orig/src/VBox/VMM/VMMR3/VM.cpp VirtualBox-6.0.6_new/
 -                                  "'/sbin/vboxconfig' as root");
 +                                  "in the right way for your system."
 +                                  "Install the kernel module by executing 'dnf install akmod-VirtualBox kernel-devel-$(uname -r)'"
-+                                  "and 'akmods --kernels $(uname -r) && systemctl restart systemd-modules-load.service' as root");
++                                  "and 'akmods && systemctl restart systemd-modules-load.service' as root");
  #else
                      pszError = N_("VirtualBox kernel driver not installed");
  #endif

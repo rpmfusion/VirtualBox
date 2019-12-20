@@ -45,16 +45,15 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.0.14
-Release:    2%{?dist}
+Version:    6.1.0
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
 URL:        http://www.virtualbox.org/wiki/VirtualBox
 
-ExclusiveArch:  i686 x86_64
+ExclusiveArch:  x86_64
 
-Group:      System/Emulators/PC
 Requires:   %{name}-server%{?isa} = %{version}
 Obsoletes:  %{name}-qt < 5.1.8
 
@@ -72,7 +71,7 @@ Source10:   vboxweb.service
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
 Patch1:     VirtualBox-6.0.0-noupdate.patch
-Patch2:     VirtualBox-6.0.6-strings.patch
+Patch2:     VirtualBox-6.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 Patch27:    VirtualBox-gcc.patch
 Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
@@ -302,8 +301,7 @@ rm -r tools/
 # Remove bundle X11 sources and some lib sources, before patching.
 rm -r src/VBox/Additions/x11/x11include/
 rm -r src/VBox/Additions/x11/x11stubs/
-rm include/VBox/HostServices/glext.h
-rm include/VBox/HostServices/glxext.h
+rm -r src/VBox/Additions/3D/mesa/mesa-17.3.9/
 # wglext.h has typedefs for Windows-specific extensions
 #rm include/VBox/HostServices/wglext.h
 # src/VBox/GuestHost/OpenGL/include/GL/glext.h have VBOX definitions
@@ -324,7 +322,7 @@ rm -r src/libs/zlib-1.2.*/
 %if 0%{?fedora} < 28 || 0%{?rhel}
 %patch29 -p2 -R -b .gsoap3
 %endif
-%patch30 -p1 -b .python37
+#patch30 -p1 -b .python37
 %patch32 -p1 -b .vnc
 %patch40 -p1 -b .python2_path
 # mageia support not ready for 6.0
@@ -418,6 +416,7 @@ install -d %{buildroot}%{_sbindir}
 install -d %{buildroot}%{_libdir}
 install -d %{buildroot}%{_libdir}/virtualbox
 install -d %{buildroot}%{_libdir}/virtualbox/components
+install -d %{buildroot}%{_libdir}/virtualbox/UnattendedTemplates
 install -d %{buildroot}%{_libdir}/virtualbox/nls
 install -d %{buildroot}%{_libdir}/virtualbox/ExtensionPacks
 install -d %{buildroot}%{_libdir}/virtualbox/sdk
@@ -433,7 +432,6 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
 
 install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/VBoxEFI*.fd \
-    obj/bin/*.rc        \
     obj/bin/*.r0
 
 # Binaries
@@ -462,6 +460,7 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/VBoxVMMPreload \
     obj/bin/VBoxXPCOMIPCD   \
     obj/bin/VBoxSysInfo.sh  \
+    obj/bin/vboxweb-service.sh \
 %if %{with python2} || %{with python3}
     obj/bin/vboxshell.py    \
 %endif
@@ -492,6 +491,8 @@ ln -s VBox %{buildroot}%{_bindir}/VBoxBalloonCtrl
 ln -s VBox %{buildroot}%{_bindir}/vboxballoonctrl
 ln -s VBox %{buildroot}%{_bindir}/VBoxAutostart
 ln -s VBox %{buildroot}%{_bindir}/vboxautostart
+ln -s VBox %{buildroot}%{_bindir}/VirtualBoxVM
+ln -s VBox %{buildroot}%{_bindir}/virtualboxvm
 %if %{with webservice}
 ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
 %endif
@@ -502,6 +503,7 @@ ln -s ../..%{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
 
 # Components, preserve symlinks
 cp -a obj/bin/components/* %{buildroot}%{_libdir}/virtualbox/components/
+cp obj/bin/UnattendedTemplates/* %{buildroot}%{_libdir}/virtualbox/UnattendedTemplates
 
 # Language files
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
@@ -571,9 +573,9 @@ install -m 0755 -t %{buildroot}%{_bindir}    \
 # Guest libraries
 install -m 0755 -t %{buildroot}%{_libdir}/security \
     obj/bin/additions/pam_vbox.so
-install -m 0755 -t %{buildroot}%{_libdir}/VBoxGuestAdditions \
-    obj/bin/additions/VBoxOGL*.so
-ln -s VBoxOGL.so %{buildroot}%{_libdir}/VBoxGuestAdditions/libGL.so.1
+#install -m 0755 -t %{buildroot}%{_libdir}/VBoxGuestAdditions \
+#    obj/bin/additions/VBoxOGL*.so
+#ln -s VBoxOGL.so %{buildroot}%{_libdir}/VBoxGuestAdditions/libGL.so.1
 
 # init/vboxadd-x11 code near call the function install_x11_startup_app
 install -p -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
@@ -760,6 +762,8 @@ getent passwd vboxadd >/dev/null || \
 %dir %{_libdir}/virtualbox
 %{_libdir}/virtualbox/*.[^p]*
 %exclude %{_libdir}/virtualbox/VBoxDbg.so
+%exclude %{_libdir}/virtualbox/UICommon.so
+%exclude %{_libdir}/virtualbox/VirtualBoxVM.so
 %if %{with python2}
 %exclude %{_libdir}/virtualbox/VBoxPython2_7.so
 %endif
@@ -775,6 +779,7 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/SUPInstall
 %{_libdir}/virtualbox/SUPLoggerCtl
 %{_libdir}/virtualbox/SUPUninstall
+%{_libdir}/virtualbox/UnattendedTemplates
 %{_libdir}/virtualbox/VBoxAutostart
 %{_libdir}/virtualbox/VBoxVMMPreload
 %{_libdir}/virtualbox/VBoxBugReport
@@ -806,6 +811,8 @@ getent passwd vboxadd >/dev/null || \
 %{_bindir}/virtualbox
 %{_libdir}/virtualbox/VBoxTestOGL
 %{_libdir}/virtualbox/VBoxDbg.so
+%{_libdir}/virtualbox/UICommon.so
+%{_libdir}/virtualbox/VirtualBoxVM.so
 %{_libdir}/virtualbox/nls
 %{_datadir}/pixmaps/*.png
 %{_datadir}/applications/*.desktop
@@ -862,6 +869,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Dec 18 2019 Sérgio Monteiro Basto <sergio@serjux.com> - 6.1.0-1
+- Update VBox to 6.1.0
+
 * Tue Oct 29 2019 Sérgio Basto <sergio@serjux.com> - 6.0.14-2
 - Add appstream file (copied from openSUSE)
 
