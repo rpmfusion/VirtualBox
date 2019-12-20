@@ -740,24 +740,26 @@ getent passwd vboxadd >/dev/null || \
 %doc UserManual.pdf
 %endif
 %license COPYING*
+%{_bindir}/VBox
+%{_bindir}/VBoxAutostart
+%{_bindir}/vboxautostart
+%{_bindir}/VBoxBalloonCtrl
+%{_bindir}/vboxballoonctrl
+%{_bindir}/VBoxBugReport
+%{_bindir}/vboxbugreport
+%{_bindir}/VBoxDTrace
+%{_bindir}/vboxdtrace
+%{_bindir}/vboxheadless
+%{_bindir}/VBoxHeadless
 %{_bindir}/VBoxManage
 %{_bindir}/vboxmanage
 %{_bindir}/VBoxSDL
 %{_bindir}/vboxsdl
-%{_bindir}/VBox
-%{_bindir}/VBoxVRDP
-%{_bindir}/vboxheadless
-%{_bindir}/VBoxHeadless
-%{_bindir}/VBoxDTrace
-%{_bindir}/vboxdtrace
-%{_bindir}/VBoxBugReport
-%{_bindir}/vboxbugreport
-%{_bindir}/VBoxBalloonCtrl
-%{_bindir}/vboxballoonctrl
-%{_bindir}/VBoxAutostart
-%{_bindir}/vboxautostart
-%{_bindir}/vbox-img
 %{_bindir}/VBoxTunctl
+%{_bindir}/VBoxVRDP
+%{_bindir}/VirtualBoxVM
+%{_bindir}/virtualboxvm
+%{_bindir}/vbox-img
 %{_bindir}/rdesktop-vrdp
 %dir %{_libdir}/virtualbox
 %{_libdir}/virtualbox/*.[^p]*
