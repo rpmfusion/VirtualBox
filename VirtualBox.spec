@@ -45,7 +45,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.1.0
+Version:    6.1.2
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -871,6 +871,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Jan 18 2020 Sérgio Basto <sergio@serjux.com> - 6.1.2-1
+- Update VBox to 6.1.2
+
 * Wed Dec 18 2019 Sérgio Monteiro Basto <sergio@serjux.com> - 6.1.0-1
 - Update VBox to 6.1.0
 

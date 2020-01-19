@@ -1,4 +1,4 @@
-VERSION=6.1.0
+VERSION=6.1.2
 REL=1
 RAWHIDE=32
 if [ -z "$1" ]
@@ -16,6 +16,7 @@ git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
 rm UserManual.pdf
 spectool -g VirtualBox.spec
+rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
 rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-$VERSION-$REL.fc$RAWHIDE.src.rpm
 echo Press enter to continue; read dummy;
 fi
@@ -23,7 +24,6 @@ fi
 if test $stage -le 1
 then
 echo STAGE 1
-rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
 rfpkg ci -c && git show
 echo Press enter to continue; read dummy;
 rfpkg push && rfpkg build --nowait
@@ -41,9 +41,9 @@ fi
 if test $stage -le 3
 then
 echo STAGE 3
-git checkout f29 && git merge master && git push && rfpkg build --nowait; git checkout master
+#git checkout f29 && git merge master && git push && rfpkg build --nowait; git checkout master
+#echo Press enter to continue; read dummy;
 fi
-echo Press enter to continue; read dummy;
 git checkout el7 && git merge master && git push && rfpkg build --nowait; git checkout master
 
 echo "Continue in ../VirtualBox-kmod/update_vbox.sh"
