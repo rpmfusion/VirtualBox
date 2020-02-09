@@ -90,6 +90,7 @@ Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 # from OpenSuse
 Patch70:    vbox-python-detection.diff
 
+Patch80:   Makefile.kmk_hack.patch
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  SDL-devel
@@ -331,6 +332,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch60 -p1 -b .xclient
 %patch61 -p1 -b .automount
 %patch70 -p1 -b .python-detection
+%patch80 -p1 -b .Makefile.kmk_hack.patch
 
 %build
 ./configure --disable-kmods \
