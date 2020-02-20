@@ -35,7 +35,7 @@ if test $stage -le 2
 then
 echo STAGE 2
 for repo in $REPOS ; do
-echo Press enter to build on branch f$repo; read dummy;
+echo Press enter to build on branch $repo; read dummy;
 git checkout $repo && git merge master && git push && rfpkg build --nowait; git checkout master
 done
 fi
