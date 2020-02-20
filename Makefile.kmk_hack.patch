@@ -1,8 +1,8 @@
---- ./Makefile.kmk.orig	2020-02-05 00:18:15.751562458 +0000
-+++ ./Makefile.kmk	2020-02-05 01:47:17.825333439 +0000
-@@ -169,15 +169,6 @@ ifeq ($(KBUILD_TARGET),darwin)
-   Frameworks/$(qtmod).framework/$(qtmod)=>Versions/5/$(qtmod) \
-   Frameworks/$(qtmod).framework/Resources=>Versions/5/Resources)
+--- ./Makefile.kmk.orig	2020-02-20 03:40:14.049126175 +0000
++++ ./Makefile.kmk	2020-02-20 03:40:41.843981024 +0000
+@@ -188,15 +188,6 @@ ifeq ($(KBUILD_TARGET),darwin)
+  					"$(if $(VBOX_WITH_HARDENING),/Applications/VirtualBox.app/Contents/Frameworks,@rpath)/$(qtmod).framework/Versions/5/$(qtmod)" ) ) \
+  			"$(2)",) # HACK ALERT! Using $(source_type_prefix) to detect EXEC_SOURCES.
  else # win x11
 - if1of ($(KBUILD_TARGET), linux solaris)
 -  ifndef VBOX_ONLY_BUILD
@@ -16,13 +16,3 @@
   if defined(VBOX_WITH_ORACLE_QT) || defined(VBOX_WITH_QT_PAYLOAD)
    include $(KBUILD_PATH)/units/qt5.kmk
    ifeq ($(KBUILD_TARGET),win)
---- ./src/VBox/Devices/PC/ipxe/Makefile.kmk.orig	2020-02-08 23:53:19.747326051 +0000
-+++ ./src/VBox/Devices/PC/ipxe/Makefile.kmk	2020-02-08 23:54:17.038644318 +0000
-@@ -111,6 +111,7 @@ endif
-  TEMPLATE_iPxe_LNK_DEPS = $(VBOX_PATH_IPXE_SRC)/src/arch/i386/scripts/i386.lds
-  TEMPLATE_iPxe_CFLAGS  = \
- 	-fno-pie \
-+	-fcommon \
- 	-ffreestanding \
- 	-ffunction-sections \
- 	-march=i386 \

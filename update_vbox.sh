@@ -1,6 +1,7 @@
-VERSION=6.1.2
+VERSION=6.1.4
 REL=1
-RAWHIDE=32
+RAWHIDE=33
+REPOS="f32 f31 f30 el7"
 if [ -z "$1" ]
 then
       stage=0
@@ -33,17 +34,10 @@ fi
 if test $stage -le 2
 then
 echo STAGE 2
-git checkout f31 && git merge master && git push && rfpkg build --nowait; git checkout master
-echo Press enter to continue; read dummy;
-git checkout f30 && git merge master && git push && rfpkg build --nowait; git checkout master
-echo Press enter to continue; read dummy;
+for repo in $REPOS ; do
+echo Press enter to build on branch f$repo; read dummy;
+git checkout $repo && git merge master && git push && rfpkg build --nowait; git checkout master
+done
 fi
-if test $stage -le 3
-then
-echo STAGE 3
-#git checkout f29 && git merge master && git push && rfpkg build --nowait; git checkout master
-#echo Press enter to continue; read dummy;
-fi
-git checkout el7 && git merge master && git push && rfpkg build --nowait; git checkout master
 
 echo "Continue in ../VirtualBox-kmod/update_vbox.sh"
