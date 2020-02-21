@@ -1,0 +1,40 @@
+Patch 1: Fix Detection of GCC10 (is >= 4.4 )
+Patch 2: Fix
+
+/builddir/build/BUILD/VirtualBox-6.1.4/src/VBox/Debugger/DBGCDumpImage.cpp: In function 'const char* dbgcMachoCpuType(uint32_t, uint32_t)':
+/builddir/build/BUILD/VirtualBox-6.1.4/include/iprt/formats/mach-o.h:41:46: error: narrowing conversion of '-1' from 'int' to 'unsigned int' [-Wnarrowing]
+   41 | #define CPU_TYPE_ANY                INT32_C(-1)
+      |                                              ^
+/builddir/build/BUILD/VirtualBox-6.1.4/src/VBox/Debugger/DBGCDumpImage.cpp:471:14: note: in expansion of macro 'CPU_TYPE_ANY'
+  471 |         case CPU_TYPE_ANY:          return "CPU_TYPE_ANY";
+      |              ^~~~~~~~~~~~
+
+--- ./Makefile.kmk.orig	2020-02-20 03:40:14.049126175 +0000
++++ ./Makefile.kmk	2020-02-20 03:40:41.843981024 +0000
+@@ -188,15 +188,6 @@ ifeq ($(KBUILD_TARGET),darwin)
+  					"$(if $(VBOX_WITH_HARDENING),/Applications/VirtualBox.app/Contents/Frameworks,@rpath)/$(qtmod).framework/Versions/5/$(qtmod)" ) ) \
+  			"$(2)",) # HACK ALERT! Using $(source_type_prefix) to detect EXEC_SOURCES.
+ else # win x11
+- if1of ($(KBUILD_TARGET), linux solaris)
+-  ifndef VBOX_ONLY_BUILD
+-   ifneq ($(VBOX_GCC_VERSION_CXX),)
+-    ifeq ($(int-ge $(VBOX_GCC_VERSION_CXX),40400),)
+-     $(error gcc >= 4.4 required when compiling against Qt5!)
+-    endif
+-   endif
+-  endif
+- endif
+  if defined(VBOX_WITH_ORACLE_QT) || defined(VBOX_WITH_QT_PAYLOAD)
+   include $(KBUILD_PATH)/units/qt5.kmk
+   ifeq ($(KBUILD_TARGET),win)
+--- ./include/iprt/formats/mach-o.h.orig	2020-02-21 00:48:43.337510836 +0000
++++ ./include/iprt/formats/mach-o.h	2020-02-21 00:54:56.263466584 +0000
+@@ -38,7 +38,7 @@
+ /* cputype */
+ #define CPU_ARCH_MASK               INT32_C(0xff000000)
+ #define CPU_ARCH_ABI64              INT32_C(0x01000000)
+-#define CPU_TYPE_ANY                INT32_C(-1)
++#define CPU_TYPE_ANY                INT32_C(0xffffffff)
+ #define CPU_TYPE_VAX                INT32_C(1)
+ #define CPU_TYPE_MC680x0            INT32_C(6)
+ #define CPU_TYPE_X86                INT32_C(7)
