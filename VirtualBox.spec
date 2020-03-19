@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.4
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -91,6 +91,7 @@ Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 Patch70:    vbox-python-detection.diff
 
 Patch80:    VirtualBox-6.1.4-hacks.patch
+Patch81:    fixes_for_5.6.patch
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  SDL-devel
@@ -140,6 +141,8 @@ BuildRequires:  device-mapper-devel
 BuildRequires:  libvpx-devel
 BuildRequires:  makeself
 BuildRequires:  opus-devel
+#For fixrom.pl
+BuildRequires:  perl-interpreter
 
 # for 32bit on 64
 %ifarch x86_64
@@ -201,6 +204,10 @@ Obsoletes:   python2-%{name}%{?isa} < %{version}-%{release}
 %if ! %{with python3}
 Obsoletes:   python%{python3_pkgversion}-%{name}%{?isa} < %{version}-%{release}
 %endif
+# temporary hack
+# if virtualbox-guest-additions 6.1.2 still in repos, we try remove it to allow
+# install VirtualBox-server 6.1.4
+Obsoletes:  virtualbox-guest-additions < 6.1.4-1
 
 %description server
 %{name} without Qt GUI part.
@@ -333,6 +340,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch61 -p1 -b .automount
 %patch70 -p1 -b .python-detection
 %patch80 -p1 -b .hack
+%patch81 -p1 -b .kernel5.6
 
 %build
 ./configure --disable-kmods \
@@ -873,6 +881,12 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Mar 19 2020 Sérgio Basto <sergio@serjux.com> - 6.1.4-3
+- Fixes_for_kernel 5.6 from
+  https://build.opensuse.org/package/show/Virtualization/virtualbox
+  but breaks build on epel 7
+- Temporary hack to try to fix upgrade path.
+
 * Fri Feb 21 2020 Sérgio Basto <sergio@serjux.com> - 6.1.4-2
 - Add a hack to fix builds on Rawhide/F32
 
