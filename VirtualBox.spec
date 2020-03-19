@@ -92,6 +92,7 @@ Patch70:    vbox-python-detection.diff
 
 Patch80:    VirtualBox-6.1.4-hacks.patch
 Patch81:    fixes_for_5.6.patch
+Patch82:    Clipboard.patch
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  SDL-devel
@@ -341,6 +342,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch70 -p1 -b .python-detection
 %patch80 -p1 -b .hack
 %patch81 -p1 -b .kernel5.6
+%patch82 -p1 -b .clipboard
 
 %build
 ./configure --disable-kmods \
