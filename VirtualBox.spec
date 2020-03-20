@@ -342,7 +342,9 @@ rm -r src/libs/zlib-1.2.*/
 %patch61 -p1 -b .automount
 %patch70 -p1 -b .python-detection
 %patch80 -p1 -b .hack
+%if 0%{?fedora}
 %patch81 -p1 -b .kernel5.6
+%endif
 %patch82 -p1 -b .clipboard
 
 %build
@@ -885,10 +887,11 @@ getent passwd vboxadd >/dev/null || \
 
 %changelog
 * Thu Mar 19 2020 Sérgio Basto <sergio@serjux.com> - 6.1.4-3
-- Fixes_for_kernel 5.6 from
+- Fixes for kernel 5.6 from
   https://build.opensuse.org/package/show/Virtualization/virtualbox
-  but breaks build on epel 7
+  but just applied on Fedora, because breaks the build on EPEL 7
 - Temporary hack to try to fix upgrade path.
+- Fix build on rawhide, perl related.
 
 * Fri Feb 21 2020 Sérgio Basto <sergio@serjux.com> - 6.1.4-2
 - Add a hack to fix builds on Rawhide/F32
