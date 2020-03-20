@@ -143,8 +143,8 @@ BuildRequires:  libvpx-devel
 BuildRequires:  makeself
 BuildRequires:  opus-devel
 #For fixrom.pl
-BuildRequires:  perl-FindBin
-BuildRequires:  perl-lib
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(lib)
 
 # for 32bit on 64
 %ifarch x86_64
