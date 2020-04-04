@@ -66,7 +66,6 @@ Source5:    VirtualBox-60-vboxguest.rules
 Source6:    VirtualBox-guest.modules
 Source7:    vboxservice.service
 Source8:    96-vbox.preset
-Source9:    VBoxOGLRun.sh
 Source10:   vboxweb.service
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
@@ -592,9 +591,6 @@ install -m 0755 -t %{buildroot}%{_bindir}    \
 # Guest libraries
 install -m 0755 -t %{buildroot}%{_libdir}/security \
     obj/bin/additions/pam_vbox.so
-#install -m 0755 -t %{buildroot}%{_libdir}/VBoxGuestAdditions \
-#    obj/bin/additions/VBoxOGL*.so
-#ln -s VBoxOGL.so %{buildroot}%{_libdir}/VBoxGuestAdditions/libGL.so.1
 
 # init/vboxadd-x11 code near call the function install_x11_startup_app
 install -p -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
@@ -609,7 +605,6 @@ desktop-file-validate \
 install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_unitdir}/vboxservice.service
 install -p -m 0644 -D %{SOURCE8} %{buildroot}%{_presetdir}/96-vbox.preset
 install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_udevrulesdir}/60-vboxguest.rules
-install -p -m 0755 -D %{SOURCE9} %{buildroot}%{_bindir}/VBoxOGLRun
 install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
 %if 0%{?fedora}
 #sed -i s/vboxvideo/d %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
@@ -870,7 +865,6 @@ getent passwd vboxadd >/dev/null || \
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
 %{_bindir}/VBoxClient-all
-%{_bindir}/VBoxOGLRun
 %{_sbindir}/VBoxService
 %{_sbindir}/mount.vboxsf
 %{_libdir}/security/pam_vbox.so
