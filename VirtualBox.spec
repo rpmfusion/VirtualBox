@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.4
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -93,6 +93,8 @@ Patch70:    vbox-python-detection.diff
 Patch80:    VirtualBox-6.1.4-hacks.patch
 Patch81:    fixes_for_5.6.patch
 Patch82:    Clipboard.patch
+Patch83:    VirtualBox-6.1.4-VBoxClient-vmsvga-x11-crash.patch
+
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  SDL-devel
@@ -346,6 +348,8 @@ rm -r src/libs/zlib-1.2.*/
 %patch81 -p1 -b .kernel5.6
 %endif
 %patch82 -p1 -b .clipboard
+%patch83 -p1 -b .vmsvga-x11-crash
+
 
 %build
 ./configure --disable-kmods \
@@ -886,6 +890,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Apr 04 2020 Sérgio Basto <sergio@serjux.com> - 6.1.4-4
+- Fix rfbz#5581 USB devices are not available
+- VirtualBox-6.1.4-VBoxClient-vmsvga-x11-crash.patch, just for epel7 guest-additions.
+
 * Thu Mar 19 2020 Sérgio Basto <sergio@serjux.com> - 6.1.4-3
 - Fixes for kernel 5.6 from
   https://build.opensuse.org/package/show/Virtualization/virtualbox
