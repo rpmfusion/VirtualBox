@@ -93,6 +93,8 @@ Patch80:    VirtualBox-6.1.4-hacks.patch
 Patch81:    fixes_for_5.6.patch
 Patch82:    Clipboard.patch
 Patch83:    VirtualBox-6.1.4-VBoxClient-vmsvga-x11-crash.patch
+Patch84:    VirtualBox-6.1.4-wayland-crash.patch
+Patch85:    VirtualBox-6.1.4-Xwayland-shortcut-inhibit.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -348,6 +350,8 @@ rm -r src/libs/zlib-1.2.*/
 %endif
 %patch82 -p1 -b .clipboard
 %patch83 -p1 -b .vmsvga-x11-crash
+%patch84 -p1 -b .wayland
+%patch85 -p1 -b .wayland2
 
 
 %build
@@ -886,7 +890,10 @@ getent passwd vboxadd >/dev/null || \
 %changelog
 * Sat Apr 04 2020 Sérgio Basto <sergio@serjux.com> - 6.1.4-4
 - Fix rfbz#5581 USB devices are not available
-- VirtualBox-6.1.4-VBoxClient-vmsvga-x11-crash.patch, just for epel7 guest-additions.
+- VirtualBox-6.1.4-VBoxClient-vmsvga-x11-crash.patch, just for epel7
+  guest-additions.
+- rfbz #5598 2 patches: Fix VBox crash when started under Wayland, Fix
+  keyboard-grab under Wayland
 
 * Thu Mar 19 2020 Sérgio Basto <sergio@serjux.com> - 6.1.4-3
 - Fixes for kernel 5.6 from

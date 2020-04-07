@@ -1,0 +1,45 @@
+diff -up VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/globals/UICommon.cpp~ VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/globals/UICommon.cpp
+--- VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/globals/UICommon.cpp~	2020-02-18 18:19:59.000000000 +0100
++++ VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/globals/UICommon.cpp	2020-04-06 13:30:21.274027340 +0200
+@@ -2203,6 +2204,17 @@ void UICommon::setWMClass(QWidget *pWidg
+     XSetClassHint(QX11Info::display(), pWidget->window()->winId(), &windowClass);
+ }
+ 
++/* static */
++void UICommon::setXwaylandMayGrabKeyboardFlag(QWidget *pWidget)
++{
++    /* Tell the WM we are well behaved wrt Xwayland keyboard-grabs. This will
++     * make the WM turn our grab into a Wayland shortcut inhibition request,
++     * so that e.g. alt+tab will get send to the VM instead of moving the
++     * focus away from the VM. */
++    XXSendClientMessage(QX11Info::display(), pWidget->window()->winId(),
++                        "_XWAYLAND_MAY_GRAB_KEYBOARD", 1);
++}
++
+ #endif /* VBOX_WS_X11 */
+ 
+ /* static */
+diff -up VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/globals/UICommon.h~ VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/globals/UICommon.h
+--- VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/globals/UICommon.h~	2020-02-18 18:19:59.000000000 +0100
++++ VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/globals/UICommon.h	2020-04-06 13:30:20.345012390 +0200
+@@ -416,6 +416,8 @@ public:
+ 
+         /** Assigns WM_CLASS property for passed @a pWidget. */
+         static void setWMClass(QWidget *pWidget, const QString &strNameString, const QString &strClassString);
++        /** Tell the WM the passed @a pWidget window is well behaved wrt XWayland keyboard-grabs. */
++        static void setXwaylandMayGrabKeyboardFlag(QWidget *pWidget);
+ #endif /* VBOX_WS_X11 */
+ 
+         /** Assigns minimum @a pSpinBox to correspond to @a cCount digits. */
+diff -up VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/runtime/UIMachineWindow.cpp~ VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/runtime/UIMachineWindow.cpp
+--- VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/runtime/UIMachineWindow.cpp~	2020-04-06 13:18:46.000000000 +0200
++++ VirtualBox-6.1.4/src/VBox/Frontends/VirtualBox/src/runtime/UIMachineWindow.cpp	2020-04-06 13:25:52.235673962 +0200
+@@ -135,6 +135,8 @@ void UIMachineWindow::prepare()
+         strWindowName = QString("VirtualBox Machine UUID: %1").arg(uiCommon().managedVMUuid().toString());
+     /* Assign WM_CLASS property: */
+     UICommon::setWMClass(this, strWindowName, strWindowClass);
++    /* Tell the WM we are well behaved wrt Xwayland keyboard-grabs: */
++    UICommon::setXwaylandMayGrabKeyboardFlag(this);
+ #endif
+ }
+ 

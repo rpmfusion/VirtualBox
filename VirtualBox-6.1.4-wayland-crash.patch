@@ -1,0 +1,15 @@
+diff -up VirtualBox-6.1.4/src/VBox/Installer/linux/VBox.sh~ VirtualBox-6.1.4/src/VBox/Installer/linux/VBox.sh
+--- VirtualBox-6.1.4/src/VBox/Installer/linux/VBox.sh~	2020-04-02 18:29:07.000000000 +0200
++++ VirtualBox-6.1.4/src/VBox/Installer/linux/VBox.sh	2020-04-06 10:29:16.560823901 +0200
+@@ -88,6 +88,11 @@ if [ "$SHUTDOWN" = "true" ]; then
+     exit 0
+ fi
+ 
++# The VirtualBox code uses QX11Info::display() to make direct X11 calls in
++# various places, so it is not ready to run as native Wayland client yet
++# Without this "VirtualBox" crashes immediately at startup under Wayland
++export QT_QPA_PLATFORM=xcb
++
+ APP=`basename $0`
+ case "$APP" in
+     VirtualBox|virtualbox)
