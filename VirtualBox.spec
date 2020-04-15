@@ -45,8 +45,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.1.4
-Release:    4%{?dist}
+Version:    6.1.6
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -90,9 +90,6 @@ Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 Patch70:    vbox-python-detection.diff
 
 Patch80:    VirtualBox-6.1.4-hacks.patch
-Patch81:    fixes_for_5.6.patch
-Patch82:    Clipboard.patch
-Patch83:    VirtualBox-6.1.4-VBoxClient-vmsvga-x11-crash.patch
 Patch84:    VirtualBox-6.1.4-wayland-crash.patch
 Patch85:    VirtualBox-6.1.4-Xwayland-shortcut-inhibit.patch
 
@@ -345,11 +342,6 @@ rm -r src/libs/zlib-1.2.*/
 %patch61 -p1 -b .automount
 %patch70 -p1 -b .python-detection
 %patch80 -p1 -b .hack
-%if 0%{?fedora}
-%patch81 -p1 -b .kernel5.6
-%endif
-%patch82 -p1 -b .clipboard
-%patch83 -p1 -b .vmsvga-x11-crash
 %patch84 -p1 -b .wayland
 %patch85 -p1 -b .wayland2
 
@@ -888,6 +880,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Apr 14 2020 Sérgio Basto <sergio@serjux.com> - 6.1.6-1
+- Update VBox to 6.1.6
+
 * Sat Apr 04 2020 Sérgio Basto <sergio@serjux.com> - 6.1.4-4
 - Fix rfbz#5581 USB devices are not available
 - VirtualBox-6.1.4-VBoxClient-vmsvga-x11-crash.patch, just for epel7
