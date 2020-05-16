@@ -1,4 +1,4 @@
-VERSION=6.1.6
+VERSION=6.1.8
 REL=1
 RAWHIDE=33
 REPOS="f32 f31 f30 el7"
@@ -17,7 +17,6 @@ git pull
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
 rm UserManual.pdf
 spectool -g VirtualBox.spec
-rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
 rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-$VERSION-$REL.fc$RAWHIDE.src.rpm
 echo Press enter to continue; read dummy;
 fi
@@ -25,6 +24,7 @@ fi
 if test $stage -le 1
 then
 echo STAGE 1
+rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
 rfpkg ci -c && git show
 echo Press enter to continue; read dummy;
 rfpkg push && rfpkg build --nowait
