@@ -18,17 +18,16 @@ rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
 rm UserManual.pdf
 spectool -g VirtualBox.spec
 rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-$VERSION-$REL.fc$RAWHIDE.src.rpm
-echo Press enter to continue; read dummy;
 fi
 
 if test $stage -le 1
 then
 echo STAGE 1
+echo Press enter to upload sources; read dummy;
 rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
 rfpkg ci -c && git show
-echo Press enter to continue; read dummy;
+echo Press enter to push and build on rawhide; read dummy;
 rfpkg push && rfpkg build --nowait
-echo Press enter to continue; read dummy;
 fi
 
 if test $stage -le 2
