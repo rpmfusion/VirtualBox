@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.8
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -63,7 +63,6 @@ Source2:    VirtualBox.appdata.xml
 Source3:    VirtualBox-60-vboxdrv.rules
 Source4:    VirtualBox.modules
 Source5:    VirtualBox-60-vboxguest.rules
-Source6:    VirtualBox-guest.modules
 Source7:    vboxservice.service
 Source8:    96-vbox.preset
 Source10:   vboxweb.service
@@ -599,11 +598,6 @@ desktop-file-validate \
 install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_unitdir}/vboxservice.service
 install -p -m 0644 -D %{SOURCE8} %{buildroot}%{_presetdir}/96-vbox.preset
 install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_udevrulesdir}/60-vboxguest.rules
-install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
-%if 0%{?fedora}
-#sed -i s/vboxvideo/d %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
-sed -i 's/vboxvideo/#vboxvideo/' %{buildroot}%{_prefix}/lib/modules-load.d/%{name}-guest.conf
-%endif
 %endif
 
 # Module Source Code
@@ -714,9 +708,6 @@ getent passwd vboxadd >/dev/null || \
 # Guest additions install
 %post guest-additions
 /sbin/ldconfig
-# should be in kmod package, not here, but we need modules loaded to start
-# vboxservice
-/bin/systemctl restart systemd-modules-load.service >/dev/null 2>&1 || :
 %systemd_post vboxservice.service
 
 #chcon -u system_u -t mount_exec_t "$lib_path/$PACKAGE/mount.vboxsf" > /dev/null 2>&1
@@ -869,7 +860,6 @@ getent passwd vboxadd >/dev/null || \
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %{_udevrulesdir}/60-vboxguest.rules
-%{_prefix}/lib/modules-load.d/%{name}-guest.conf
 %{_unitdir}/vboxservice.service
 %{_presetdir}/96-vbox.preset
 %endif
@@ -878,6 +868,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed May 20 2020 Sérgio Basto <sergio@serjux.com> - 6.1.8-2
+- Fix for guest additions on EL7, now we use vboxservice.service to load modules.
+  Partial fix for rfbz #3966
+
 * Fri May 15 2020 Sérgio Basto <sergio@serjux.com> - 6.1.8-1
 - Update VBox to 6.1.8
 

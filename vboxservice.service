@@ -5,6 +5,10 @@ ConditionVirtualization=|kvm
 ConditionVirtualization=|oracle
 
 [Service]
+ExecStartPre=-/usr/bin/modprobe vboxguest
+ExecStartPre=-/usr/bin/modprobe vboxvideo
+ExecStartPre=-/usr/bin/modprobe vboxsf
+ExecStartPre=-/usr/bin/VBoxClient --vmsvga
 ExecStart=/usr/sbin/VBoxService -f
 
 [Install]
