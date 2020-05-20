@@ -285,8 +285,6 @@ This subpackage provides tools that use kernel modules for supporting
 integration with the Host, including file sharing, clipboard sharing,
 X.org X11 video and mouse driver, USB and webcam proxy and Seamless mode.
 
-To use OpenGL pass-through mode run apps using "VBoxOGLRun foo -opt1 -opt2".
-
 %package kmodsrc
 Summary:    %{name} kernel module source code
 Group:      System Environment/Kernel
