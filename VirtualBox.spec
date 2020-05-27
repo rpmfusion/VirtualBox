@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.8
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -91,6 +91,7 @@ Patch70:    vbox-python-detection.diff
 Patch80:    VirtualBox-6.1.4-hacks.patch
 Patch84:    VirtualBox-6.1.4-wayland-crash.patch
 Patch85:    VirtualBox-6.1.4-Xwayland-shortcut-inhibit.patch
+Patch86:    VirtualBox-6.1.0-VBoxRem.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -99,8 +100,6 @@ BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
 BuildRequires:  libxslt-devel
-BuildRequires:  xalan-c-devel
-BuildRequires:  xerces-c-devel
 BuildRequires:  libIDL-devel
 BuildRequires:  yasm
 BuildRequires:  pulseaudio-libs-devel
@@ -301,6 +300,8 @@ cp -a %{SOURCE20} %{SOURCE21} src/VBox/Frontends/VirtualBox/images/
 
 # Remove prebuilt binary tools
 find -name '*.py[co]' -delete
+# Remove pre-compiled headers
+find . -name "*.gch" -delete
 rm -r src/VBox/Additions/WINNT
 rm -r src/VBox/Additions/os2
 rm -r kBuild/
@@ -341,6 +342,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch80 -p1 -b .hack
 %patch84 -p1 -b .wayland
 %patch85 -p1 -b .wayland2
+%patch86 -p1 -b .vboxrem
 
 
 %build
@@ -868,6 +870,11 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue May 26 2020 Sérgio Basto <sergio@serjux.com> - 6.1.8-3
+- Add VirtualBox-6.1.0-VBoxRem.patch rfbz #5652
+- Remove pre-compiled headers
+- xalan-c-devel and xerces-c-devel are not needed anymore
+
 * Wed May 20 2020 Sérgio Basto <sergio@serjux.com> - 6.1.8-2
 - Fix for guest additions on EL7, now we use vboxservice.service to load modules.
   Partial fix for rfbz #3966
