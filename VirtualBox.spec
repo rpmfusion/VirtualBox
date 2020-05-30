@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.8
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -870,6 +870,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat May 30 2020 Leigh Scott <leigh123linux@gmail.com> - 6.1.8-4
+- Rebuild for python-3.9
+
 * Tue May 26 2020 Sérgio Basto <sergio@serjux.com> - 6.1.8-3
 - Add VirtualBox-6.1.0-VBoxRem.patch rfbz #5652
 - Remove pre-compiled headers
