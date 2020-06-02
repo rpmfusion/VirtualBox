@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.8
-Release:    4%{?dist}
+Release:    5%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -300,8 +300,6 @@ cp -a %{SOURCE20} %{SOURCE21} src/VBox/Frontends/VirtualBox/images/
 
 # Remove prebuilt binary tools
 find -name '*.py[co]' -delete
-# Remove pre-compiled headers
-find . -name "*.gch" -delete
 rm -r src/VBox/Additions/WINNT
 rm -r src/VBox/Additions/os2
 rm -r kBuild/
@@ -332,7 +330,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch31 -p1 -b .gsoap2
 %endif
 %patch32 -p1 -b .vnc
-%if 0%{?fedora} || 0%{?rhel} > 7
+%if %{with python3}
 %patch40 -p1 -b .python2_path
 %endif
 # mageia support not ready for 6.0
@@ -403,6 +401,7 @@ kmk %{_smp_mflags}    \
 %{?with_docs:   VBOX_WITH_DOCS=1 }                             \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java  \
     VBOX_WITH_UPDATE_REQUEST=               \
+    VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
 #    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
@@ -872,6 +871,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Jun 02 2020 Sérgio Basto <sergio@serjux.com> - 6.1.8-5
+- Fix build on EL8
+
 * Sun May 31 2020 Sérgio Basto <sergio@serjux.com> - 6.1.8-4
 - Add python-3.9 support
 - Fix some conditionals of python especially for el8
