@@ -45,8 +45,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.1.8
-Release:    5%{?dist}
+Version:    6.1.10
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -871,6 +871,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Jun 06 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-1
+- Update VBox to 6.1.10
+
 * Tue Jun 02 2020 Sérgio Basto <sergio@serjux.com> - 6.1.8-5
 - Fix build on EL8
 
