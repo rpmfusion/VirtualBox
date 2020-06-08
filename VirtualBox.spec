@@ -650,18 +650,11 @@ install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox obj/bin/rdesktop-vrdp.ta
 install -p -m 0755 -t %{buildroot}%{_bindir} obj/bin/rdesktop-vrdp
 
 
-%pre
+%pre server
 # Group for USB devices
 getent group vboxusers >/dev/null || groupadd -r vboxusers
 
-%post
-# Icon Cache
-/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-# mimeinfo F23 only
-/bin/touch --no-create %{_datadir}/mime/packages &>/dev/null || :
-# Desktop databases F23 and F24 only
-/usr/bin/update-desktop-database &> /dev/null || :
-
+%post server
 # Assign USB devices
 if /sbin/udevadm control --reload-rules >/dev/null 2>&1
 then
@@ -672,11 +665,15 @@ fi
 # should be in kmod package, not here
 /bin/systemctl restart systemd-modules-load.service >/dev/null 2>&1 || :
 
-%post webservice
-%systemd_post vboxweb-httpd.service
-
-%preun webservice
-%systemd_preun vboxweb.service
+# Need review, I don't know the rules of Icon Cache, mimeinfo and Desktop databases for epel 8
+%if 0%{?rhel} && 0%{?rhel} < 8
+%post
+# Icon Cache
+/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+# mimeinfo F23 only
+/bin/touch --no-create %{_datadir}/mime/packages &>/dev/null || :
+# Desktop databases F23 and F24 only
+/usr/bin/update-desktop-database &> /dev/null || :
 
 %postun
 if [ $1 -eq 0 ] ; then
@@ -687,10 +684,6 @@ if [ $1 -eq 0 ] ; then
     # mimeinfo F23 only
     /usr/bin/update-mime-database %{_datadir}/mime &> /dev/null || :
 fi
-
-%postun webservice
-%systemd_postun_with_restart vboxweb.service
-
 # Desktop databases F23 and F24 only
 /usr/bin/update-desktop-database &> /dev/null || :
 
@@ -699,6 +692,16 @@ fi
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 # mimeinfo F23 only
 /usr/bin/update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
+%endif
+
+%post webservice
+%systemd_post vboxweb-httpd.service
+
+%preun webservice
+%systemd_preun vboxweb.service
+
+%postun webservice
+%systemd_postun_with_restart vboxweb.service
 
 %pre guest-additions
 # Add a group "vboxsf" for Shared Folders access
@@ -801,10 +804,6 @@ getent passwd vboxadd >/dev/null || \
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
 %attr(4511,root,root) %{_libdir}/virtualbox/VirtualBoxVM
 %{_libdir}/virtualbox/VirtualBox
-%{_datadir}/icons/hicolor/*/apps/*.png
-%{_datadir}/icons/hicolor/*/mimetypes/*.png
-%{_datadir}/icons/hicolor/scalable/mimetypes/virtualbox.svg
-%{_datadir}/mime/*
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
 %{_udevrulesdir}/60-vboxdrv.rules
@@ -821,6 +820,10 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/nls
 %{_datadir}/pixmaps/*.png
 %{_datadir}/applications/*.desktop
+%{_datadir}/icons/hicolor/*/apps/*.png
+%{_datadir}/icons/hicolor/*/mimetypes/*.png
+%{_datadir}/icons/hicolor/scalable/mimetypes/virtualbox.svg
+%{_datadir}/mime/*
 %{_metainfodir}/%{name}.appdata.xml
 
 %if %{with webservice}
