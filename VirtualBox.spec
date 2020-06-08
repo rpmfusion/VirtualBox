@@ -88,7 +88,7 @@ Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 # from OpenSuse
 Patch70:    vbox-python-detection.diff
 
-Patch80:    VirtualBox-6.1.4-hacks.patch
+Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch84:    VirtualBox-6.1.4-wayland-crash.patch
 Patch85:    VirtualBox-6.1.4-Xwayland-shortcut-inhibit.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
@@ -314,8 +314,9 @@ rm -r src/VBox/Additions/3D/mesa/mesa-17.3.9/
 #rm -r src/VBox/GuestHost/OpenGL/include/GL
 
 #rm -rf src/libs/liblzf-3.4/
-rm -r src/libs/libxml2-2.9.*/
 rm -r src/libs/libpng-1.6.*/
+rm -r src/libs/libxml2-2.9.*/
+rm -r src/libs/openssl-1.*/
 rm -r src/libs/zlib-1.2.*/
 
 %patch1 -p1 -b .noupdates
@@ -903,7 +904,7 @@ getent passwd vboxadd >/dev/null || \
 - Fix rfbz#5581 USB devices are not available
 - VirtualBox-6.1.4-VBoxClient-vmsvga-x11-crash.patch, just for epel7
   guest-additions.
-- rfbz #5598 2 patches: Fix VBox crash when started under Wayland, Fix
+- rfbz #5589 2 patches: Fix VBox crash when started under Wayland, Fix
   keyboard-grab under Wayland
 
 * Thu Mar 19 2020 Sérgio Basto <sergio@serjux.com> - 6.1.4-3

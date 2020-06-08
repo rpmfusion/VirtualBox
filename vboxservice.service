@@ -5,11 +5,10 @@ ConditionVirtualization=|kvm
 ConditionVirtualization=|oracle
 
 [Service]
+Type=simple
 ExecStartPre=-/usr/bin/modprobe vboxguest
-ExecStartPre=-/usr/bin/modprobe vboxvideo
-ExecStartPre=-/usr/bin/modprobe vboxsf
-ExecStartPre=-/usr/bin/VBoxClient --vmsvga
 ExecStart=/usr/sbin/VBoxService -f
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
