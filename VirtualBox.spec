@@ -90,7 +90,6 @@ Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 Patch70:    vbox-python-detection.diff
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
-Patch84:    VirtualBox-6.1.4-wayland-crash.patch
 Patch85:    VirtualBox-6.1.4-Xwayland-shortcut-inhibit.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
 
@@ -342,7 +341,6 @@ rm -r src/libs/zlib-1.2.*/
 %patch61 -p1 -b .automount
 %patch70 -p1 -b .python-detection
 %patch80 -p1 -b .hack
-%patch84 -p1 -b .wayland
 %patch85 -p1 -b .wayland2
 %patch86 -p1 -b .vboxrem
 
@@ -882,6 +880,7 @@ getent passwd vboxadd >/dev/null || \
 
 %changelog
 * Mon Jun 08 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-2
+- Drop wayland-crash patch and fix wrong path to modprobe
 - Rfbz #3966, not using anymore systemd-modules-load.service
   Instead we use one systemd service (vboxdrv.service) to load the server modules.
 - Only in epel7 run the scriptlets of Icon Cache, mimeinfo and Desktop databases

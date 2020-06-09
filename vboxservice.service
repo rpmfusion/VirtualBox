@@ -6,7 +6,7 @@ ConditionVirtualization=|oracle
 
 [Service]
 Type=simple
-ExecStartPre=-/usr/bin/modprobe vboxguest
+ExecStartPre=-/usr/sbin/modprobe vboxguest
 ExecStart=/usr/sbin/VBoxService -f
 Restart=on-failure
 
