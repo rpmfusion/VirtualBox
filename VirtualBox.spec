@@ -580,6 +580,7 @@ install -m 0755 -t %{buildroot}%{_sbindir}   \
     obj/bin/additions/VBoxService       \
     obj/bin/additions/mount.vboxsf
 install -m 0755 -t %{buildroot}%{_bindir}    \
+    obj/bin/additions/VBoxDRMClient          \
     obj/bin/additions/VBoxClient        \
     obj/bin/additions/VBoxControl
 
@@ -861,6 +862,7 @@ getent passwd vboxadd >/dev/null || \
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
 %{_bindir}/VBoxClient-all
+%{_bindir}/VBoxDRMClient
 %{_sbindir}/VBoxService
 %{_sbindir}/mount.vboxsf
 %{_libdir}/security/pam_vbox.so
@@ -880,6 +882,7 @@ getent passwd vboxadd >/dev/null || \
 
 %changelog
 * Mon Jun 08 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-2
+- Install the new VBoxDRMClient binary for guest-additions
 - Drop wayland-crash patch and fix wrong path to modprobe
 - Rfbz #3966, not using anymore systemd-modules-load.service
   Instead we use one systemd service (vboxdrv.service) to load the server modules.
