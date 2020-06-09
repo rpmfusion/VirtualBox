@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.10
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -61,10 +61,11 @@ Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/V
 Source1:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/UserManual.pdf
 Source2:    VirtualBox.appdata.xml
 Source3:    VirtualBox-60-vboxdrv.rules
-Source4:    VirtualBox.modules
+Source4:    vboxdrv.service
 Source5:    VirtualBox-60-vboxguest.rules
 Source7:    vboxservice.service
 Source8:    96-vbox.preset
+Source9:    96-vbox-server.preset
 Source10:   vboxweb.service
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
@@ -515,7 +516,6 @@ ln -s ../..%{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
 
 #ln -s /usr/share/virtualbox/src/vboxhost $RPM_BUILD_ROOT/usr/src/vboxhost-%VER%
 
-
 # Components, preserve symlinks
 cp -a obj/bin/components/* %{buildroot}%{_libdir}/virtualbox/components/
 cp obj/bin/UnattendedTemplates/* %{buildroot}%{_libdir}/virtualbox/UnattendedTemplates
@@ -625,8 +625,10 @@ echo 'INSTALL_DIR=%{_libdir}/virtualbox' > %{buildroot}%{_sysconfdir}/vbox/vbox.
 install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh %{buildroot}%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_udevrulesdir}/60-vboxdrv.rules
 
-# Install modules load script
-install -p -m 0644 -D %{SOURCE4} %{buildroot}%{_prefix}/lib/modules-load.d/%{name}.conf
+# Install service to load server modules
+install -p -m 0644 -D %{SOURCE4} %{buildroot}%{_unitdir}/vboxdrv.service
+install -p -m 0644 -D %{SOURCE9} %{buildroot}%{_presetdir}/96-vbox-server.preset
+
 
 # Menu entry
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
@@ -661,9 +663,13 @@ then
    /sbin/udevadm trigger --subsystem-match=usb --action=add >/dev/null 2>&1 || :
    /sbin/udevadm settle >/dev/null 2>&1 || :
 fi
+%systemd_post vboxdrv.service
 
-# should be in kmod package, not here
-/bin/systemctl restart systemd-modules-load.service >/dev/null 2>&1 || :
+%preun server
+%systemd_preun vboxdrv.service
+
+%postun server
+%systemd_postun_with_restart vboxdrv.service
 
 # Need review, I don't know the rules of Icon Cache, mimeinfo and Desktop databases for epel 8
 %if 0%{?rhel} && 0%{?rhel} < 8
@@ -710,7 +716,6 @@ fi
 getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 getent passwd vboxadd >/dev/null || \
     useradd -r -g 1 -d /var/run/vboxadd -s /sbin/nologin vboxadd 2>&1
-
 
 # Guest additions install
 %post guest-additions
@@ -807,7 +812,8 @@ getent passwd vboxadd >/dev/null || \
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
 %{_udevrulesdir}/60-vboxdrv.rules
-%{_prefix}/lib/modules-load.d/%{name}.conf
+%{_unitdir}/vboxdrv.service
+%{_presetdir}/96-vbox-server.preset
 %{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 
 %files
@@ -875,6 +881,17 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Jun 08 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-2
+- Rfbz #3966, not using anymore systemd-modules-load.service
+  Instead we use one systemd service (vboxdrv.service) to load the server modules.
+- Only in epel7 run the scriptlets of Icon Cache, mimeinfo and Desktop databases
+- Move icons files from server sub-package to main (Qt/Desktop) sub-package
+- Also scriptlets of usb moved to server sub-package
+- Minor fixes
+  Rename patch VirtualBox-6.1.4-hacks to VirtualBox-6.1.4-gcc10
+  Syncronize vboxservice.service with virtualbox-guest-additions from Fedora
+  Remove bundled src/libs/openssl
+
 * Sat Jun 06 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-1
 - Update VBox to 6.1.10
 

@@ -13,7 +13,7 @@
 +    "  <font color=blue>dnf install akmod-VirtualBox kernel-devel-$(uname -r)</font>"
 +    "If you installed VirtualBox packages and don't want reboot the system, you may need load the "
 +    "kernel driver, doing as root:"
-+    "  <font color=blue>akmods; systemctl restart systemd-modules-load.service</font><br/><br/>"
++    "  <font color=blue>akmods; systemctl restart vboxdrv.service</font><br/><br/>"
      "If your system has EFI Secure Boot enabled you may also need to sign "
      "the kernel modules (vboxdrv, vboxnetflt, vboxnetadp, vboxpci) before "
      "you can load them. Please see your Linux system's documentation for "
@@ -25,7 +25,7 @@
 -    "VirtualBox."
 -    );
 +    "successful. Executing<br/><br/>"
-+    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxpci vboxdrv; systemctl restart systemd-modules-load.service</font> as root<br/><br/>"
++    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxpci vboxdrv; systemctl restart vboxdrv.service</font> as root<br/><br/>"
 +    "may correct this. Make sure that you do not mix the "
 +    "RPMFusion version and the Oracle version of VirtualBox."
 +
@@ -38,7 +38,7 @@
 -    "  <font color=blue>'/sbin/vboxconfig'</font><br/><br/>"
 -    "may correct this. Make sure that you are not mixing builds "
 -    "of VirtualBox from different sources."
-+    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxpci vboxdrv; systemctl restart systemd-modules-load.service</font> as root<br/><br/>"
++    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxpci vboxdrv; systemctl restart vboxdrv.service</font> as root<br/><br/>"
 +    "may correct this. Make sure that you do not mix the "
 +    "RPMFusion version and the Oracle version of VirtualBox."
      );
@@ -67,7 +67,7 @@ diff -uNdr VirtualBox-6.0.6_orig/src/VBox/Installer/linux/VBox.sh VirtualBox-6.0
  
 -           sudo /sbin/vboxconfig
 +           dnf install akmod-VirtualBox kernel-devel-$(uname -r)
-+           akmods --kernels $(uname -r) && systemctl restart systemd-modules-load.service
++           akmods --kernels $(uname -r) && systemctl restart vboxdrv.service
  
           You will not be able to start VMs until this problem is fixed.
  EOF
@@ -78,7 +78,7 @@ diff -uNdr VirtualBox-6.0.6_orig/src/VBox/Installer/linux/VBox.sh VirtualBox-6.0
  
 -           sudo /sbin/vboxconfig
 +           dnf install akmod-VirtualBox kernel-devel-$(uname -r)
-+           akmods --kernels $(uname -r) && systemctl restart systemd-modules-load.service
++           akmods --kernels $(uname -r) && systemctl restart vboxdrv.service
  
 -         and if that is not successful, try to re-install the package.
 +         and if that is not successful, try see if
@@ -94,7 +94,7 @@ diff -uNdr VirtualBox-6.0.6_orig/src/VBox/Installer/linux/VBox.sh VirtualBox-6.0
                                    "way for your host system.  Then try to recompile and reload the "
                                    "kernel modules by executing "
 -                                  "'/sbin/vboxconfig' as root");
-+                                  "'akmods && systemctl restart systemd-modules-load.service' as root");
++                                  "'akmods && systemctl restart vboxdrv.service' as root");
                      break;
  #endif
  
@@ -107,7 +107,7 @@ diff -uNdr VirtualBox-6.0.6_orig/src/VBox/Installer/linux/VBox.sh VirtualBox-6.0
 -                                  "'/sbin/vboxconfig' as root");
 +                                  "in the right way for your system."
 +                                  "Load the kernel module by executing "
-+                                  "'systemctl restart systemd-modules-load.service' as root");
++                                  "'systemctl restart vboxdrv.service' as root");
  #else
                      pszError = N_("VirtualBox kernel driver not loaded");
  #endif
@@ -120,7 +120,7 @@ diff -uNdr VirtualBox-6.0.6_orig/src/VBox/Installer/linux/VBox.sh VirtualBox-6.0
 -                                  "'/sbin/vboxconfig' as root");
 +                                  "in the right way for your system."
 +                                  "Install the kernel module by executing 'dnf install akmod-VirtualBox kernel-devel-$(uname -r)'"
-+                                  "and 'akmods && systemctl restart systemd-modules-load.service' as root");
++                                  "and 'akmods && systemctl restart vboxdrv.service' as root");
  #else
                      pszError = N_("VirtualBox kernel driver not installed");
  #endif

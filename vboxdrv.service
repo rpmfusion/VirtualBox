@@ -1,0 +1,17 @@
+[Unit]
+Description=Linux kernel module init script
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/modprobe vboxdrv
+ExecStart=/sbin/modprobe vboxnetflt
+ExecStart=/sbin/modprobe vboxnetadp
+ExecStop=/sbin/modprobe -r vboxnetadp
+ExecStop=/sbin/modprobe -r vboxnetflt
+ExecStop=/sbin/modprobe -r vboxdrv
+
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+
