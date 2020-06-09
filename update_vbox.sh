@@ -1,7 +1,7 @@
 VERSION=6.1.10
-REL=1
+REL=2
 RAWHIDE=33
-REPOS="f32 f31 f30 el7"
+REPOS="f32 f31 el7"
 if [ -z "$1" ]
 then
       stage=0
@@ -14,9 +14,12 @@ then
 echo STAGE 0
 git checkout master
 git pull
+if test $REL -eq 1
+then
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
 rm UserManual.pdf
 spectool -g VirtualBox.spec
+fi
 rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-$VERSION-$REL.fc$RAWHIDE.src.rpm
 fi
 
