@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.10
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -63,6 +63,7 @@ Source2:    VirtualBox.appdata.xml
 Source3:    VirtualBox-60-vboxdrv.rules
 Source4:    vboxdrv.service
 Source5:    VirtualBox-60-vboxguest.rules
+Source6:    vboxclient.service
 Source7:    vboxservice.service
 Source8:    96-vbox.preset
 Source9:    96-vbox-server.preset
@@ -84,6 +85,9 @@ Patch40:    007-python2-path.patch
 Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 # from Fedora
+# Do not show an error dialog when not running under vbox
+# Do not start VBoxClient --vmsvga, we run VBoxClient --vmsvga as
+# a systemd service, this works with both Wayland and Xorg based sessions
 Patch60:    VirtualBox-5.2.10-xclient.patch
 Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 # from OpenSuse
@@ -601,6 +605,7 @@ desktop-file-validate \
 install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_unitdir}/vboxservice.service
 install -p -m 0644 -D %{SOURCE8} %{buildroot}%{_presetdir}/96-vbox.preset
 install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_udevrulesdir}/60-vboxguest.rules
+install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_unitdir}/vboxclient.service
 %endif
 
 # Module Source Code
@@ -719,6 +724,7 @@ getent passwd vboxadd >/dev/null || \
 # Guest additions install
 %post guest-additions
 /sbin/ldconfig
+%systemd_post vboxclient.service
 %systemd_post vboxservice.service
 
 #chcon -u system_u -t mount_exec_t "$lib_path/$PACKAGE/mount.vboxsf" > /dev/null 2>&1
@@ -736,10 +742,12 @@ getent passwd vboxadd >/dev/null || \
 #semanage fcontext -a -t unconfined_execmem_exec_t '/usr/bin/VBoxClient' > /dev/null 2>&1
 
 %preun guest-additions
+%systemd_preun vboxclient.service
 %systemd_preun vboxservice.service
 
 %postun guest-additions
 /sbin/ldconfig
+%systemd_postun_with_restart vboxclient.service
 %systemd_postun_with_restart vboxservice.service
 
 %files server
@@ -872,6 +880,7 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/VBoxGuestAdditions
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
+%{_unitdir}/vboxclient.service
 %{_udevrulesdir}/60-vboxguest.rules
 %{_unitdir}/vboxservice.service
 %{_presetdir}/96-vbox.preset
@@ -881,6 +890,17 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Jun 13 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-3
+- Syncronize with virtualbox-guest-additions from Fedora
+- Add a vboxclient.service which runs VBoxClient --vwsvga when using the
+  VMSVGA virtual GPU, this fixes resizing in wayland sessions (rhbz 1789545)
+- Drop VBoxClient --vwsvga-x11 from VBoxClient-all, it is not necessary
+  now that we run VBoxClient --vwsvga as service and it was breaking resize
+  support with the VBoxSVGA virtual GPU (rhbz 1789545)
+- Drop ExecStartPre modprove vboxvideo vboxsf from vboxservice.service,
+  this is not necessary, they will be loaded automatically
+
+
 * Mon Jun 08 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-2
 - Install the new VBoxDRMClient binary for guest-additions
 - Drop wayland-crash patch and fix wrong path to modprobe

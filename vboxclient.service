@@ -1,0 +1,8 @@
+[Unit]
+Description=VirtualBox guest VMSVGA resize client
+ConditionVirtualization=|oracle
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/VBoxDRMClient
+Restart=on-failure

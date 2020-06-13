@@ -1,6 +1,6 @@
---- ./src/VBox/Additions/x11/Installer/98vboxadd-xclient.orig	2020-05-14 19:33:50.000000000 +0100
-+++ ./src/VBox/Additions/x11/Installer/98vboxadd-xclient	2020-05-16 00:03:45.221363282 +0100
-@@ -21,15 +21,9 @@ for i in $HOME/.vboxclient-*.pid; do
+--- ./src/VBox/Additions/x11/Installer/98vboxadd-xclient.orig	2020-06-06 06:20:12.079227656 +0100
++++ ./src/VBox/Additions/x11/Installer/98vboxadd-xclient	2020-06-06 06:26:55.886940895 +0100
+@@ -21,18 +21,11 @@ for i in $HOME/.vboxclient-*.pid; do
      test -w $i || rm -f $i
  done
  
@@ -19,3 +19,6 @@
    /usr/bin/VBoxClient --clipboard
    /usr/bin/VBoxClient --checkhostversion
    /usr/bin/VBoxClient --seamless
+   /usr/bin/VBoxClient --draganddrop
+-  /usr/bin/VBoxClient --vmsvga  # In case VMSVGA emulation is enabled
+ fi

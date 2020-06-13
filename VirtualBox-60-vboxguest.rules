@@ -1,2 +1,4 @@
 KERNEL=="vboxguest", NAME="vboxguest", OWNER="vboxadd", MODE="0660"
 KERNEL=="vboxuser", NAME="vboxuser", OWNER="vboxadd", MODE="0666"
+
+ACTION=="add|change", SUBSYSTEM=="drm", KERNEL=="card[0-9]", SUBSYSTEMS=="pci", ATTRS{vendor}=="0x15ad", ATTRS{device}=="0x0405", TAG+="systemd", ENV{SYSTEMD_WANTS}="vboxclient.service"
