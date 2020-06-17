@@ -1,8 +1,7 @@
 VERSION=6.1.10
-REL=3
+REL=4
 RAWHIDE=33
 REPOS="f32 f31 el8 el7"
-REPOS="el8 el7"
 if [ -z "$1" ]
 then
       stage=0
@@ -27,9 +26,12 @@ fi
 if test $stage -le 1
 then
 echo STAGE 1
+if test $REL -eq 1
+then
 echo Press enter to upload sources; read dummy;
 rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
 rfpkg ci -c && git show
+fi
 echo Press enter to push and build on rawhide; read dummy;
 rfpkg push && rfpkg build --nowait
 fi

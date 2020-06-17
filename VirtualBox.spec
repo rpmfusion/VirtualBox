@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.10
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -675,6 +675,9 @@ fi
 %postun server
 %systemd_postun_with_restart vboxdrv.service
 
+%triggerun -- VirtualBox-server < 0:6.1.10-4
+/usr/bin/systemctl --no-reload preset vboxdrv.service || :
+
 # Need review, I don't know the rules of Icon Cache, mimeinfo and Desktop databases for epel 8
 %if 0%{?rhel} && 0%{?rhel} < 8
 %post
@@ -890,6 +893,11 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Jun 17 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-4
+- Fix (#5677)
+  https://docs.pagure.org/packaging-guidelines/Packaging%3AScriptlets.html (On
+  upgrade, the scripts are run in the following order)
+
 * Sat Jun 13 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-3
 - Syncronize with virtualbox-guest-additions from Fedora
 - Add a vboxclient.service which runs VBoxClient --vwsvga when using the
