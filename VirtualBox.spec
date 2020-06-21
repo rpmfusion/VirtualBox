@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.10
-Release:    4%{?dist}
+Release:    5%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -391,6 +391,7 @@ kmk %{_smp_mflags}    \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox \
     VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox    \
     VBOX_WITH_VBOX_IMG=1 \
+    VBOX_WITH_VBOXIMGMOUNT=1 \
     VBOX_WITH_SYSFS_BY_DEFAULT=1 \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
@@ -483,6 +484,7 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/vboxshell.py    \
 %endif
     obj/bin/vbox-img    \
+    obj/bin/vboximg-mount   \
     obj/bin/VBoxDTrace    \
     obj/bin/VBoxBugReport \
     obj/bin/VirtualBoxVM    \
@@ -514,7 +516,8 @@ ln -s VBox %{buildroot}%{_bindir}/virtualboxvm
 %if %{with webservice}
 ln -s VBox %{buildroot}%{_bindir}/vboxwebsrv
 %endif
-ln -s ../..%{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}/vbox-img
+ln -s ../..%{_libdir}/virtualbox/vbox-img %{buildroot}%{_bindir}
+ln -s ../..%{_libdir}/virtualbox/vboximg-mount %{buildroot}%{_bindir}
 
 #ln -s /usr/share/virtualbox/src/vboxhost $RPM_BUILD_ROOT/usr/src/vboxhost-%VER%
 
@@ -781,6 +784,7 @@ getent passwd vboxadd >/dev/null || \
 %{_bindir}/VirtualBoxVM
 %{_bindir}/virtualboxvm
 %{_bindir}/vbox-img
+%{_bindir}/vboximg-mount
 %{_bindir}/rdesktop-vrdp
 %dir %{_libdir}/virtualbox
 %{_libdir}/virtualbox/*.[^p]*
@@ -808,6 +812,7 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/VBoxBugReport
 %{_libdir}/virtualbox/VBoxDTrace
 %{_libdir}/virtualbox/vbox-img
+%{_libdir}/virtualbox/vboximg-mount
 %{_libdir}/virtualbox/rdesktop-vrdp-keymaps
 # This permissions have to be here, before generator of debuginfo need
 # permissions to read this files
@@ -893,6 +898,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun Jun 21 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-5
+- The VirtualBox 6.1 changelog says that it supports vboximg-mount on Linux
+  hosts
+
 * Wed Jun 17 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-4
 - Fix (#5677)
   https://docs.pagure.org/packaging-guidelines/Packaging%3AScriptlets.html (On
