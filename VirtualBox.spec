@@ -390,8 +390,6 @@ kmk %{_smp_mflags}    \
     TOOL_YASM_AS=yasm   \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox \
     VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox    \
-    VBOX_WITH_TESTCASES= \
-    VBOX_WITH_VALIDATIONKIT= \
     VBOX_WITH_VBOX_IMG=1 \
     VBOX_WITH_SYSFS_BY_DEFAULT=1 \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
@@ -408,6 +406,8 @@ kmk %{_smp_mflags}    \
     VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
+#    VBOX_WITH_TESTCASES= \
+#    VBOX_WITH_VALIDATIONKIT= \
 #    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
 
 # doc/manual/fr_FR/ missing man_VBoxManage-debugvm.xml and man_VBoxManage-extpack.xml
