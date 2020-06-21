@@ -708,7 +708,7 @@ fi
 %endif
 
 %post webservice
-%systemd_post vboxweb-httpd.service
+%systemd_post vboxweb.service
 
 %preun webservice
 %systemd_preun vboxweb.service
