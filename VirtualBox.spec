@@ -639,7 +639,7 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
     --remove-key=Encoding obj/bin/virtualbox.desktop
 desktop-file-validate %{buildroot}%{_datadir}/applications/virtualbox.desktop
 
-install -P -m 0644 -D %{SOURCE2} %{buildroot}%{_metainfodir}/%{name}.appdata.xml
+install -p -m 0644 -D %{SOURCE2} %{buildroot}%{_metainfodir}/%{name}.appdata.xml
 
 #    --remove-key=DocPath
 # to review:
@@ -650,7 +650,7 @@ install -P -m 0644 -D %{SOURCE2} %{buildroot}%{_metainfodir}/%{name}.appdata.xml
 #set_selinux_permissions /usr/lib/virtualbox /usr/share/virtualbox
 # vboxautostart-service
 
-install -d  %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps
+install -d %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps
 install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps obj/bin/rdesktop-vrdp-keymaps/*
 install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox obj/bin/rdesktop-vrdp.tar.gz
 install -p -m 0755 -t %{buildroot}%{_bindir} obj/bin/rdesktop-vrdp
