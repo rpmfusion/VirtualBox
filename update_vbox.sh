@@ -1,5 +1,5 @@
-VERSION=6.1.10
-REL=4
+VERSION=6.1.12
+REL=1
 RAWHIDE=33
 REPOS="f32 f31 el8 el7"
 if [ -z "$1" ]
@@ -19,6 +19,8 @@ then
 rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
 rm UserManual.pdf
 spectool -g VirtualBox.spec
+# we need update sources files to avoid download the wrong UserManual.pdf
+rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
 fi
 rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-$VERSION-$REL.fc$RAWHIDE.src.rpm
 fi
@@ -29,7 +31,6 @@ echo STAGE 1
 if test $REL -eq 1
 then
 echo Press enter to upload sources; read dummy;
-rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
 rfpkg ci -c && git show
 fi
 echo Press enter to push and build on rawhide; read dummy;

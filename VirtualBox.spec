@@ -16,7 +16,7 @@
 #global prerel RC1
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%ifarch x86_64
+%ifarch x86_64 || 0%{?fedora} > 32
     %bcond_without webservice
 %else
     %bcond_with webservice
@@ -45,8 +45,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.1.10
-Release:    5%{?dist}
+Version:    6.1.12
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -94,7 +94,6 @@ Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 Patch70:    vbox-python-detection.diff
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
-Patch85:    VirtualBox-6.1.4-Xwayland-shortcut-inhibit.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
 
 
@@ -344,8 +343,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch60 -p1 -b .xclient
 %patch61 -p1 -b .automount
 %patch70 -p1 -b .python-detection
-%patch80 -p1 -b .hack
-%patch85 -p1 -b .wayland2
+%patch80 -p1 -b .gcc10
 %patch86 -p1 -b .vboxrem
 
 
@@ -404,6 +402,7 @@ kmk %{_smp_mflags}    \
 %{?with_docs:   VBOX_WITH_DOCS=1 }                             \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java  \
     VBOX_WITH_UPDATE_REQUEST=               \
+    VBOX_WITH_CLOUD_NET=                    \
     VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
@@ -532,13 +531,15 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
 # Python
 %if %{with python2} || %{with python3}
 pushd obj/bin/sdk/installer
+export VBOX_INSTALL_PATH=%{_libdir}/virtualbox
 %if %{with python2}
-VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
     %{__python2} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
 %endif
 %if %{with python3}
-VBOX_INSTALL_PATH=%{_libdir}/virtualbox \
     %{__python3} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
+    if [ -x /usr/bin/pathfix.py ]; then
+        pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}${VBOX_INSTALL_PATH}/vboxshell.py
+    fi
 %endif
 popd
 %endif
@@ -844,7 +845,7 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/icons/hicolor/*/apps/*.png
 %{_datadir}/icons/hicolor/*/mimetypes/*.png
 %{_datadir}/icons/hicolor/scalable/mimetypes/virtualbox.svg
-%{_datadir}/mime/*
+%{_datadir}/mime/packages/virtualbox.xml
 %{_metainfodir}/%{name}.appdata.xml
 
 %if %{with webservice}
@@ -898,6 +899,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Jul 16 2020 Sérgio Basto <sergio@serjux.com> - 6.1.12-1
+- Update VBox to 6.1.12
+- From Debian disable cloud_net "Fix build failure due to missing upstream file"
+
 * Sun Jun 21 2020 Sérgio Basto <sergio@serjux.com> - 6.1.10-5
 - The VirtualBox 6.1 changelog says that it supports vboximg-mount on Linux
   hosts
