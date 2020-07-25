@@ -16,10 +16,10 @@
 #global prerel RC1
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%ifarch x86_64 || 0%{?fedora} > 32
-    %bcond_without webservice
-%else
+%ifarch 0%{?fedora} > 32
     %bcond_with webservice
+%else
+    %bcond_without webservice
 %endif
 # Now we use upstream pdf
 %bcond_with docs
