@@ -16,7 +16,7 @@
 #global prerel RC1
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%ifarch 0%{?fedora} > 32
+%if 0%{?fedora} > 32
     %bcond_with webservice
 %else
     %bcond_without webservice
