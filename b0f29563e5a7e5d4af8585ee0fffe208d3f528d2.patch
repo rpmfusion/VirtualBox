@@ -1,0 +1,27 @@
+From b0f29563e5a7e5d4af8585ee0fffe208d3f528d2 Mon Sep 17 00:00:00 2001
+From: vboxsync <vboxsync@cfe28804-0f27-0410-a406-dd0f0b0b656f>
+Date: Wed, 29 Jul 2020 10:47:38 +0000
+Subject: [PATCH] IPRT/memobj-r0drv-linux.c: Enable
+ IPRT_USE_ALLOC_VM_AREA_FOR_EXEC for linux 3.2 and later.  bugref:9801
+
+git-svn-id: http://www.virtualbox.org/svn/vbox@85516 cfe28804-0f27-0410-a406-dd0f0b0b656f
+---
+ trunk/src/VBox/Runtime/r0drv/linux/memobj-r0drv-linux.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/trunk/src/VBox/Runtime/r0drv/linux/memobj-r0drv-linux.c b/trunk/src/VBox/Runtime/r0drv/linux/memobj-r0drv-linux.c
+index 4edf533d45..f2a6f829d6 100644
+--- a/trunk/src/VBox/Runtime/r0drv/linux/memobj-r0drv-linux.c
++++ b/trunk/src/VBox/Runtime/r0drv/linux/memobj-r0drv-linux.c
+@@ -54,8 +54,9 @@
+ 
+ /** @def IPRT_USE_ALLOC_VM_AREA_FOR_EXEC
+  * Whether we use alloc_vm_area (3.2+) for executable memory.
+- * This is a must for 5.8+, but we'll enable it for earlier kernels later. */
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0) || defined(DOXYGEN_RUNNING)
++ * This is a must for 5.8+, but we enable it all the way back to 3.2.x for
++ * better W^R compliance (fExecutable flag). */
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0) || defined(DOXYGEN_RUNNING)
+ # define IPRT_USE_ALLOC_VM_AREA_FOR_EXEC
+ #endif
+ 

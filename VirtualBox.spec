@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.12
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -95,6 +95,13 @@ Patch70:    vbox-python-detection.diff
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
+Patch87:    3c981196de564d78aa8c653496f7fefe303bf7b6.patch
+Patch88:    521d08e75cb85b0dad89643d2a9de39dfb6f8832.patch
+Patch89:    9f9e3db9d80be17d6fc9be48b6d8745c971fca99.patch
+Patch90:    6370c9d7c7908f7072b654f9794ed6c5d562768b.patch
+Patch91:    088da92603cb4f1175ed6d0c452b049af3372c1e.patch
+Patch92:    b0f29563e5a7e5d4af8585ee0fffe208d3f528d2.patch
+Patch93:    842e5679b0904a80c7f065ad50417d82af265395.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -344,7 +351,14 @@ rm -r src/libs/zlib-1.2.*/
 %patch61 -p1 -b .automount
 %patch70 -p1 -b .python-detection
 %patch80 -p1 -b .gcc10
-%patch86 -p1 -b .vboxrem
+#patch86 -p1 -b .vboxrem
+%patch87 -p2 -b .kernel-5.8
+%patch88 -p2 -b .kernel-5.8
+%patch89 -p2 -b .kernel-5.8
+%patch90 -p2 -b .kernel-5.8
+%patch91 -p2 -b .kernel-5.8
+%patch92 -p2 -b .kernel-5.8
+%patch93 -p2 -b .kernel-5.8
 
 
 %build
@@ -899,6 +913,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Aug 05 2020 Sérgio Basto <sergio@serjux.com> - 6.1.12-2
+- Updates for kernel-5.8
+
 * Thu Jul 16 2020 Sérgio Basto <sergio@serjux.com> - 6.1.12-1
 - Update VBox to 6.1.12
 - From Debian disable cloud_net "Fix build failure due to missing upstream file"
