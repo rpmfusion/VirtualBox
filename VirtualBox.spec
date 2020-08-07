@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.12
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -102,6 +102,7 @@ Patch90:    6370c9d7c7908f7072b654f9794ed6c5d562768b.patch
 Patch91:    088da92603cb4f1175ed6d0c452b049af3372c1e.patch
 Patch92:    b0f29563e5a7e5d4af8585ee0fffe208d3f528d2.patch
 Patch93:    842e5679b0904a80c7f065ad50417d82af265395.patch
+Patch94:    6cbdb672039c33018cf766ec010cb5631b3be1e1.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -214,10 +215,6 @@ Obsoletes:   python2-%{name}%{?isa} < %{version}-%{release}
 %if ! %{with python3}
 Obsoletes:   python%{python3_pkgversion}-%{name}%{?isa} < %{version}-%{release}
 %endif
-# temporary hack
-# if virtualbox-guest-additions 6.1.2 still in repos, we try remove it to allow
-# install VirtualBox-server 6.1.4
-Obsoletes:  virtualbox-guest-additions < 6.1.4-1
 
 %description server
 %{name} without Qt GUI part.
@@ -351,7 +348,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch61 -p1 -b .automount
 %patch70 -p1 -b .python-detection
 %patch80 -p1 -b .gcc10
-#patch86 -p1 -b .vboxrem
+%patch86 -p1 -b .vboxrem
 %patch87 -p2 -b .kernel-5.8
 %patch88 -p2 -b .kernel-5.8
 %patch89 -p2 -b .kernel-5.8
@@ -359,6 +356,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch91 -p2 -b .kernel-5.8
 %patch92 -p2 -b .kernel-5.8
 %patch93 -p2 -b .kernel-5.8
+%patch94 -p2 -b .kernel-5.8
 
 
 %build
@@ -913,6 +911,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Aug 07 2020 Sérgio Basto <sergio@serjux.com> - 6.1.12-3
+- Some fixes
+
 * Wed Aug 05 2020 Sérgio Basto <sergio@serjux.com> - 6.1.12-2
 - Updates for kernel-5.8
 

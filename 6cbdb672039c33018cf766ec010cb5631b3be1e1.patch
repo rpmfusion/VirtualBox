@@ -1,0 +1,25 @@
+From 6cbdb672039c33018cf766ec010cb5631b3be1e1 Mon Sep 17 00:00:00 2001
+From: vboxsync <vboxsync@cfe28804-0f27-0410-a406-dd0f0b0b656f>
+Date: Thu, 23 Jul 2020 11:59:16 +0000
+Subject: [PATCH] Add/vboxsf: We're not allowed to include vermagic.h starting
+ with 5.8.  We probably haven't needed it for quite a few versions, so no
+ matter.  bugref:9801
+
+git-svn-id: http://www.virtualbox.org/svn/vbox@85432 cfe28804-0f27-0410-a406-dd0f0b0b656f
+---
+ trunk/src/VBox/Additions/linux/sharedfolders/vfsmod.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/trunk/src/VBox/Additions/linux/sharedfolders/vfsmod.c b/trunk/src/VBox/Additions/linux/sharedfolders/vfsmod.c
+index 71ba646879..04ee187e40 100644
+--- a/trunk/src/VBox/Additions/linux/sharedfolders/vfsmod.c
++++ b/trunk/src/VBox/Additions/linux/sharedfolders/vfsmod.c
+@@ -52,7 +52,7 @@
+ #endif
+ #include <linux/seq_file.h>
+ #include <linux/vfs.h>
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 62)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 62) && LINUX_VERSION_CODE < KERNEL_VERSION(5, 8, 0)
+ # include <linux/vermagic.h>
+ #endif
+ #include <VBox/err.h>
