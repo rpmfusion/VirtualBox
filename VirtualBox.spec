@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.12
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -911,6 +911,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Aug 17 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 6.1.12-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Fri Aug 07 2020 Sérgio Basto <sergio@serjux.com> - 6.1.12-3
 - Some fixes
 
