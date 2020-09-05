@@ -398,7 +398,6 @@ kmk %{_smp_mflags}    \
 %{?with_docs:   VBOX_WITH_DOCS=1 }                             \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java  \
     VBOX_WITH_UPDATE_REQUEST=               \
-    VBOX_WITH_CLOUD_NET=                    \
     VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
