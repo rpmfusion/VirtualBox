@@ -45,8 +45,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.1.12
-Release:    4%{?dist}
+Version:    6.1.14
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -398,6 +398,7 @@ kmk %{_smp_mflags}    \
 %{?with_docs:   VBOX_WITH_DOCS=1 }                             \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java  \
     VBOX_WITH_UPDATE_REQUEST=               \
+    VBOX_WITH_VIRTIO=                       \
     VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
@@ -894,6 +895,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Sep 05 2020 Sérgio Basto <sergio@serjux.com> - 6.1.14-1
+- Update VBox to 6.1.14
+
 * Mon Aug 17 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 6.1.12-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
