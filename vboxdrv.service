@@ -1,5 +1,6 @@
 [Unit]
 Description=Linux kernel module init script
+After=akmods.service
 
 [Service]
 Type=oneshot

@@ -16,7 +16,7 @@ git checkout master
 git pull
 if test $REL -eq 1
 then
-rpmdev-bumpspec -n $VERSION -c "Update VBox to $VERSION" VirtualBox.spec
+rpmdev-bumpspec -n $VERSION -c "Update VirtualBox to $VERSION" VirtualBox.spec
 rm UserManual.pdf
 spectool -g VirtualBox.spec
 # we need update sources files to avoid download the wrong UserManual.pdf
