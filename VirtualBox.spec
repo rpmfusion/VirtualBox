@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.14
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -57,7 +57,7 @@ ExclusiveArch:  x86_64
 Requires:   %{name}-server%{?isa} = %{version}
 Obsoletes:  %{name}-qt < 5.1.8
 
-Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
+Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}a%{?prereltag}.tar.bz2
 Source1:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/UserManual.pdf
 Source2:    VirtualBox.appdata.xml
 Source3:    VirtualBox-60-vboxdrv.rules
@@ -398,7 +398,6 @@ kmk %{_smp_mflags}    \
 %{?with_docs:   VBOX_WITH_DOCS=1 }                             \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java  \
     VBOX_WITH_UPDATE_REQUEST=               \
-    VBOX_WITH_VIRTIO=                       \
     VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
@@ -895,6 +894,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Sep 08 2020 Sérgio Basto <sergio@serjux.com> - 6.1.14-2
+- Update to VirtualBox-6.1.14a rfbz (#5747)
+
 * Sat Sep 05 2020 Sérgio Basto <sergio@serjux.com> - 6.1.14-1
 - Update VBox to 6.1.14
 
