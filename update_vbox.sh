@@ -1,5 +1,5 @@
 VERSION=6.1.14
-REL=2
+REL=3
 RAWHIDE=34
 REPOS="f33 f32 f31 el8 el7"
 if [ -z "$1" ]
@@ -28,11 +28,7 @@ fi
 if test $stage -le 1
 then
 echo STAGE 1
-if test $REL -eq 1
-then
-echo Press enter to upload sources; read dummy;
 rfpkg ci -c && git show
-fi
 echo Press enter to push and build on rawhide; read dummy;
 rfpkg push && rfpkg build --nowait
 fi

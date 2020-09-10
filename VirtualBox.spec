@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.14
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -95,6 +95,7 @@ Patch70:    vbox-python-detection.diff
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
+Patch88:    fixes_for_5.9_withoutdrm.patch
 
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -312,7 +313,7 @@ rm -r src/VBox/Additions/3D/mesa/mesa-17.3.9/
 # src/VBox/GuestHost/OpenGL/include/GL/glext.h have VBOX definitions
 #rm -r src/VBox/GuestHost/OpenGL/include/GL
 
-#rm -rf src/libs/liblzf-3.4/
+#rm -r src/libs/liblzf-3.*/
 rm -r src/libs/libpng-1.6.*/
 rm -r src/libs/libxml2-2.9.*/
 rm -r src/libs/openssl-1.*/
@@ -341,6 +342,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch70 -p1 -b .python-detection
 %patch80 -p1 -b .gcc10
 %patch86 -p1 -b .vboxrem
+%patch88 -p1 -b .kernel-4.9
 
 
 %build
@@ -894,6 +896,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Sep 10 2020 Sérgio Basto <sergio@serjux.com> - 6.1.14-3
+- Fixes for kernel 4.9
+
 * Tue Sep 08 2020 Sérgio Basto <sergio@serjux.com> - 6.1.14-2
 - Update to VirtualBox-6.1.14a rfbz (#5747)
 
