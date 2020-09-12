@@ -887,7 +887,8 @@ getent passwd vboxadd >/dev/null || \
 
 %changelog
 * Fri Sep 11 2020 Sérgio Basto <sergio@serjux.com> - 6.1.14-4
-- Use upstreamd patch to build webservice on F33+
+- Use upstreamd patch to build webservice on F33+ and more synchronizations
+  with the debian package.
 
 * Thu Sep 10 2020 Sérgio Basto <sergio@serjux.com> - 6.1.14-3
 - Fixes for kernel 4.9
