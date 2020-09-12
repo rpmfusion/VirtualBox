@@ -16,11 +16,6 @@
 #global prerel RC1
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%if 0%{?fedora} > 32
-    %bcond_with webservice
-%else
-    %bcond_without webservice
-%endif
 # Now we use upstream pdf
 %bcond_with docs
 %bcond_without vnc
@@ -46,7 +41,7 @@
 
 Name:       VirtualBox
 Version:    6.1.14
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -73,12 +68,9 @@ Source21:   os_mageia_64.png
 Patch1:     VirtualBox-6.0.0-noupdate.patch
 Patch2:     VirtualBox-6.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
-Patch27:    VirtualBox-gcc.patch
+#Patch27:    VirtualBox-gcc.patch
 Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
 Patch30:    VirtualBox-python.patch
-# from Debian
-Patch31:    02-gsoap-build-fix.patch
-Patch32:    VBoxVNC.fix.patch
 # from ArchLinux
 Patch40:    007-python2-path.patch
 # from Mageia
@@ -96,7 +88,8 @@ Patch70:    vbox-python-detection.diff
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
 Patch88:    fixes_for_5.9_withoutdrm.patch
-
+# from Debian
+Patch89:    7001af05d63c9019d583ad6c4a079995c4a0ba5a.patch
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  SDL-devel
@@ -327,10 +320,6 @@ rm -r src/libs/zlib-1.2.*/
 %patch29 -p2 -R -b .gsoap3
 %endif
 %patch30 -p1 -b .python39
-%if 0%{?fedora} > 20 || 0%{?rhel} > 7
-%patch31 -p1 -b .gsoap2
-%endif
-%patch32 -p1 -b .vnc
 %if %{with python3}
 %patch40 -p1 -b .python2_path
 %endif
@@ -343,6 +332,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch80 -p1 -b .gcc10
 %patch86 -p1 -b .vboxrem
 %patch88 -p1 -b .kernel-4.9
+%patch89 -p1 -b .webservice
 
 
 %build
@@ -896,6 +886,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Sep 11 2020 Sérgio Basto <sergio@serjux.com> - 6.1.14-4
+- Use upstreamd patch to build webservice on F33+
+
 * Thu Sep 10 2020 Sérgio Basto <sergio@serjux.com> - 6.1.14-3
 - Fixes for kernel 4.9
 

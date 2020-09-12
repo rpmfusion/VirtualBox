@@ -1,0 +1,25 @@
+commit 7001af05d63c9019d583ad6c4a079995c4a0ba5a
+Author: vboxsync <vboxsync@cfe28804-0f27-0410-a406-dd0f0b0b656f>
+Date:   Mon Sep 7 11:21:41 2020 +0000
+
+    Main/webservice: Adjust to allow building with gsoap 2.8.103 and later. Thank you Gianfranco Costamagna for the patch.
+    
+    
+    git-svn-id: http://www.virtualbox.org/svn/vbox@86039 cfe28804-0f27-0410-a406-dd0f0b0b656f
+
+diff --git a/trunk/src/VBox/Main/webservice/vboxweb.cpp b/trunk/src/VBox/Main/webservice/vboxweb.cpp
+index 53acd0c771..9e74c274f1 100644
+--- trunk/src/VBox/Main/webservice/vboxweb.cpp
++++ trunk/src/VBox/Main/webservice/vboxweb.cpp
+@@ -944,7 +944,11 @@ static void doQueuesLoop()
+                 if (rv == 0)
+                     continue; // timeout, not necessary to bother gsoap
+                 // r < 0, errno
++#if GSOAP_VERSION >= 208103
++                if (soap_socket_errno == SOAP_EINTR)
++#else
+                 if (soap_socket_errno(soap.master) == SOAP_EINTR)
++#endif
+                     rv = 0; // re-check if we should terminate
+                 break;
+             }
