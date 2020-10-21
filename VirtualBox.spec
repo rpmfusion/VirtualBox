@@ -40,8 +40,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.1.14
-Release:    4%{?dist}
+Version:    6.1.16
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -52,7 +52,7 @@ ExclusiveArch:  x86_64
 Requires:   %{name}-server%{?isa} = %{version}
 Obsoletes:  %{name}-qt < 5.1.8
 
-Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}a%{?prereltag}.tar.bz2
+Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
 Source1:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/UserManual.pdf
 Source2:    VirtualBox.appdata.xml
 Source3:    VirtualBox-60-vboxdrv.rules
@@ -87,9 +87,6 @@ Patch70:    vbox-python-detection.diff
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
-Patch88:    fixes_for_5.9_withoutdrm.patch
-# from Debian
-Patch89:    7001af05d63c9019d583ad6c4a079995c4a0ba5a.patch
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  SDL-devel
@@ -331,8 +328,6 @@ rm -r src/libs/zlib-1.2.*/
 %patch70 -p1 -b .python-detection
 %patch80 -p1 -b .gcc10
 %patch86 -p1 -b .vboxrem
-%patch88 -p1 -b .kernel-4.9
-%patch89 -p1 -b .webservice
 
 
 %build
@@ -886,6 +881,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Oct 21 2020 Sérgio Basto <sergio@serjux.com> - 6.1.16-1
+- Update VirtualBox to 6.1.16
+
 * Fri Sep 11 2020 Sérgio Basto <sergio@serjux.com> - 6.1.14-4
 - Use upstreamd patch to build webservice on F33+ and more synchronizations
   with the debian package.
