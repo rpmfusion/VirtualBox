@@ -1,5 +1,5 @@
 VERSION=6.1.16
-REL=1
+REL=2
 RAWHIDE=34
 REPOS="f33 f32 f31 el8 el7"
 if [ -z "$1" ]

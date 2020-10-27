@@ -16,6 +16,11 @@
 #global prerel RC1
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
+%if 0%{?fedora} > 32
+    %bcond_with webservice
+%else
+    %bcond_without webservice
+%endif
 # Now we use upstream pdf
 %bcond_with docs
 %bcond_without vnc
@@ -41,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.16
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -881,6 +886,11 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Oct 26 2020 Sérgio Basto <sergio@serjux.com> - 6.1.16-2
+- Enable webservice (#5809)
+- wsimport was removed from Java 11, so we can't build webservice in F33+ until
+  Fedora have the package jaxws .
+
 * Wed Oct 21 2020 Sérgio Basto <sergio@serjux.com> - 6.1.16-1
 - Update VirtualBox to 6.1.16
 
