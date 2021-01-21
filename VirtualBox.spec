@@ -45,8 +45,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.1.16
-Release:    2%{?dist}
+Version:    6.1.18
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -886,6 +886,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Jan 21 2021 Sérgio Basto <sergio@serjux.com> - 6.1.18-1
+- Update VirtualBox to 6.1.18
+
 * Mon Oct 26 2020 Sérgio Basto <sergio@serjux.com> - 6.1.16-2
 - Enable webservice (#5809)
 - wsimport was removed from Java 11, so we can't build webservice in F33+ until
