@@ -1,0 +1,11 @@
+--- VirtualBox-6.1.18/src/VBox/Frontends/VirtualBox/src/globals/UICommon.cpp_	2021-01-07 18:41:12.000000000 +0300
++++ VirtualBox-6.1.18/src/VBox/Frontends/VirtualBox/src/globals/UICommon.cpp	2021-02-23 16:27:39.968740587 +0300
+@@ -2738,7 +2738,7 @@
+     strFilter = backends.join(";;").trimmed();
+ 
+     /* Create open file dialog: */
+-    QStringList files = QIFileDialog::getOpenFileNames(strHomeFolder, strFilter, pParent, strTitle, 0, true, true);
++    QStringList files = QIFileDialog::getOpenFileNames(strHomeFolder, strFilter, nullptr, strTitle, 0, true, true);
+ 
+     /* If dialog has some result: */
+     if (!files.empty() && !files[0].isEmpty())
