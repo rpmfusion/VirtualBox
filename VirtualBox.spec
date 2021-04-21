@@ -45,8 +45,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.1.18
-Release:    2%{?dist}
+Version:    6.1.20
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -75,23 +75,23 @@ Patch2:     VirtualBox-6.1.0-strings.patch
 Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
 #Patch27:    VirtualBox-gcc.patch
 Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
-Patch30:    VirtualBox-python.patch
 # from ArchLinux
 Patch40:    007-python2-path.patch
 # from Mageia
-Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
+#Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 # from Fedora
 # Do not show an error dialog when not running under vbox
 # Do not start VBoxClient --vmsvga, we run VBoxClient --vmsvga as
 # a systemd service, this works with both Wayland and Xorg based sessions
 Patch60:    VirtualBox-5.2.10-xclient.patch
-Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
+#Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 # from OpenSuse
 Patch70:    vbox-python-detection.diff
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
+Patch87:    vbox-fix-file-picker.patch
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  SDL-devel
@@ -250,7 +250,7 @@ Python XPCOM bindings to %{name}.
 Summary:    Python3 bindings for %{name}
 Group:      Development/Libraries
 Requires:   %{name}-server%{?_isa} = %{version}-%{release}
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
+%py_provides python%{python3_pkgversion}-%{name}
 
 %description -n python%{python3_pkgversion}-%{name}
 Python3 XPCOM bindings to %{name}.
@@ -321,7 +321,6 @@ rm -r src/libs/zlib-1.2.*/
 %if 0%{?rhel} && 0%{?rhel} < 8
 %patch29 -p2 -R -b .gsoap3
 %endif
-%patch30 -p1 -b .python39
 %if %{with python3}
 %patch40 -p1 -b .python2_path
 %endif
@@ -329,10 +328,11 @@ rm -r src/libs/zlib-1.2.*/
 #patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
-%patch61 -p1 -b .automount
+#patch61 -p1 -b .automount
 %patch70 -p1 -b .python-detection
 %patch80 -p1 -b .gcc10
 %patch86 -p1 -b .vboxrem
+%patch87 -p1 -b .fix-file-picker
 
 
 %build
@@ -886,6 +886,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Apr 21 2021 Sérgio Basto <sergio@serjux.com> - 6.1.20-1
+- Update VirtualBox to 6.1.20
+
 * Tue Feb 02 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 6.1.18-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
