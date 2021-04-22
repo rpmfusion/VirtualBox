@@ -1,0 +1,9 @@
+diff -Nurp VirtualBox-6.0.10.orig/src/VBox/RDP/client-1.8.4/keymaps/convert-map VirtualBox-6.0.10/src/VBox/RDP/client-1.8.4/keymaps/convert-map
+--- VirtualBox-6.0.10.orig/src/VBox/RDP/client-1.8.4/keymaps/convert-map	2019-07-12 11:38:37.000000000 +0300
++++ VirtualBox-6.0.10/src/VBox/RDP/client-1.8.4/keymaps/convert-map	2019-08-30 19:06:04.712761560 +0300
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python2
++#!/usr/bin/env python3
+ # -*-Python-*-
+ #
+ # Copyright 2001 Peter Åstrand <astrand@cendio.se> for Cendio AB

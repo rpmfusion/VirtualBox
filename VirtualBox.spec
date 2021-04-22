@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.20
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -70,16 +70,24 @@ Source9:    96-vbox-server.preset
 Source10:   vboxweb.service
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
+Source22:   os_mageia_x2.png
+Source23:   os_mageia_64_x2.png
+Source24:   os_mageia_x3.png
+Source25:   os_mageia_64_x3.png
+Source26:   os_mageia_x4.png
+Source27:   os_mageia_64_x4.png
 Patch1:     VirtualBox-6.0.0-noupdate.patch
 Patch2:     VirtualBox-6.1.0-strings.patch
-Patch18:    VirtualBox-OSE-4.0.2-aiobug.patch
+Patch3:     vbox-default-os-type.diff
 #Patch27:    VirtualBox-gcc.patch
+#to revert on EL7
 Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
 # from ArchLinux
 Patch40:    007-python2-path.patch
 # from Mageia
-#Patch50:    VirtualBox-5.1.0-add-Mageia-support.patch
+Patch50:    VirtualBox-6.1.20-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
+Patch52:    VirtualBox-6.0.10-convert-map-python3.patch
 # from Fedora
 # Do not show an error dialog when not running under vbox
 # Do not start VBoxClient --vmsvga, we run VBoxClient --vmsvga as
@@ -88,6 +96,8 @@ Patch60:    VirtualBox-5.2.10-xclient.patch
 #Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 # from OpenSuse
 Patch70:    vbox-python-detection.diff
+Patch71:    fixes_for_Qt5.11to15.patch
+Patch72:    virtualbox-snpritnf-buffer-overflow.patch
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
@@ -292,6 +302,9 @@ which is generated during the build of main package.
 %setup -q -n %{name}-%{version}%{?prereltag}
 # add Mageia images
 cp -a %{SOURCE20} %{SOURCE21} src/VBox/Frontends/VirtualBox/images/
+cp -a %{SOURCE22} %{SOURCE23} src/VBox/Frontends/VirtualBox/images/x2/
+cp -a %{SOURCE24} %{SOURCE25} src/VBox/Frontends/VirtualBox/images/x3/
+cp -a %{SOURCE26} %{SOURCE27} src/VBox/Frontends/VirtualBox/images/x4/
 
 # Remove prebuilt binary tools
 find -name '*.py[co]' -delete
@@ -316,20 +329,23 @@ rm -r src/libs/zlib-1.2.*/
 
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
-%patch18 -p1 -b .aiobug
+%patch3 -p1 -b .default_os_fedora
 #patch27 -p1 -b .gcc
 %if 0%{?rhel} && 0%{?rhel} < 8
 %patch29 -p2 -R -b .gsoap3
 %endif
 %if %{with python3}
 %patch40 -p1 -b .python2_path
+%patch52 -p1 -b .convert-map-python3
 %endif
 # mageia support not ready for 6.0
-#patch50 -p1 -b .mageia-support
+%patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
 #patch61 -p1 -b .automount
 %patch70 -p1 -b .python-detection
+%patch71 -p1 -b .qt
+%patch72 -p1 -b .snpritnf-buffer-overflow
 %patch80 -p1 -b .gcc10
 %patch86 -p1 -b .vboxrem
 %patch87 -p1 -b .fix-file-picker
@@ -393,6 +409,8 @@ kmk %{_smp_mflags}    \
     VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
+#    SDK_VBOX_LZF_LIBS="lzf"                                    \
+#    SDK_VBOX_LZF_INCS="/usr/include/liblzf"                    \
 #    VBOX_WITH_TESTCASES= \
 #    VBOX_WITH_VALIDATIONKIT= \
 #    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
@@ -886,6 +904,12 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Apr 22 2021 Sérgio Basto <sergio@serjux.com> - 6.1.20-2
+- Add back Mageia support and default Linux OS as Fedora
+- From Mageia add VirtualBox-6.0.10-convert-map-python3.patch
+- Add a couple of patches of openSuse for qt and virtualbox-snpritnf-buffer-overflow.patch
+- Drop patch of aiobug is for EL6 only
+
 * Wed Apr 21 2021 Sérgio Basto <sergio@serjux.com> - 6.1.20-1
 - Update VirtualBox to 6.1.20
 
