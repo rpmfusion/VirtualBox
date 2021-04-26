@@ -16,11 +16,7 @@
 #global prerel RC1
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%if 0%{?fedora} > 32
-    %bcond_with webservice
-%else
-    %bcond_without webservice
-%endif
+%bcond_without webservice
 # Now we use upstream pdf
 %bcond_with docs
 %bcond_without vnc
@@ -46,7 +42,7 @@
 
 Name:       VirtualBox
 Version:    6.1.20
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -102,6 +98,7 @@ Patch72:    virtualbox-snpritnf-buffer-overflow.patch
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
 Patch87:    vbox-fix-file-picker.patch
+Patch88:    VirtualBox-lzf.patch
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  SDL-devel
@@ -128,7 +125,7 @@ BuildRequires:  gsoap-devel
 %endif
 BuildRequires:  pam-devel
 BuildRequires:  genisoimage
-BuildRequires:  java-devel >= 1.6
+BuildRequires:  java-1.8.0-devel
 %if %{with docs}
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  docbook-dtds
@@ -141,7 +138,7 @@ BuildRequires:  texlive-tabulary
 BuildRequires:  texlive-fancybox
 %endif
 BuildRequires:  boost-devel
-#BuildRequires:  liblzf-devel
+BuildRequires:  liblzf-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libpng-devel
 BuildRequires:  zlib-devel
@@ -321,7 +318,7 @@ rm -r src/VBox/Additions/3D/mesa/mesa-17.3.9/
 # src/VBox/GuestHost/OpenGL/include/GL/glext.h have VBOX definitions
 #rm -r src/VBox/GuestHost/OpenGL/include/GL
 
-#rm -r src/libs/liblzf-3.*/
+rm -r src/libs/liblzf-3.*/
 rm -r src/libs/libpng-1.6.*/
 rm -r src/libs/libxml2-2.9.*/
 rm -r src/libs/openssl-1.*/
@@ -349,6 +346,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch80 -p1 -b .gcc10
 %patch86 -p1 -b .vboxrem
 %patch87 -p1 -b .fix-file-picker
+%patch88 -p1 -b .lzf
 
 
 %build
@@ -400,6 +398,8 @@ kmk %{_smp_mflags}    \
 %{!?legacy_vboxvideo_drv:   VBOX_NO_LEGACY_XORG_X11=1 }        \
     SDK_VBOX_LIBPNG_INCS=/usr/include/libpng16                 \
     SDK_VBOX_LIBXML2_INCS=/usr/include/libxml2                 \
+    SDK_VBOX_LZF_LIBS="lzf"                                    \
+    SDK_VBOX_LZF_INCS="/usr/include/liblzf"                    \
     SDK_VBOX_OPENSSL_INCS=""                                   \
     SDK_VBOX_OPENSSL_LIBS="ssl crypto"                         \
     SDK_VBOX_ZLIB_INCS=""                                      \
@@ -409,8 +409,6 @@ kmk %{_smp_mflags}    \
     VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
-#    SDK_VBOX_LZF_LIBS="lzf"                                    \
-#    SDK_VBOX_LZF_INCS="/usr/include/liblzf"                    \
 #    VBOX_WITH_TESTCASES= \
 #    VBOX_WITH_VALIDATIONKIT= \
 #    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
@@ -904,6 +902,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Apr 23 2021 Sérgio Basto <sergio@serjux.com> - 6.1.20-3
+- We can build webservice with JDK 1.8 as workaround
+- Enable system lzf with patch that make it work
+
 * Thu Apr 22 2021 Sérgio Basto <sergio@serjux.com> - 6.1.20-2
 - Add back Mageia support and default Linux OS as Fedora
 - From Mageia add VirtualBox-6.0.10-convert-map-python3.patch
