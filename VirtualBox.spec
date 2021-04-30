@@ -16,7 +16,11 @@
 #global prerel RC1
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%bcond_without webservice
+%if 0%{?fedora} > 34
+    %bcond_with webservice
+%else
+    %bcond_without webservice
+%endif
 # Now we use upstream pdf
 %bcond_with docs
 %bcond_without vnc
@@ -904,6 +908,7 @@ getent passwd vboxadd >/dev/null || \
 %changelog
 * Thu Apr 29 2021 Sérgio Basto <sergio@serjux.com> - 6.1.22-1
 - Update VirtualBox to 6.1.22
+- wsimport is not loading on Fedora rawhide so we can't build webservice until have a fix
 
 * Fri Apr 23 2021 Sérgio Basto <sergio@serjux.com> - 6.1.20-3
 - We can build webservice with JDK 1.8 as workaround
