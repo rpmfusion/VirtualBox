@@ -41,8 +41,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.1.20
-Release:    3%{?dist}
+Version:    6.1.22
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -902,6 +902,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Apr 29 2021 Sérgio Basto <sergio@serjux.com> - 6.1.22-1
+- Update VirtualBox to 6.1.22
+
 * Fri Apr 23 2021 Sérgio Basto <sergio@serjux.com> - 6.1.20-3
 - We can build webservice with JDK 1.8 as workaround
 - Enable system lzf with patch that make it work
