@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.22
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -98,10 +98,10 @@ Patch60:    VirtualBox-5.2.10-xclient.patch
 Patch70:    vbox-python-detection.diff
 Patch71:    fixes_for_Qt5.11to15.patch
 Patch72:    virtualbox-snpritnf-buffer-overflow.patch
+Patch73:    vb-6.1.16-modal-dialog-parent.patch
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
-Patch87:    vbox-fix-file-picker.patch
 Patch88:    VirtualBox-lzf.patch
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -347,9 +347,9 @@ rm -r src/libs/zlib-1.2.*/
 %patch70 -p1 -b .python-detection
 %patch71 -p1 -b .qt
 %patch72 -p1 -b .snpritnf-buffer-overflow
+%patch73 -p1 -b .modal-dialog-parent
 %patch80 -p1 -b .gcc10
 %patch86 -p1 -b .vboxrem
-%patch87 -p1 -b .fix-file-picker
 %patch88 -p1 -b .lzf
 
 
@@ -906,6 +906,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon May 03 2021 Sérgio Basto <sergio@serjux.com> - 6.1.22-2
+- Fix picker dialog with patch from OpenSuse (rfbz #5929)
+
 * Thu Apr 29 2021 Sérgio Basto <sergio@serjux.com> - 6.1.22-1
 - Update VirtualBox to 6.1.22
 - wsimport is not loading on Fedora rawhide so we can't build webservice until have a fix
