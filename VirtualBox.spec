@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    6.1.22
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -906,6 +906,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Jun 15 2021 Leigh Scott <leigh123linux@gmail.com> - 6.1.22-3
+- Rebuild for python-3.10
+
 * Mon May 03 2021 Sérgio Basto <sergio@serjux.com> - 6.1.22-2
 - Fix picker dialog with patch from OpenSuse (rfbz #5929)
 
