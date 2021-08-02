@@ -32,21 +32,16 @@
     %bcond_without guest_additions
 %endif
 
-%if 0%{?fedora} > 30 || 0%{?rhel} > 7
-    %bcond_with python2
+# Since version 6.1.28, VBox should not have the python2 dependency
+%if 0%{?fedora} > 34
+%bcond_with python3
 %else
-    %bcond_without python2
-%endif
-
-%if 0%{?fedora} > 15 || 0%{?rhel} > 7
-    %bcond_without python3
-%else
-    %bcond_with python3
+%bcond_without python3
 %endif
 
 Name:       VirtualBox
-Version:    6.1.22
-Release:    3%{?dist}
+Version:    6.1.26
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -55,7 +50,6 @@ URL:        http://www.virtualbox.org/wiki/VirtualBox
 ExclusiveArch:  x86_64
 
 Requires:   %{name}-server%{?isa} = %{version}
-Obsoletes:  %{name}-qt < 5.1.8
 
 Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
 Source1:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/UserManual.pdf
@@ -93,7 +87,6 @@ Patch52:    VirtualBox-6.0.10-convert-map-python3.patch
 # Do not start VBoxClient --vmsvga, we run VBoxClient --vmsvga as
 # a systemd service, this works with both Wayland and Xorg based sessions
 Patch60:    VirtualBox-5.2.10-xclient.patch
-#Patch61:    0001-VBoxServiceAutoMount-Change-Linux-mount-code-to-use-.patch
 # from OpenSuse
 Patch70:    vbox-python-detection.diff
 Patch71:    fixes_for_Qt5.11to15.patch
@@ -103,6 +96,7 @@ Patch73:    vb-6.1.16-modal-dialog-parent.patch
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch86:    VirtualBox-6.1.0-VBoxRem.patch
 Patch88:    VirtualBox-lzf.patch
+Patch89:    changeset_90377.diff
 
 BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  SDL-devel
@@ -343,7 +337,6 @@ rm -r src/libs/zlib-1.2.*/
 %patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
-#patch61 -p1 -b .automount
 %patch70 -p1 -b .python-detection
 %patch71 -p1 -b .qt
 %patch72 -p1 -b .snpritnf-buffer-overflow
@@ -351,6 +344,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch80 -p1 -b .gcc10
 %patch86 -p1 -b .vboxrem
 %patch88 -p1 -b .lzf
+%patch89 -p1 -b .changeset_90377
 
 
 %build
@@ -904,6 +898,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Aug 02 2021 Sérgio Basto <sergio@serjux.com> - 6.1.26-1
+- Update VirtualBox to 6.1.26
+- Patch 61 was included upstream
+
 * Tue Jun 15 2021 Leigh Scott <leigh123linux@gmail.com> - 6.1.22-3
 - Rebuild for python-3.10
 
