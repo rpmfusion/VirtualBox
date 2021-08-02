@@ -572,7 +572,6 @@ install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 %if %{with guest_additions}
 # Guest X.Org drivers
 mkdir -p %{buildroot}%{_libdir}/security
-mkdir -p %{buildroot}%{_libdir}/VBoxGuestAdditions
 
 # Michael Thayer from Oracle wrote: I have applied the patch [1] I posted so that you
 # can build with VBOX_USE_SYSTEM_XORG_HEADERS=1 set in future to only
@@ -893,7 +892,6 @@ getent passwd vboxadd >/dev/null || \
 %if %{with legacy_vboxvideo_drv}
 %{_libdir}/xorg/modules/drivers/*
 %endif
-%{_libdir}/VBoxGuestAdditions
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %{_unitdir}/vboxclient.service
