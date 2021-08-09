@@ -16,11 +16,11 @@
 #global prerel RC1
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%if 0%{?fedora} > 34
-    %bcond_with webservice
-%else
+#%%if 0%%{?fedora} > 34
+#    %%bcond_with webservice
+#%%else
     %bcond_without webservice
-%endif
+#%%endif
 # Now we use upstream pdf
 %bcond_with docs
 %bcond_without vnc
@@ -33,6 +33,8 @@
 %endif
 
 # Since version 6.1.28, VBox should not have the python2 dependency
+%bcond_with python2
+
 %if 0%{?fedora} > 34
 %bcond_with python3
 %else
@@ -41,7 +43,7 @@
 
 Name:       VirtualBox
 Version:    6.1.26
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -106,7 +108,7 @@ BuildRequires:  iasl
 BuildRequires:  libxslt-devel
 BuildRequires:  libIDL-devel
 BuildRequires:  yasm
-BuildRequires:  pulseaudio-libs-devel
+BuildRequires:  alsa-lib-devel
 %if %{with python2}
 BuildRequires:  python2-devel
 %endif
@@ -333,7 +335,6 @@ rm -r src/libs/zlib-1.2.*/
 %patch40 -p1 -b .python2_path
 %patch52 -p1 -b .convert-map-python3
 %endif
-# mageia support not ready for 6.0
 %patch50 -p1 -b .mageia-support
 %patch51 -p1 -b .revert-VBox.sh
 %patch60 -p1 -b .xclient
@@ -898,6 +899,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Aug 09 2021 Sérgio Basto <sergio@serjux.com> - 6.1.26-3
+- Fix build on rawhide (disabling python) and BR alsa-lib-devel
+
 * Mon Aug 02 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 6.1.26-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
