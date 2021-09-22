@@ -22,7 +22,14 @@ spectool -g VirtualBox.spec
 # we need update sources files to avoid download the wrong UserManual.pdf
 rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
 fi
-rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-$VERSION-$REL.fc$RAWHIDE.src.rpm
+echo Press enter scratch-build or n to skip ; read dummy;
+    if [[ "$dummy" != "n" ]]; then
+        rfpkg scratch-build --srpm
+    fi
+echo Press enter to build on corp -build or n to skip ; read dummy;
+    if [[ "$dummy" != "n" ]]; then
+        rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-$VERSION-$REL.fc$RAWHIDE.src.rpm
+    fi
 fi
 
 if test $stage -le 1

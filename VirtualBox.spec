@@ -74,7 +74,7 @@ Source26:   os_mageia_x4.png
 Source27:   os_mageia_64_x4.png
 Patch1:     VirtualBox-6.0.0-noupdate.patch
 Patch2:     VirtualBox-6.1.0-strings.patch
-Patch3:     vbox-default-os-type.diff
+Patch3:     VirtualBox-6.0.0-default-to-Fedora.patch
 #Patch27:    VirtualBox-gcc.patch
 #to revert on EL7
 Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
@@ -100,6 +100,7 @@ Patch86:    VirtualBox-6.1.0-VBoxRem.patch
 Patch88:    VirtualBox-lzf.patch
 Patch89:    changeset_90377.diff
 
+BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  SDL-devel
 BuildRequires:  openssl-devel

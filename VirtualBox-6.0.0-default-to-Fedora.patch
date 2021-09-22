@@ -1,3 +1,4 @@
+Defaults to Linux and to Fedora
 Index: VirtualBox-6.0.0/src/VBox/Frontends/VirtualBox/src/widgets/UINameAndSystemEditor.cpp
 ===================================================================
 --- VirtualBox-6.0.0.orig/src/VBox/Frontends/VirtualBox/src/widgets/UINameAndSystemEditor.cpp
@@ -23,3 +24,14 @@ Index: VirtualBox-6.0.0/src/VBox/Frontends/VirtualBox/src/widgets/UINameAndSyste
      }
      /* Else simply select the first one present: */
      else
+@@ -468,6 +468,10 @@ void UINameAndSystemEditor::prepareFamil
+ 
+     /* Choose the 1st item to be the current: */
+     m_pComboFamily->setCurrentIndex(0);
++    /* Default to Linux */
++    const int liIndex = m_pComboFamily->findData("Linux", TypeID);
++    if (liIndex != -1)
++        m_pComboFamily->setCurrentIndex(liIndex);
+     /* And update the linked widgets accordingly: */
+     sltFamilyChanged(m_pComboFamily->currentIndex());
+ }
