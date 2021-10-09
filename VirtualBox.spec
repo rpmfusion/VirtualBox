@@ -375,9 +375,12 @@ cp %{SOURCE1} UserManual.pdf
 . ./env.sh
 umask 0022
 
-#TODO fix publisher in copr
+%if "%{vendor}" == "RPM Fusion"
+%global publisher _rpmfusion
+%else
 %global publisher _%{?vendor:%(echo "%{vendor}" | \
-     sed -e 's/[^[:alnum:]]//g; s/FedoraProject//' | cut -c -9)}%{?!vendor:custom}
+     sed -e 's/[^[:alnum:]]//g; s/FedoraCopruser//' | cut -c -9)}%{?!vendor:custom}
+%endif 
 
 # VirtualBox build system installs and builds in the same step,
 # not always looking for the installed files in places they have
