@@ -900,7 +900,7 @@ getent passwd vboxadd >/dev/null || \
 
 %changelog
 * Wed Oct 20 2021 Sérgio Basto <sergio@serjux.com> - 6.1.28-1
-- Update VirtualBox to 6.1.28 with with inspirations in the Mageia and Debian packages
+- Update VirtualBox to 6.1.28 with inspirations in the Mageia and Debian packages
 
 * Mon Aug 09 2021 Sérgio Basto <sergio@serjux.com> - 6.1.26-3
 - Fix build on rawhide (disabling python) and BR alsa-lib-devel
