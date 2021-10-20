@@ -16,10 +16,10 @@
  src/VBox/Main/xml/Settings.cpp                                              |    1 +
  15 files changed, 59 insertions(+), 2 deletions(-)
 
-diff -Nurp VirtualBox-6.1.20.orig/include/VBox/ostypes.h VirtualBox-6.1.20/include/VBox/ostypes.h
---- VirtualBox-6.1.20.orig/include/VBox/ostypes.h	2021-04-20 07:22:16.000000000 +0300
-+++ VirtualBox-6.1.20/include/VBox/ostypes.h	2021-04-20 22:23:34.664631359 +0300
-@@ -112,6 +112,8 @@ typedef enum VBOXOSTYPE
+diff -Nurp VirtualBox-6.1.28.orig/include/VBox/ostypes.h VirtualBox-6.1.28/include/VBox/ostypes.h
+--- VirtualBox-6.1.28.orig/include/VBox/ostypes.h	2021-10-18 20:47:30.000000000 +0300
++++ VirtualBox-6.1.28/include/VBox/ostypes.h	2021-10-19 23:37:22.566374741 +0300
+@@ -113,6 +113,8 @@ typedef enum VBOXOSTYPE
      VBOXOSTYPE_Xandros_x64      = 0x5D100,
      VBOXOSTYPE_Oracle           = 0x5E000,
      VBOXOSTYPE_Oracle_x64       = 0x5E100,
@@ -28,9 +28,9 @@ diff -Nurp VirtualBox-6.1.20.orig/include/VBox/ostypes.h VirtualBox-6.1.20/inclu
      VBOXOSTYPE_FreeBSD          = 0x60000,
      VBOXOSTYPE_FreeBSD_x64      = 0x60100,
      VBOXOSTYPE_OpenBSD          = 0x61000,
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Additions/linux/installer/vboxadd-x11.sh VirtualBox-6.1.20/src/VBox/Additions/linux/installer/vboxadd-x11.sh
---- VirtualBox-6.1.20.orig/src/VBox/Additions/linux/installer/vboxadd-x11.sh	2021-04-20 07:24:21.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Additions/linux/installer/vboxadd-x11.sh	2021-04-20 22:23:34.686632426 +0300
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Additions/linux/installer/vboxadd-x11.sh VirtualBox-6.1.28/src/VBox/Additions/linux/installer/vboxadd-x11.sh
+--- VirtualBox-6.1.28.orig/src/VBox/Additions/linux/installer/vboxadd-x11.sh	2021-10-18 20:50:51.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Additions/linux/installer/vboxadd-x11.sh	2021-10-19 23:37:22.566374741 +0300
 @@ -94,8 +94,14 @@ install_x11_startup_app() {
      x11_autostart="/etc/xdg/autostart"
      kde_autostart="/usr/share/autostart"
@@ -46,10 +46,10 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Additions/linux/installer/vboxadd-x11
      if [ -d "$mandriva_dir" -a -w "$mandriva_dir" -a -x "$mandriva_dir" ]
      then
          install -m 0644 $app_src "$mandriva_dir/$app_dest"
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Devices/VMMDev/VMMDev.cpp VirtualBox-6.1.20/src/VBox/Devices/VMMDev/VMMDev.cpp
---- VirtualBox-6.1.20.orig/src/VBox/Devices/VMMDev/VMMDev.cpp	2021-04-20 07:30:47.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Devices/VMMDev/VMMDev.cpp	2021-04-20 22:23:34.690632620 +0300
-@@ -200,6 +200,7 @@ static void vmmdevLogGuestOsInfo(VBoxGue
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Devices/VMMDev/VMMDev.cpp VirtualBox-6.1.28/src/VBox/Devices/VMMDev/VMMDev.cpp
+--- VirtualBox-6.1.28.orig/src/VBox/Devices/VMMDev/VMMDev.cpp	2021-10-18 20:56:47.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Devices/VMMDev/VMMDev.cpp	2021-10-19 23:37:22.567374788 +0300
+@@ -202,6 +202,7 @@ static void vmmdevLogGuestOsInfo(VBoxGue
          case VBOXOSTYPE_OpenSUSE:                         pszOs = "openSUSE";       break;
          case VBOXOSTYPE_FedoraCore:                       pszOs = "Fedora";         break;
          case VBOXOSTYPE_Gentoo:                           pszOs = "Gentoo";         break;
@@ -57,10 +57,10 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Devices/VMMDev/VMMDev.cpp VirtualBox-
          case VBOXOSTYPE_Mandriva:                         pszOs = "Mandriva";       break;
          case VBOXOSTYPE_RedHat:                           pszOs = "RedHat";         break;
          case VBOXOSTYPE_Turbolinux:                       pszOs = "TurboLinux";     break;
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp
---- VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp	2021-04-20 07:31:49.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp	2021-04-20 22:23:34.690632620 +0300
-@@ -326,6 +326,8 @@ UIIconPoolGeneral::UIIconPoolGeneral()
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp
+--- VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp	2021-10-18 20:57:50.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp	2021-10-19 23:37:22.567374788 +0300
+@@ -327,6 +327,8 @@ UIIconPoolGeneral::UIIconPoolGeneral()
      m_guestOSTypeIconNames.insert("Fedora_64",       ":/os_fedora_64.png");
      m_guestOSTypeIconNames.insert("Gentoo",          ":/os_gentoo.png");
      m_guestOSTypeIconNames.insert("Gentoo_64",       ":/os_gentoo_64.png");
@@ -69,10 +69,10 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/src/globals/UIIc
      m_guestOSTypeIconNames.insert("Mandriva",        ":/os_mandriva.png");
      m_guestOSTypeIconNames.insert("Mandriva_64",     ":/os_mandriva_64.png");
      m_guestOSTypeIconNames.insert("RedHat",          ":/os_redhat.png");
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/src/wizards/newvm/UIWizardNewVMPageBasic1.cpp VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/src/wizards/newvm/UIWizardNewVMPageBasic1.cpp
---- VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/src/wizards/newvm/UIWizardNewVMPageBasic1.cpp	2021-04-20 07:32:00.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/src/wizards/newvm/UIWizardNewVMPageBasic1.cpp	2021-04-20 22:23:34.694632814 +0300
-@@ -137,8 +137,10 @@ static const osTypePattern gs_OSTypePatt
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/src/wizards/newvm/UIWizardNewVMPageBasic1.cpp VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/src/wizards/newvm/UIWizardNewVMPageBasic1.cpp
+--- VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/src/wizards/newvm/UIWizardNewVMPageBasic1.cpp	2021-10-18 20:58:01.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/src/wizards/newvm/UIWizardNewVMPageBasic1.cpp	2021-10-19 23:37:22.567374788 +0300
+@@ -138,8 +138,10 @@ static const osTypePattern gs_OSTypePatt
      { QRegExp("Fe.*32",                            Qt::CaseInsensitive), "Fedora" },
      { QRegExp("((Gen)|(Sab)).*64",                 Qt::CaseInsensitive), "Gentoo_64" },
      { QRegExp("((Gen)|(Sab)).*32",                 Qt::CaseInsensitive), "Gentoo" },
@@ -85,9 +85,9 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/src/wizards/newv
      { QRegExp("((Red)|(rhel)|(cen)).*64",          Qt::CaseInsensitive), "RedHat_64" },
      { QRegExp("((Red)|(rhel)|(cen)).*32",          Qt::CaseInsensitive), "RedHat" },
      { QRegExp("Tur.*64",                           Qt::CaseInsensitive), "Turbolinux_64" },
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc
---- VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc	2021-04-20 07:31:25.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc	2021-04-20 22:23:34.695632862 +0300
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc
+--- VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc	2021-10-18 20:57:28.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc	2021-10-19 23:37:22.567374788 +0300
 @@ -64,6 +64,8 @@
          <file alias="os_linux_64.png">images/os_linux_64.png</file>
          <file alias="os_macosx.png">images/os_macosx.png</file>
@@ -97,9 +97,9 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc 
          <file alias="os_mandriva.png">images/os_mandriva.png</file>
          <file alias="os_mandriva_64.png">images/os_mandriva_64.png</file>
          <file alias="os_netbsd.png">images/os_netbsd.png</file>
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc
---- VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc	2021-04-20 07:31:25.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc	2021-04-20 22:23:34.695632862 +0300
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc
+--- VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc	2021-10-18 20:57:28.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc	2021-10-19 23:37:22.567374788 +0300
 @@ -67,6 +67,8 @@
          <file alias="os_linux_x2.png">images/x2/os_linux_x2.png</file>
          <file alias="os_macosx_64_x2.png">images/x2/os_macosx_64_x2.png</file>
@@ -109,9 +109,9 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.q
          <file alias="os_mandriva_64_x2.png">images/x2/os_mandriva_64_x2.png</file>
          <file alias="os_mandriva_x2.png">images/x2/os_mandriva_x2.png</file>
          <file alias="os_netbsd_64_x2.png">images/x2/os_netbsd_64_x2.png</file>
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc
---- VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc	2021-04-20 07:31:25.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc	2021-04-20 22:23:34.695632862 +0300
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc
+--- VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc	2021-10-18 20:57:28.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc	2021-10-19 23:37:22.567374788 +0300
 @@ -67,6 +67,8 @@
          <file alias="os_linux_x3.png">images/x3/os_linux_x3.png</file>
          <file alias="os_macosx_64_x3.png">images/x3/os_macosx_64_x3.png</file>
@@ -121,9 +121,9 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.q
          <file alias="os_mandriva_64_x3.png">images/x3/os_mandriva_64_x3.png</file>
          <file alias="os_mandriva_x3.png">images/x3/os_mandriva_x3.png</file>
          <file alias="os_netbsd_64_x3.png">images/x3/os_netbsd_64_x3.png</file>
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc
---- VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc	2021-04-20 07:31:25.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc	2021-04-20 22:23:34.695632862 +0300
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc
+--- VirtualBox-6.1.28.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc	2021-10-18 20:57:28.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc	2021-10-19 23:37:22.567374788 +0300
 @@ -67,6 +67,8 @@
          <file alias="os_linux_x4.png">images/x4/os_linux_x4.png</file>
          <file alias="os_macosx_64_x4.png">images/x4/os_macosx_64_x4.png</file>
@@ -133,9 +133,9 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.q
          <file alias="os_mandriva_64_x4.png">images/x4/os_mandriva_64_x4.png</file>
          <file alias="os_mandriva_x4.png">images/x4/os_mandriva_x4.png</file>
          <file alias="os_netbsd_64_x4.png">images/x4/os_netbsd_64_x4.png</file>
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Installer/linux/distributions_rpm VirtualBox-6.1.20/src/VBox/Installer/linux/distributions_rpm
---- VirtualBox-6.1.20.orig/src/VBox/Installer/linux/distributions_rpm	2021-04-20 07:32:09.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Installer/linux/distributions_rpm	2021-04-20 22:23:34.695632862 +0300
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Installer/linux/distributions_rpm VirtualBox-6.1.28/src/VBox/Installer/linux/distributions_rpm
+--- VirtualBox-6.1.28.orig/src/VBox/Installer/linux/distributions_rpm	2021-10-18 20:58:10.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Installer/linux/distributions_rpm	2021-10-19 23:37:22.567374788 +0300
 @@ -7,6 +7,21 @@ openSUSE114     = OPENSUSE_11_4
  openSUSE113     = OPENSUSE_11_3
  sles11.0        = SLES_11_0
@@ -158,9 +158,9 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Installer/linux/distributions_rpm Vir
  mdv2011.0       = MANDRIVA_2011_0
  fedora33        = FEDORA_33
  fedora32        = FEDORA_32
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Installer/linux/VBoxSysInfo.sh VirtualBox-6.1.20/src/VBox/Installer/linux/VBoxSysInfo.sh
---- VirtualBox-6.1.20.orig/src/VBox/Installer/linux/VBoxSysInfo.sh	2021-04-20 07:32:09.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Installer/linux/VBoxSysInfo.sh	2021-04-20 22:23:34.695632862 +0300
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Installer/linux/VBoxSysInfo.sh VirtualBox-6.1.28/src/VBox/Installer/linux/VBoxSysInfo.sh
+--- VirtualBox-6.1.28.orig/src/VBox/Installer/linux/VBoxSysInfo.sh	2021-10-18 20:58:09.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Installer/linux/VBoxSysInfo.sh	2021-10-19 23:37:22.567374788 +0300
 @@ -44,6 +44,11 @@ get_linux_info () {
          # Debian-based system
          release=`cat /etc/debian_version`
@@ -173,30 +173,30 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Installer/linux/VBoxSysInfo.sh Virtua
      elif [ -r /etc/mandriva-release ]
      then
          # Mandriva-based system
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Main/src-all/Global.cpp VirtualBox-6.1.20/src/VBox/Main/src-all/Global.cpp
---- VirtualBox-6.1.20.orig/src/VBox/Main/src-all/Global.cpp	2021-04-20 07:32:15.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Main/src-all/Global.cpp	2021-04-20 22:23:34.699633056 +0300
-@@ -249,6 +249,17 @@ const Global::OSType Global::sOSTypes[]
-       1024,  16,  8 * _1G64, GraphicsControllerType_VMSVGA, NetworkAdapterType_I82540EM, 0, StorageControllerType_PIIX4, StorageBus_IDE,
-         StorageControllerType_IntelAhci, StorageBus_SATA, ChipsetType_PIIX3, AudioControllerType_AC97, AudioCodecType_AD1980  },
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Main/src-all/Global.cpp VirtualBox-6.1.28/src/VBox/Main/src-all/Global.cpp
+--- VirtualBox-6.1.28.orig/src/VBox/Main/src-all/Global.cpp	2021-10-18 20:58:15.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Main/src-all/Global.cpp	2021-10-19 23:57:42.607061761 +0300
+@@ -257,6 +257,17 @@ const Global::OSType Global::sOSTypes[]
+       1, 1024,  16,  8 * _1G64, GraphicsControllerType_VMSVGA, NetworkAdapterType_I82540EM, 0, StorageControllerType_PIIX4, StorageBus_IDE,
+       StorageControllerType_IntelAhci, StorageBus_SATA, ChipsetType_PIIX3, AudioControllerType_AC97, AudioCodecType_AD1980  },
  
 +    { "Linux",   "Linux",             "Mageia",             "Mageia (32-bit)",
 +      VBOXOSTYPE_Mageia,        VBOXOSHINT_RTCUTC | VBOXOSHINT_USBTABLET | VBOXOSHINT_X2APIC,
-+      1024,  16,  20 * _1G64, GraphicsControllerType_VMSVGA, NetworkAdapterType_I82540EM, 0, StorageControllerType_PIIX4, StorageBus_IDE,
++      1, 1024,  16,  20 * _1G64, GraphicsControllerType_VMSVGA, NetworkAdapterType_I82540EM, 0, StorageControllerType_PIIX4, StorageBus_IDE,
 +        StorageControllerType_IntelAhci, StorageBus_SATA, ChipsetType_PIIX3, AudioControllerType_AC97, AudioCodecType_AD1980  },
 +
 +    { "Linux",   "Linux",             "Mageia_64",          "Mageia (64-bit)",
-+      VBOXOSTYPE_Mandriva_x64,    VBOXOSHINT_64BIT | VBOXOSHINT_HWVIRTEX | VBOXOSHINT_IOAPIC | VBOXOSHINT_RTCUTC
++      VBOXOSTYPE_Mageia_x64,    VBOXOSHINT_64BIT | VBOXOSHINT_HWVIRTEX | VBOXOSHINT_IOAPIC | VBOXOSHINT_RTCUTC
 +                                | VBOXOSHINT_USBTABLET | VBOXOSHINT_X2APIC,
-+      1024,  16,  20 * _1G64, GraphicsControllerType_VMSVGA, NetworkAdapterType_I82540EM, 0, StorageControllerType_PIIX4, StorageBus_IDE,
++      1, 1024,  16,  20 * _1G64, GraphicsControllerType_VMSVGA, NetworkAdapterType_I82540EM, 0, StorageControllerType_PIIX4, StorageBus_IDE,
 +        StorageControllerType_IntelAhci, StorageBus_SATA, ChipsetType_PIIX3, AudioControllerType_AC97, AudioCodecType_AD1980  },
 +
      { "Linux",   "Linux",             "Mandriva",           "Mandriva (32-bit)",
        VBOXOSTYPE_Mandriva,        VBOXOSHINT_RTCUTC | VBOXOSHINT_USBTABLET | VBOXOSHINT_X2APIC,
-       1024,  16,  8 * _1G64, GraphicsControllerType_VMSVGA, NetworkAdapterType_I82540EM, 0, StorageControllerType_PIIX4, StorageBus_IDE,
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Main/src-server/ApplianceImpl.cpp VirtualBox-6.1.20/src/VBox/Main/src-server/ApplianceImpl.cpp
---- VirtualBox-6.1.20.orig/src/VBox/Main/src-server/ApplianceImpl.cpp	2021-04-20 07:32:17.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Main/src-server/ApplianceImpl.cpp	2021-04-20 22:23:34.700633105 +0300
+       1, 1024,  16,  8 * _1G64, GraphicsControllerType_VMSVGA, NetworkAdapterType_I82540EM, 0, StorageControllerType_PIIX4, StorageBus_IDE,
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Main/src-server/ApplianceImpl.cpp VirtualBox-6.1.28/src/VBox/Main/src-server/ApplianceImpl.cpp
+--- VirtualBox-6.1.28.orig/src/VBox/Main/src-server/ApplianceImpl.cpp	2021-10-18 20:58:17.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Main/src-server/ApplianceImpl.cpp	2021-10-19 23:37:22.568374835 +0300
 @@ -218,6 +218,7 @@ static const osTypePattern g_aOsTypesPat
      {"SUSE",          VBOXOSTYPE_OpenSUSE},
      {"Novell",        VBOXOSTYPE_OpenSUSE},
@@ -213,10 +213,10 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Main/src-server/ApplianceImpl.cpp Vir
      {"Mandriva",      VBOXOSTYPE_Mandriva_x64},
      {"Ubuntu",        VBOXOSTYPE_Ubuntu_x64},
      {"Debian",        VBOXOSTYPE_Debian_x64},
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Main/src-server/MachineImpl.cpp VirtualBox-6.1.20/src/VBox/Main/src-server/MachineImpl.cpp
---- VirtualBox-6.1.20.orig/src/VBox/Main/src-server/MachineImpl.cpp	2021-04-20 07:32:18.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Main/src-server/MachineImpl.cpp	2021-04-20 22:23:34.701633153 +0300
-@@ -1360,6 +1360,8 @@ HRESULT Machine::getEffectiveParavirtPro
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Main/src-server/MachineImpl.cpp VirtualBox-6.1.28/src/VBox/Main/src-server/MachineImpl.cpp
+--- VirtualBox-6.1.28.orig/src/VBox/Main/src-server/MachineImpl.cpp	2021-10-18 20:58:18.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Main/src-server/MachineImpl.cpp	2021-10-19 23:37:22.569374882 +0300
+@@ -1363,6 +1363,8 @@ HRESULT Machine::getEffectiveParavirtPro
                               || mUserData->s.strOsType == "Gentoo_64"
                               || mUserData->s.strOsType == "Mandriva"
                               || mUserData->s.strOsType == "Mandriva_64"
@@ -225,9 +225,9 @@ diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Main/src-server/MachineImpl.cpp Virtu
                               || mUserData->s.strOsType == "OpenSUSE"
                               || mUserData->s.strOsType == "OpenSUSE_64"
                               || mUserData->s.strOsType == "Oracle"
-diff -Nurp VirtualBox-6.1.20.orig/src/VBox/Main/xml/Settings.cpp VirtualBox-6.1.20/src/VBox/Main/xml/Settings.cpp
---- VirtualBox-6.1.20.orig/src/VBox/Main/xml/Settings.cpp	2021-04-20 07:32:21.000000000 +0300
-+++ VirtualBox-6.1.20/src/VBox/Main/xml/Settings.cpp	2021-04-20 22:23:34.701633153 +0300
+diff -Nurp VirtualBox-6.1.28.orig/src/VBox/Main/xml/Settings.cpp VirtualBox-6.1.28/src/VBox/Main/xml/Settings.cpp
+--- VirtualBox-6.1.28.orig/src/VBox/Main/xml/Settings.cpp	2021-10-18 20:58:21.000000000 +0300
++++ VirtualBox-6.1.28/src/VBox/Main/xml/Settings.cpp	2021-10-19 23:37:22.569374882 +0300
 @@ -5673,6 +5673,7 @@ const struct {
      { "opensuse", "OpenSUSE" },
      { "fedoracore", "Fedora" },

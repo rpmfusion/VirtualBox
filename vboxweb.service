@@ -10,3 +10,4 @@ PIDFile=/run/vboxweb.pid
 
 [Install]
 WantedBy=multi-user.target
+Alias=vboxweb-service.service

@@ -1,6 +1,6 @@
-VERSION=6.1.26
+VERSION=6.1.28
 REL=1
-RAWHIDE=35
+RAWHIDE=36
 REPOS="f34 f33 f32 el8 el7"
 if [ -z "$1" ]
 then
@@ -24,7 +24,7 @@ rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
 fi
 echo Press enter scratch-build or n to skip ; read dummy;
     if [[ "$dummy" != "n" ]]; then
-        rfpkg scratch-build --srpm
+        rfpkg scratch-build --srpm --nowait
     fi
 echo Press enter to build on corp -build or n to skip ; read dummy;
     if [[ "$dummy" != "n" ]]; then
@@ -35,6 +35,7 @@ fi
 if test $stage -le 1
 then
 echo STAGE 1
+echo Press enter to commit; read dummy;
 rfpkg ci -c && git show
 echo Press enter to push and build on rawhide; read dummy;
 rfpkg push && rfpkg build --nowait

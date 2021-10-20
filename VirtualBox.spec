@@ -42,8 +42,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.1.26
-Release:    3%{?dist}
+Version:    6.1.28
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -61,8 +61,8 @@ Source4:    vboxdrv.service
 Source5:    VirtualBox-60-vboxguest.rules
 Source6:    vboxclient.service
 Source7:    vboxservice.service
-Source8:    96-vbox.preset
-Source9:    96-vbox-server.preset
+Source8:    96-vboxguest.preset
+Source9:    96-vboxhost.preset
 Source10:   vboxweb.service
 Source20:   os_mageia.png
 Source21:   os_mageia_64.png
@@ -81,7 +81,7 @@ Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
 # from ArchLinux
 Patch40:    007-python2-path.patch
 # from Mageia
-Patch50:    VirtualBox-6.1.20-add-Mageia-support.patch
+Patch50:    VirtualBox-6.1.28-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 Patch52:    VirtualBox-6.0.10-convert-map-python3.patch
 # from Fedora
@@ -96,9 +96,7 @@ Patch72:    virtualbox-snpritnf-buffer-overflow.patch
 Patch73:    vb-6.1.16-modal-dialog-parent.patch
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
-Patch86:    VirtualBox-6.1.0-VBoxRem.patch
 Patch88:    VirtualBox-lzf.patch
-Patch89:    changeset_90377.diff
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -344,9 +342,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch72 -p1 -b .snpritnf-buffer-overflow
 %patch73 -p1 -b .modal-dialog-parent
 %patch80 -p1 -b .gcc10
-%patch86 -p1 -b .vboxrem
 %patch88 -p1 -b .lzf
-%patch89 -p1 -b .changeset_90377
 
 
 %build
@@ -612,7 +608,7 @@ desktop-file-validate \
     %{buildroot}%{_sysconfdir}/xdg/autostart/vboxclient.desktop
 
 install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_unitdir}/vboxservice.service
-install -p -m 0644 -D %{SOURCE8} %{buildroot}%{_presetdir}/96-vbox.preset
+install -p -m 0644 -D %{SOURCE8} %{buildroot}%{_presetdir}/96-vboxguest.preset
 install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_udevrulesdir}/60-vboxguest.rules
 install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_unitdir}/vboxclient.service
 %endif
@@ -640,7 +636,7 @@ install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_udevrulesdir}/60-vboxdrv.rules
 
 # Install service to load server modules
 install -p -m 0644 -D %{SOURCE4} %{buildroot}%{_unitdir}/vboxdrv.service
-install -p -m 0644 -D %{SOURCE9} %{buildroot}%{_presetdir}/96-vbox-server.preset
+install -p -m 0644 -D %{SOURCE9} %{buildroot}%{_presetdir}/96-vboxhost.preset
 
 
 # Menu entry
@@ -834,7 +830,7 @@ getent passwd vboxadd >/dev/null || \
 %config %{_sysconfdir}/vbox/vbox.cfg
 %{_udevrulesdir}/60-vboxdrv.rules
 %{_unitdir}/vboxdrv.service
-%{_presetdir}/96-vbox-server.preset
+%{_presetdir}/96-vboxhost.preset
 %{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 
 %files
@@ -896,13 +892,16 @@ getent passwd vboxadd >/dev/null || \
 %{_unitdir}/vboxclient.service
 %{_udevrulesdir}/60-vboxguest.rules
 %{_unitdir}/vboxservice.service
-%{_presetdir}/96-vbox.preset
+%{_presetdir}/96-vboxguest.preset
 %endif
 
 %files kmodsrc
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Oct 20 2021 Sérgio Basto <sergio@serjux.com> - 6.1.28-1
+- Update VirtualBox to 6.1.28 with with inspirations in the Mageia and Debian packages
+
 * Mon Aug 09 2021 Sérgio Basto <sergio@serjux.com> - 6.1.26-3
 - Fix build on rawhide (disabling python) and BR alsa-lib-devel
 
