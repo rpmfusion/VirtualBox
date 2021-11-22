@@ -725,9 +725,9 @@ fi
 # Add a group "vboxsf" for Shared Folders access
 # All users which want to access the auto-mounted Shared Folders have to
 # be added to this group.
-getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
+getent group vboxsf >/dev/null || groupadd -r vboxsf
 getent passwd vboxadd >/dev/null || \
-    useradd -r -g 1 -d /var/run/vboxadd -s /sbin/nologin vboxadd 2>&1
+    useradd -r -g 1 -d /var/run/vboxadd -s /sbin/nologin vboxadd
 
 # Guest additions install
 %post guest-additions
