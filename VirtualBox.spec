@@ -42,7 +42,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    6.1.28
+Version:    6.1.30
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -899,6 +899,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Nov 22 2021 Sérgio Basto <sergio@serjux.com> - 6.1.30-1
+- Update VirtualBox to 6.1.30
+
 * Wed Oct 20 2021 Sérgio Basto <sergio@serjux.com> - 6.1.28-1
 - Update VirtualBox to 6.1.28 with inspirations in the Mageia and Debian packages
 
