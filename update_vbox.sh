@@ -1,7 +1,7 @@
-VERSION=6.1.30
+VERSION=6.1.32
 REL=1
 RAWHIDE=36
-REPOS="f35 f34 f33 el8 el7"
+REPOS="f35 f34 el8 el7"
 if [ -z "$1" ]
 then
       stage=0
@@ -45,8 +45,10 @@ if test $stage -le 2
 then
 echo STAGE 2
 for repo in $REPOS ; do
-echo Press enter to build on branch $repo; read dummy;
+echo Press enter to build on branch $repo or n to skip; read dummy;
+if [[ "$dummy" != "n" ]]; then
 git checkout $repo && git merge master && git push && rfpkg build --nowait; git checkout master
+fi
 done
 fi
 
