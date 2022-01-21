@@ -43,7 +43,7 @@
 
 Name:       VirtualBox
 Version:    6.1.32
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -108,6 +108,8 @@ BuildRequires:  libxslt-devel
 BuildRequires:  libIDL-devel
 BuildRequires:  yasm
 BuildRequires:  alsa-lib-devel
+BuildRequires:  opus-devel
+BuildRequires:  pulseaudio-libs-devel
 %if %{with python2}
 BuildRequires:  python2-devel
 %endif
@@ -144,7 +146,6 @@ BuildRequires:  zlib-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  libvpx-devel
 BuildRequires:  makeself
-BuildRequires:  opus-devel
 #For fixrom.pl
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
@@ -825,7 +826,6 @@ getent passwd vboxadd >/dev/null || \
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
 %attr(4511,root,root) %{_libdir}/virtualbox/VirtualBoxVM
-%{_libdir}/virtualbox/VirtualBox
 %dir %{_sysconfdir}/vbox
 %config %{_sysconfdir}/vbox/vbox.cfg
 %{_udevrulesdir}/60-vboxdrv.rules
@@ -839,6 +839,7 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/VBoxTestOGL
 %{_libdir}/virtualbox/VBoxDbg.so
 %{_libdir}/virtualbox/UICommon.so
+%{_libdir}/virtualbox/VirtualBox
 %{_libdir}/virtualbox/VirtualBoxVM.so
 %{_libdir}/virtualbox/nls
 %{_datadir}/pixmaps/*.png
@@ -899,6 +900,11 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Jan 21 2022 Sérgio Basto <sergio@serjux.com> - 6.1.32-2
+- Add BR pulseaudio-libs-devel which add pulse audio support
+- Move /usr/lib64/virtualbox/VirtualBox to VirtualBox (Qt) package which make
+  VirtualBox-server not depend on Qt5
+
 * Tue Jan 18 2022 Sérgio Basto <sergio@serjux.com> - 6.1.32-1
 - Update VirtualBox to 6.1.32
 
