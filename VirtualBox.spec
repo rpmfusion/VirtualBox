@@ -43,7 +43,7 @@
 
 Name:       VirtualBox
 Version:    6.1.32
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -900,6 +900,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Feb 08 2022 Leigh Scott <leigh123linux@gmail.com> - 6.1.32-3
+- Rebuild for libvpx
+
 * Fri Jan 21 2022 Sérgio Basto <sergio@serjux.com> - 6.1.32-2
 - Add BR pulseaudio-libs-devel which add pulse audio support
 - Move /usr/lib64/virtualbox/VirtualBox to VirtualBox (Qt) package which make
