@@ -35,15 +35,11 @@
 # Since version 6.1.28, VBox should not have the python2 dependency
 %bcond_with python2
 
-%if 0%{?fedora} > 34
-%bcond_with python3
-%else
 %bcond_without python3
-%endif
 
 Name:       VirtualBox
 Version:    6.1.32
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -900,6 +896,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Feb 17 2022 Sérgio Basto <sergio@serjux.com> - 6.1.32-4
+- Re-enable python on Fedora > 34
+
 * Tue Feb 08 2022 Leigh Scott <leigh123linux@gmail.com> - 6.1.32-3
 - Rebuild for libvpx
 
