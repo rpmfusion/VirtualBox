@@ -93,6 +93,7 @@ Patch73:    vb-6.1.16-modal-dialog-parent.patch
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch88:    VirtualBox-lzf.patch
+Patch90:    0001-libs-xpcom-Added-support-for-running-with-Python-3.1.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -340,6 +341,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch73 -p1 -b .modal-dialog-parent
 %patch80 -p1 -b .gcc10
 %patch88 -p1 -b .lzf
+%patch90 -p2 -b .python3.10
 
 
 %build
