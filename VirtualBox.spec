@@ -16,11 +16,11 @@
 #global prerel RC1
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-#%%if 0%%{?fedora} > 34
-#    %%bcond_with webservice
-#%%else
+%if 0%{?fedora} > 35
+    %bcond_with webservice
+%else
     %bcond_without webservice
-#%%endif
+%endif
 # Now we use upstream pdf
 %bcond_with docs
 %bcond_without vnc
@@ -94,6 +94,7 @@ Patch73:    vb-6.1.16-modal-dialog-parent.patch
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch88:    VirtualBox-lzf.patch
 Patch90:    0001-libs-xpcom-Added-support-for-running-with-Python-3.1.patch
+Patch91:    0002-no_ifndef.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -123,7 +124,7 @@ BuildRequires:  gsoap-devel
 %endif
 BuildRequires:  pam-devel
 BuildRequires:  genisoimage
-BuildRequires:  java-1.8.0-devel
+BuildRequires:  java-11-devel
 %if %{with docs}
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  docbook-dtds
@@ -342,6 +343,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch80 -p1 -b .gcc10
 %patch88 -p1 -b .lzf
 %patch90 -p2 -b .python3.10
+%patch91 -p1 -b .python3.10
 
 
 %build
