@@ -16,11 +16,11 @@
 #global prerel RC1
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
-%if 0%{?fedora} > 35
-    %bcond_with webservice
-%else
-    %bcond_without webservice
-%endif
+#%%if 0%%{?fedora} > 35
+    #%%bcond_with webservice
+#%%else
+%bcond_without webservice
+#%%endif
 # Now we use upstream pdf
 %bcond_with docs
 %bcond_without vnc
@@ -39,7 +39,7 @@
 
 Name:       VirtualBox
 Version:    6.1.32
-Release:    4%{?dist}
+Release:    5%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -124,7 +124,8 @@ BuildRequires:  gsoap-devel
 %endif
 BuildRequires:  pam-devel
 BuildRequires:  genisoimage
-BuildRequires:  java-11-devel
+# we can't use java-11 because "kmk: wsimport: Command not found"
+BuildRequires:  java-1.8.0-devel
 %if %{with docs}
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  docbook-dtds
@@ -900,6 +901,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Feb 21 2022 Sérgio Basto <sergio@serjux.com> - 6.1.32-5
+- Re-enable webservice
+
 * Thu Feb 17 2022 Sérgio Basto <sergio@serjux.com> - 6.1.32-4
 - Re-enable python on Fedora > 34
 
