@@ -26,7 +26,7 @@
 %bcond_without vnc
 %bcond_with legacy_vboxvideo_drv
 
-%if 0%{?fedora} > 27
+%if 0%{?fedora} > 27 || 0%{?rhel} >= 9
     %bcond_with guest_additions
 %else
     %bcond_without guest_additions
@@ -38,8 +38,8 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    6.1.32
-Release:    5%{?dist}
+Version:    6.1.34
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -901,6 +901,12 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Apr 19 2022 Sérgio Basto <sergio@serjux.com> - 6.1.34-1
+- Update VirtualBox to 6.1.34
+- Fix rfbz #6254
+- Don't build virtualbox-guest-additions on EL-9 because is already provided by
+  kmod SIG
+
 * Mon Feb 21 2022 Sérgio Basto <sergio@serjux.com> - 6.1.32-5
 - Re-enable webservice
 
