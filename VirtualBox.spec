@@ -39,7 +39,7 @@
 
 Name:       VirtualBox
 Version:    6.1.34
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -92,6 +92,7 @@ Patch72:    virtualbox-snpritnf-buffer-overflow.patch
 Patch73:    vb-6.1.16-modal-dialog-parent.patch
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
+Patch81:    ffreestanding.patch
 Patch88:    VirtualBox-lzf.patch
 Patch90:    0001-libs-xpcom-Added-support-for-running-with-Python-3.1.patch
 Patch91:    0002-no_ifndef.patch
@@ -342,6 +343,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch72 -p1 -b .snpritnf-buffer-overflow
 %patch73 -p1 -b .modal-dialog-parent
 %patch80 -p1 -b .gcc10
+%patch81 -p1 -b .ffreestanding
 %patch88 -p1 -b .lzf
 %patch90 -p2 -b .python3.10
 %patch91 -p1 -b .python3.10
@@ -901,6 +903,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Apr 25 2022 Sérgio Basto <sergio@serjux.com> - 6.1.34-2
+- Fix for rfbz #6287 (won't launch any VM)
+
 * Tue Apr 19 2022 Sérgio Basto <sergio@serjux.com> - 6.1.34-1
 - Update VirtualBox to 6.1.34
 - Fix rfbz #6254
