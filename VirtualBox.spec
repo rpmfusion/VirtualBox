@@ -39,7 +39,7 @@
 
 Name:       VirtualBox
 Version:    6.1.34
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -68,6 +68,7 @@ Source24:   os_mageia_x3.png
 Source25:   os_mageia_64_x3.png
 Source26:   os_mageia_x4.png
 Source27:   os_mageia_64_x4.png
+
 Patch1:     VirtualBox-6.0.0-noupdate.patch
 Patch2:     VirtualBox-6.1.0-strings.patch
 Patch3:     VirtualBox-6.0.0-default-to-Fedora.patch
@@ -86,7 +87,7 @@ Patch52:    VirtualBox-6.0.10-convert-map-python3.patch
 # a systemd service, this works with both Wayland and Xorg based sessions
 Patch60:    VirtualBox-5.2.10-xclient.patch
 # from OpenSuse
-Patch70:    vbox-python-detection.diff
+Patch70:    vbox-python-selection.patch
 Patch71:    fixes_for_Qt5.11to15.patch
 Patch72:    virtualbox-snpritnf-buffer-overflow.patch
 Patch73:    vb-6.1.16-modal-dialog-parent.patch
@@ -96,10 +97,11 @@ Patch81:    ffreestanding.patch
 Patch88:    VirtualBox-lzf.patch
 Patch90:    0001-libs-xpcom-Added-support-for-running-with-Python-3.1.patch
 Patch91:    0002-no_ifndef.patch
+Patch92:    vbox-linux-5.18.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3093
-BuildRequires:  SDL-devel
+BuildRequires:  pkgconfig(sdl)
 BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
@@ -347,6 +349,7 @@ rm -r src/libs/zlib-1.2.*/
 %patch88 -p1 -b .lzf
 %patch90 -p2 -b .python3.10
 %patch91 -p1 -b .python3.10
+%patch92 -p0 -b .linux-5.18
 
 
 %build
@@ -903,6 +906,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue May 31 2022 Sérgio Basto <sergio@serjux.com> - 6.1.34-3
+- Initial fix Windows 10 VM crashes with Linux 5.18 kernel
+
 * Mon Apr 25 2022 Sérgio Basto <sergio@serjux.com> - 6.1.34-2
 - Fix for rfbz #6287 (won't launch any VM)
 
