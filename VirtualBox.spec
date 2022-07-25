@@ -38,8 +38,8 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    6.1.34
-Release:    5%{?dist}
+Version:    6.1.36
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -78,7 +78,7 @@ Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
 # from ArchLinux
 Patch40:    007-python2-path.patch
 # from Mageia
-Patch50:    VirtualBox-6.1.28-add-Mageia-support.patch
+Patch50:    VirtualBox-6.1.36-add-Mageia-support.patch
 Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
 Patch52:    VirtualBox-6.0.10-convert-map-python3.patch
 # from Fedora
@@ -91,12 +91,10 @@ Patch70:    vbox-python-selection.patch
 Patch71:    fixes_for_Qt5.11to15.patch
 Patch72:    virtualbox-snpritnf-buffer-overflow.patch
 Patch73:    vb-6.1.16-modal-dialog-parent.patch
-Patch74:    fixes_for_kernel_5.18.patch
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch88:    VirtualBox-lzf.patch
-Patch90:    0001-libs-xpcom-Added-support-for-running-with-Python-3.1.patch
-Patch91:    0002-no_ifndef.patch
+Patch90:    VirtualBox-python3.11.patch
 # Force the build of xpcom with -std=gnu++17, mandated by Python 3.11
 Patch92:    VirtualBox-6.1.34-build-xpcom18a4-with-c++17.patch
 
@@ -345,11 +343,9 @@ rm -r src/libs/zlib-1.2.*/
 %patch71 -p1 -b .qt
 %patch72 -p1 -b .snpritnf-buffer-overflow
 %patch73 -p1 -b .modal-dialog-parent
-%patch74 -p1 -b .linux-5.18
 %patch80 -p1 -b .gcc10
 %patch88 -p1 -b .lzf
-%patch90 -p2 -b .python3.10
-%patch91 -p1 -b .python3.10
+%patch90 -p1 -b .python3.11
 %patch92 -p1 -b .c++17
 
 
@@ -907,6 +903,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Jul 25 2022 Sérgio Basto <sergio@serjux.com> - 6.1.36-1
+- Update VirtualBox to 6.1.36
+
 * Sat Jun 25 2022 Robert-André Mauchin <zebob.m@gmail.com> - 6.1.34-5
 - Rebuilt for Python 3.11
 
