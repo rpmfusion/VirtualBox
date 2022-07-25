@@ -346,7 +346,9 @@ rm -r src/libs/zlib-1.2.*/
 %patch80 -p1 -b .gcc10
 %patch88 -p1 -b .lzf
 %patch90 -p1 -b .python3.11
+%if 0%{?fedora} >= 36 || 0%{?rhel} >= 9
 %patch92 -p1 -b .c++17
+%endif
 
 
 %build
