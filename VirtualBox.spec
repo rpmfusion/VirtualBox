@@ -38,7 +38,7 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    6.1.38
+Version:    6.1.40
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -905,6 +905,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Oct 12 2022 Sérgio Basto <sergio@serjux.com> - 6.1.40-1
+- Update VirtualBox to 6.1.40
+
 * Thu Sep 01 2022 Sérgio Basto <sergio@serjux.com> - 6.1.38-1
 - Update VirtualBox to 6.1.38
 
