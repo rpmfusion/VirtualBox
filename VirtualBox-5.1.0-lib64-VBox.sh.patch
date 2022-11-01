@@ -1,0 +1,14 @@
+--- VirtualBox-7.0.2/src/VBox/Installer/linux/VBox.sh.revert-VBox.sh	2022-10-31 22:37:48.783785457 +0000
++++ VirtualBox-7.0.2/src/VBox/Installer/linux/VBox.sh	2022-11-01 14:24:29.579809075 +0000
+@@ -51,7 +51,10 @@ MY_DIR="${TARGET%/[!/]*}"
+ #     done
+ # )
+ 
+-if test -f /usr/lib/virtualbox/VirtualBox &&
++if test -f /usr/lib64/virtualbox/VirtualBox &&
++    test -x /usr/lib64/virtualbox/VirtualBox; then
++    INSTALL_DIR=/usr/lib64/virtualbox
++elif test -f /usr/lib/virtualbox/VirtualBox &&
+     test -x /usr/lib/virtualbox/VirtualBox; then
+     INSTALL_DIR=/usr/lib/virtualbox
+ elif test -f "${MY_DIR}/VirtualBox" && test -x "${MY_DIR}/VirtualBox"; then

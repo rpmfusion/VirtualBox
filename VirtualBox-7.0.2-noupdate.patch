@@ -1,0 +1,9 @@
+--- VirtualBox-7.0.2/src/VBox/Frontends/VirtualBox/src/networking/UIUpdateDefs.cpp.noupdates	2022-10-19 19:28:35.000000000 +0100
++++ VirtualBox-7.0.2/src/VBox/Frontends/VirtualBox/src/networking/UIUpdateDefs.cpp	2022-11-01 19:26:21.790765337 +0000
+@@ -400,5 +400,5 @@ UpdatePeriodType VBoxUpdateData::gatherS
+         enmType = (UpdatePeriodType)(enmType + 1);
+     }
+ 
+-    return UpdatePeriodType_1Month;
++    return UpdatePeriodType_Never;
+ }

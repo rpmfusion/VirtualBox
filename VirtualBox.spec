@@ -1,5 +1,3 @@
-%global __provides_exclude_from %{_libdir}/VBoxGuestAdditions
-
 # Standard compiler flags, without:
 # -Wall        -- VirtualBox takes care of reasonable warnings very well
 # -m32, -m64   -- 32bit code is built besides 64bit on x86_64
@@ -32,13 +30,22 @@
     %bcond_without guest_additions
 %endif
 
-# Since version 6.1.28, VBox should not have the python2 dependency
-%bcond_with python2
+%if 0%{?fedora}
+    %bcond_without system_libtpms
+%else
+    %bcond_with system_libtpms
+%endif
+
+%if 0%{?fedora} || 0%{?rhel} > 8
+    %bcond_without dxvk_native
+%else
+    %bcond_with dxvk_native
+%endif
 
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    6.1.40
+Version:    7.0.2
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -69,28 +76,28 @@ Source25:   os_mageia_64_x3.png
 Source26:   os_mageia_x4.png
 Source27:   os_mageia_64_x4.png
 
-Patch1:     VirtualBox-6.0.0-noupdate.patch
+Patch1:     VirtualBox-7.0.2-noupdate.patch
 Patch2:     VirtualBox-6.1.0-strings.patch
-Patch3:     VirtualBox-6.0.0-default-to-Fedora.patch
+Patch3:     VirtualBox-7.0.2-default-to-Fedora.patch
+Patch4:     VirtualBox-5.1.0-lib64-VBox.sh.patch
 #Patch27:    VirtualBox-gcc.patch
 #to revert on EL7
 Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
+#from Debian
+Patch30:    system-libs_cutted.patch
+Patch31:    fix-build.patch
 # from ArchLinux
 Patch40:    007-python2-path.patch
 # from Mageia
-Patch50:    VirtualBox-6.1.36-add-Mageia-support.patch
-Patch51:    VirtualBox-5.1.0-revert-VBox.sh.patch
-Patch52:    VirtualBox-6.0.10-convert-map-python3.patch
+Patch50:    VirtualBox-7.0.2-update-Mageia-support.patch
+Patch52:    VirtualBox-6.1.14-fix-missing-includes-with-qt-5.15.patch
+Patch53:    VirtualBox-6.0.10-remove-duplicated-define.patch
+Patch54:    VirtualBox-7.0.2-ExtPacks-VBoxDTrace-no-publisher-in-version.patch
 # from Fedora
-# Do not show an error dialog when not running under vbox
-# Do not start VBoxClient --vmsvga, we run VBoxClient --vmsvga as
-# a systemd service, this works with both Wayland and Xorg based sessions
-Patch60:    VirtualBox-5.2.10-xclient.patch
+Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 # from OpenSuse
-Patch70:    vbox-python-selection.patch
-Patch71:    fixes_for_Qt5.11to15.patch
+#Patch70:    vbox-python-selection.patch
 Patch72:    virtualbox-snpritnf-buffer-overflow.patch
-Patch73:    vb-6.1.16-modal-dialog-parent.patch
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch88:    VirtualBox-lzf.patch
@@ -106,21 +113,25 @@ BuildRequires:  libcurl-devel
 BuildRequires:  iasl
 BuildRequires:  libxslt-devel
 BuildRequires:  libIDL-devel
+BuildRequires:  nasm
 BuildRequires:  yasm
 BuildRequires:  alsa-lib-devel
 BuildRequires:  opus-devel
 BuildRequires:  pulseaudio-libs-devel
-%if %{with python2}
-BuildRequires:  python2-devel
-%endif
 %if %{with python3}
 BuildRequires:  python%{python3_pkgversion}-devel
 %endif
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-qtx11extras-devel
-BuildRequires:  qt5-linguist
+BuildRequires:  pkgconfig(Qt5Core)
+BuildRequires:  pkgconfig(Qt5Gui)
+BuildRequires:  pkgconfig(Qt5Help)
+BuildRequires:  pkgconfig(Qt5OpenGL)
+BuildRequires:  pkgconfig(Qt5PrintSupport)
+BuildRequires:  pkgconfig(Qt5Widgets)
+BuildRequires:  pkgconfig(Qt5X11Extras)
+BuildRequires:  pkgconfig(Qt5Xml)
+
 %if %{with webservice}
 BuildRequires:  gsoap-devel
 %endif
@@ -181,6 +192,15 @@ BuildRequires:  mesa-libGLU-devel
 %if %{with vnc}
 BuildRequires:  libvncserver-devel
 %endif
+%if %{with system_libtpms}
+BuildRequires:	pkgconfig(libtpms)
+%endif
+BuildRequires:	pkgconfig(ogg)
+BuildRequires:	pkgconfig(vorbis)
+%if %{with dxvk_native}
+BuildRequires:	glslang
+#BuildRequires:  dxvk-native-devel
+%endif
 
 %{?systemd_requires}
 BuildRequires: systemd
@@ -205,9 +225,6 @@ Group:      Development/Tools
 Requires:   %{name}-kmod = %{version}
 Requires:   hicolor-icon-theme
 Provides:   %{name}-kmod-common = %{version}-%{release}
-%if ! %{with python2}
-Obsoletes:   python2-%{name}%{?isa} < %{version}-%{release}
-%endif
 %if ! %{with python3}
 Obsoletes:   python%{python3_pkgversion}-%{name}%{?isa} < %{version}-%{release}
 %endif
@@ -229,29 +246,12 @@ webservice GUI part for %{name}.
 Summary:    %{name} SDK
 Group:      Development/Libraries
 Requires:   %{name}-server%{?isa} = %{version}-%{release}
-%if %{with python2}
-Requires:   python2-%{name}%{?isa} = %{version}-%{release}
-%endif
 %if %{with python3}
 Requires:   python%{python3_pkgversion}-%{name}%{?isa} = %{version}-%{release}
 %endif
 
 %description devel
 %{name} Software Development Kit.
-
-
-%package -n python2-%{name}
-Summary:    Python bindings for %{name}
-Group:      Development/Libraries
-Requires:   %{name}-server%{?_isa} = %{version}-%{release}
-%{?python_provide:%python_provide python2-%{name}}
-# Remove before F30
-Provides:       python-VirtualBox = %{version}-%{release}
-Provides:       python-VirtualBox%{?_isa} = %{version}-%{release}
-Obsoletes:      python-VirtualBox < %{version}-%{release}
-
-%description -n python2-%{name}
-Python XPCOM bindings to %{name}.
 
 
 %package -n python%{python3_pkgversion}-%{name}
@@ -309,11 +309,14 @@ find -name '*.py[co]' -delete
 rm -r src/VBox/Additions/WINNT
 rm -r src/VBox/Additions/os2
 rm -r kBuild/
+#mv tools/kBuildUnits .
 rm -r tools/
+#mkdir tools
+#mv kBuildUnits tools/
+
 # Remove bundle X11 sources and some lib sources, before patching.
 rm -r src/VBox/Additions/x11/x11include/
-rm -r src/VBox/Additions/x11/x11stubs/
-rm -r src/VBox/Additions/3D/mesa/mesa-17.3.9/
+rm -r src/VBox/Additions/3D/mesa/mesa-21.3.8/
 # wglext.h has typedefs for Windows-specific extensions
 #rm include/VBox/HostServices/wglext.h
 # src/VBox/GuestHost/OpenGL/include/GL/glext.h have VBOX definitions
@@ -322,27 +325,39 @@ rm -r src/VBox/Additions/3D/mesa/mesa-17.3.9/
 rm -r src/libs/liblzf-3.*/
 rm -r src/libs/libpng-1.6.*/
 rm -r src/libs/libxml2-2.9.*/
-rm -r src/libs/openssl-1.*/
+rm -r src/libs/openssl-3.*/
 rm -r src/libs/zlib-1.2.*/
+rm -r src/libs/curl-7.*/
+rm -r src/libs/libvorbis-1.3.*/
+rm -r src/libs/libogg-1.3.*/
+%if %{with system_libtpms}
+rm -r src/libs/libtpms-0.9.0/
+%endif
+%if %{with dxvk_native}
+#rm -r src/libs/dxvk-native-1.9.*/
+%endif
+#rm -r src/libs/softfloat-3e/
 
 %patch1 -p1 -b .noupdates
 %patch2 -p1 -b .strings
 %patch3 -p1 -b .default_os_fedora
+%patch4 -p1 -b .lib64-VBox.sh
 #patch27 -p1 -b .gcc
 %if 0%{?rhel} && 0%{?rhel} < 8
 %patch29 -p2 -R -b .gsoap3
 %endif
+%patch30 -p1 -b .use_vorbis_and_ogg_system
+%patch31 -p1 -b .fix_build_noneed_kBuildUnits
 %if %{with python3}
 %patch40 -p1 -b .python2_path
-%patch52 -p1 -b .convert-map-python3
 %endif
 %patch50 -p1 -b .mageia-support
-%patch51 -p1 -b .revert-VBox.sh
+%patch52 -p1 -b .qt
+%patch53 -p1 -b .qt2
+%patch54 -p1 -b .dtrace
 %patch60 -p1 -b .xclient
-%patch70 -p1 -b .python-detection
-%patch71 -p1 -b .qt
+#patch70 -p1 -b .python-detection
 %patch72 -p1 -b .snpritnf-buffer-overflow
-%patch73 -p1 -b .modal-dialog-parent
 %patch80 -p1 -b .gcc10
 %patch88 -p1 -b .lzf
 %patch90 -p1 -b .python3.11
@@ -362,7 +377,7 @@ rm -r src/libs/zlib-1.2.*/
 %if !%{with docs}
   --disable-docs \
 %endif
-%if !%{with python2} && !%{with python3}
+%if !%{with python3}
   --disable-python \
 %endif
 
@@ -408,15 +423,39 @@ kmk %{_smp_mflags}    \
     SDK_VBOX_OPENSSL_INCS=""                                   \
     SDK_VBOX_OPENSSL_LIBS="ssl crypto"                         \
     SDK_VBOX_ZLIB_INCS=""                                      \
+%{?with_system_libtpms:   SDK_VBOX_LIBTPMS_INCS="/usr/include/libtpms"}  \
+    SDK_VBOX_VORBIS_INCS="/usr/include/vorbis"                 \
+    SDK_VBOX_OGG_INCS="/usr/include/ogg"                       \
+%{!?with_dxvk_native: VBOX_WITH_DXVK= }             \
 %{?with_docs:   VBOX_WITH_DOCS=1 }                             \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java  \
     VBOX_WITH_UPDATE_REQUEST=               \
     VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
+#    VBOX_WITH_CLOUD_NET:=
 #    VBOX_WITH_TESTCASES= \
 #    VBOX_WITH_VALIDATIONKIT= \
 #    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
+
+
+# build fails with system dxvk_native
+#{?with_dxvk_native: SDK_VBOX_DXVK_INCS="/usr/include/dxvk-native/native/directx /usr/include/dxvk-native/native/windows"}             \
+#
+# In file included from /usr/include/dxvk-native/native/windows/windows.h:3,
+#from /usr/include/dxvk-native/native/directx/d3d11_1.h:12,
+#from /builddir/build/BUILD/VirtualBox-7.0.2/src/VBox/Devices/Graphics/DevVGA-SVGA3d-win-dx.cpp:58:
+#/usr/include/dxvk-native/native/windows/windows_base.h:110:10: warning: ISO C++ prohibits anonymous structs [-Wpedantic]
+#110 |   struct {
+#|          ^
+#In file included from /builddir/build/BUILD/VirtualBox-7.0.2/src/VBox/Devices/Graphics/DevVGA.h:68,
+#from /builddir/build/BUILD/VirtualBox-7.0.2/src/VBox/Devices/Graphics/DevVGA-SVGA3d-win-dx.cpp:47:
+#/builddir/build/BUILD/VirtualBox-7.0.2/src/VBox/Devices/Graphics/DevVGA-SVGA.h:64:15: error: expected unqualified-id before numeric constant
+#64 | # define TRUE 1
+#|               ^
+#/usr/include/dxvk-native/native/windows/windows_base.h:161:16: note: in expansion of macro 'TRUE'
+#161 | constexpr BOOL TRUE  = 1;
+#|                ^~~~
 
 # doc/manual/fr_FR/ missing man_VBoxManage-debugvm.xml and man_VBoxManage-extpack.xml
 #    VBOX_WITH_DOCS_TRANSLATIONS=1 \
@@ -462,8 +501,6 @@ install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox \
 
 # Binaries
 install -p -m 0755 obj/bin/VBox.sh %{buildroot}%{_bindir}/VBox
-install -p -m 0755 -t %{buildroot}%{_bindir} \
-    obj/bin/VBoxTunctl
 
 # Executables
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
@@ -473,7 +510,6 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/VBoxNetNAT \
     obj/bin/VBoxNetAdpCtl   \
     obj/bin/VBoxVolInfo \
-    obj/bin/VBoxSDL     \
     obj/bin/SUPInstall \
     obj/bin/SUPLoggerCtl \
     obj/bin/SUPUninstall \
@@ -487,7 +523,7 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/VBoxXPCOMIPCD   \
     obj/bin/VBoxSysInfo.sh  \
     obj/bin/vboxweb-service.sh \
-%if %{with python2} || %{with python3}
+%if %{with python3}
     obj/bin/vboxshell.py    \
 %endif
     obj/bin/vbox-img    \
@@ -537,18 +573,13 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
     obj/bin/nls/*
 
 # Python
-%if %{with python2} || %{with python3}
+%if %{with python3}
 pushd obj/bin/sdk/installer
 export VBOX_INSTALL_PATH=%{_libdir}/virtualbox
-%if %{with python2}
-    %{__python2} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
-%endif
-%if %{with python3}
-    %{__python3} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
-    if [ -x /usr/bin/pathfix.py ]; then
-        pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}${VBOX_INSTALL_PATH}/vboxshell.py
-    fi
-%endif
+%{__python3} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
+if [ -x /usr/bin/pathfix.py ]; then
+    pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}${VBOX_INSTALL_PATH}/vboxshell.py
+fi
 popd
 %endif
 
@@ -622,7 +653,6 @@ install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_unitdir}/vboxclient.service
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
 cp -al obj/bin/src/vbox* obj/bin/additions/src/vbox* %{name}-kmod-%{version}
-#rm -r %{name}-kmod-%{version}/vboxvideo/
 install -d %{buildroot}%{_datadir}/%{name}-kmod-%{version}
 tar --use-compress-program xz -cf %{buildroot}%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.xz \
     %{name}-kmod-%{version}
@@ -632,10 +662,6 @@ install -m 0644 -D %{SOURCE10} \
     %{buildroot}%{_unitdir}/vboxweb.service
 %endif
 
-# Installation root configuration
-install -d %{buildroot}%{_sysconfdir}/vbox
-echo 'INSTALL_DIR=%{_libdir}/virtualbox' > %{buildroot}%{_sysconfdir}/vbox/vbox.cfg
-
 # Install udev rules
 install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh %{buildroot}%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_udevrulesdir}/60-vboxdrv.rules
@@ -643,7 +669,6 @@ install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_udevrulesdir}/60-vboxdrv.rules
 # Install service to load server modules
 install -p -m 0644 -D %{SOURCE4} %{buildroot}%{_unitdir}/vboxdrv.service
 install -p -m 0644 -D %{SOURCE9} %{buildroot}%{_presetdir}/96-vboxhost.preset
-
 
 # Menu entry
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
@@ -660,12 +685,6 @@ install -p -m 0644 -D %{SOURCE2} %{buildroot}%{_metainfodir}/%{name}.appdata.xml
 #fi
 #set_selinux_permissions /usr/lib/virtualbox /usr/share/virtualbox
 # vboxautostart-service
-
-install -d %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps
-install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox/rdesktop-vrdp-keymaps obj/bin/rdesktop-vrdp-keymaps/*
-install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox obj/bin/rdesktop-vrdp.tar.gz
-install -p -m 0755 -t %{buildroot}%{_bindir} obj/bin/rdesktop-vrdp
-
 
 %pre server
 # Group for USB devices
@@ -787,21 +806,16 @@ getent passwd vboxadd >/dev/null || \
 %{_bindir}/vboxmanage
 %{_bindir}/VBoxSDL
 %{_bindir}/vboxsdl
-%{_bindir}/VBoxTunctl
 %{_bindir}/VBoxVRDP
 %{_bindir}/VirtualBoxVM
 %{_bindir}/virtualboxvm
 %{_bindir}/vbox-img
 %{_bindir}/vboximg-mount
-%{_bindir}/rdesktop-vrdp
 %dir %{_libdir}/virtualbox
 %{_libdir}/virtualbox/*.[^p]*
 %exclude %{_libdir}/virtualbox/VBoxDbg.so
 %exclude %{_libdir}/virtualbox/UICommon.so
 %exclude %{_libdir}/virtualbox/VirtualBoxVM.so
-%if %{with python2}
-%exclude %{_libdir}/virtualbox/VBoxPython2_7.so
-%endif
 %if %{with python3}
 %exclude %{_libdir}/virtualbox/VBoxPython3*.so
 %endif
@@ -821,18 +835,14 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/VBoxDTrace
 %{_libdir}/virtualbox/vbox-img
 %{_libdir}/virtualbox/vboximg-mount
-%{_libdir}/virtualbox/rdesktop-vrdp-keymaps
 # This permissions have to be here, before generator of debuginfo need
 # permissions to read this files
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetNAT
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxVolInfo
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxHeadless
-%attr(4511,root,root) %{_libdir}/virtualbox/VBoxSDL
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
 %attr(4511,root,root) %{_libdir}/virtualbox/VirtualBoxVM
-%dir %{_sysconfdir}/vbox
-%config %{_sysconfdir}/vbox/vbox.cfg
 %{_udevrulesdir}/60-vboxdrv.rules
 %{_unitdir}/vboxdrv.service
 %{_presetdir}/96-vboxhost.preset
@@ -866,13 +876,6 @@ getent passwd vboxadd >/dev/null || \
 %files devel
 %{_libdir}/virtualbox/sdk
 
-%if %{with python2}
-%files -n python2-%{name}
-%{_libdir}/virtualbox/*.py*
-%{python2_sitelib}/vboxapi*
-%{_libdir}/virtualbox/VBoxPython2_7.so
-%endif
-
 %if %{with python3}
 %files -n python%{python3_pkgversion}-%{name}
 %{_libdir}/virtualbox/*.py*
@@ -905,6 +908,19 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Oct 26 2022 Sérgio Basto <sergio@serjux.com> - 7.0.2-1
+- Update to 7.0.2
+- Drop python2 support
+- Based on Mageia and after on Debian packages
+- Drop VirtualBox-6.0.10-convert-map-python3.patch and vb-6.1.16-modal-dialog-parent.patch
+- Refresh default-to-Fedora, noupdate.patch, xclient.patch, build-xpcom18a4-with-c++17.patch and python3.11.patch
+- Replace fixes_for_Qt5.11to15.patch with remove-duplicated-define.patch, update-Mageia-support.patch and fix-missing-includes-with-qt-5.15.patch
+- Add ExtPacks-VBoxDTrace-no-publisher-in-version.patch from Mageia
+- Add partial system-libs.patch and fix-build.patch from Debian (libvorbis and libogg system support)
+- Add build conditionals for system_libtpms and dxvk-native
+- Add VirtualBox-5.1.0-lib64-VBox.sh.patch and finally drop /etc/vbox as upstream did in 5.1.0
+- Add BR: nasm (to fix nasm: not found message)
+
 * Wed Oct 12 2022 Sérgio Basto <sergio@serjux.com> - 6.1.40-1
 - Update VirtualBox to 6.1.40
 

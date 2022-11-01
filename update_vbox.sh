@@ -1,4 +1,4 @@
-VERSION=6.1.40
+VERSION=7.0.2
 REL=1
 RAWHIDE=38
 REPOS="f37 f36 f35 el9 el8 el7"
@@ -24,7 +24,7 @@ rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
 fi
 echo Press enter scratch-build or n to skip ; read dummy;
     if [[ "$dummy" != "n" ]]; then
-        rfpkg scratch-build --srpm --nowait
+        rfpkg scratch-build --srpm
     fi
 echo Press enter to build on corp -build or n to skip ; read dummy;
     if [[ "$dummy" != "n" ]]; then
@@ -47,7 +47,7 @@ echo STAGE 2
 for repo in $REPOS ; do
 echo Press enter to build on branch $repo or n to skip; read dummy;
 if [[ "$dummy" != "n" ]]; then
-git checkout $repo && git merge master && git push && rfpkg build --nowait; git checkout master
+git checkout $repo && git merge master && git push && rfpkg build; git checkout master
 fi
 done
 fi

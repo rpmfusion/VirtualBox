@@ -1,6 +1,15 @@
---- ./src/VBox/Additions/x11/Installer/98vboxadd-xclient.orig	2020-06-06 06:20:12.079227656 +0100
-+++ ./src/VBox/Additions/x11/Installer/98vboxadd-xclient	2020-06-06 06:26:55.886940895 +0100
-@@ -21,18 +21,11 @@ for i in $HOME/.vboxclient-*.pid; do
+# Do not show an error dialog when not running under vbox
+# Do not start VBoxClient --vmsvga, we run VBoxClient --vmsvga as
+# a systemd service, this works with both Wayland and Xorg based sessions
+
+---
+ src/VBox/Additions/x11/Installer/98vboxadd-xclient |   13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
+
+diff -Nurp VirtualBox-7.0.2.orig/src/VBox/Additions/x11/Installer/98vboxadd-xclient VirtualBox-7.0.2/src/VBox/Additions/x11/Installer/98vboxadd-xclient
+--- VirtualBox-7.0.2.orig/src/VBox/Additions/x11/Installer/98vboxadd-xclient	2022-10-19 21:20:45.000000000 +0300
++++ VirtualBox-7.0.2/src/VBox/Additions/x11/Installer/98vboxadd-xclient	2022-10-22 12:05:28.770187860 +0300
+@@ -31,18 +31,11 @@ for i in $HOME/.vboxclient-*.pid; do
      test -w $i || rm -f $i
  done
  
@@ -20,5 +29,6 @@
    /usr/bin/VBoxClient --checkhostversion
    /usr/bin/VBoxClient --seamless
    /usr/bin/VBoxClient --draganddrop
--  /usr/bin/VBoxClient --vmsvga  # In case VMSVGA emulation is enabled
+-  /usr/bin/VBoxClient --vmsvga-session # In case VMSVGA emulation is enabled
  fi
+

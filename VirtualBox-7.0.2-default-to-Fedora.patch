@@ -1,0 +1,47 @@
+Default to Linux and Fedora.
+
+Signed-off-by: Thomas Backlund <tmb@Fedora.org>
+
+---
+ src/VBox/Frontends/VirtualBox/src/settings/editors/UINameAndSystemEditor.cpp |   14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff -Nurp VirtualBox-7.0.2.orig/src/VBox/Frontends/VirtualBox/src/settings/editors/UINameAndSystemEditor.cpp VirtualBox-7.0.2/src/VBox/Frontends/VirtualBox/src/settings/editors/UINameAndSystemEditor.cpp
+--- VirtualBox-7.0.2.orig/src/VBox/Frontends/VirtualBox/src/settings/editors/UINameAndSystemEditor.cpp	2022-10-19 21:28:39.000000000 +0300
++++ VirtualBox-7.0.2/src/VBox/Frontends/VirtualBox/src/settings/editors/UINameAndSystemEditor.cpp	2022-10-22 13:32:01.577033153 +0300
+@@ -397,15 +397,15 @@ void UINameAndSystemEditor::sltFamilyCha
+         if (iIndexWin10 != -1)
+             m_pComboType->setCurrentIndex(iIndexWin10);
+     }
+-    /* Or select Oracle Linux item for Linux family as default: */
++    /* Or select Fedora Linux item for Linux family as default: */
+     else if (m_strFamilyId == "Linux")
+     {
+-        QString strDefaultID = "Oracle";
++        QString strDefaultID = "Fedora";
+         if (ARCH_BITS == 64)
+             strDefaultID += "_64";
+-        const int iIndexUbuntu = m_pComboType->findData(strDefaultID, TypeID);
+-        if (iIndexUbuntu != -1)
+-            m_pComboType->setCurrentIndex(iIndexUbuntu);
++        const int iIndexFedora = m_pComboType->findData(strDefaultID, TypeID);
++        if (iIndexFedora != -1)
++            m_pComboType->setCurrentIndex(iIndexFedora);
+     }
+     /* Else simply select the first one present: */
+     else
+@@ -665,6 +665,10 @@ void UINameAndSystemEditor::prepareFamil
+ 
+     /* Choose the 1st item to be the current: */
+     m_pComboFamily->setCurrentIndex(0);
++    /* Default to Linux */
++    const int liIndex = m_pComboFamily->findData("Linux", TypeID);
++    if (liIndex != -1)
++        m_pComboFamily->setCurrentIndex(liIndex);
+     /* And update the linked widgets accordingly: */
+     sltFamilyChanged(m_pComboFamily->currentIndex());
+ }
+
+Default to Linux and Fedora.
+
+

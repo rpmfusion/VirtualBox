@@ -1,4 +1,3 @@
-Patch 1: Fix Detection of GCC10 (is >= 4.4 )
 Patch 2: Fix
 
 /builddir/build/BUILD/VirtualBox-6.1.4/src/VBox/Debugger/DBGCDumpImage.cpp: In function 'const char* dbgcMachoCpuType(uint32_t, uint32_t)':
@@ -9,32 +8,14 @@ Patch 2: Fix
   471 |         case CPU_TYPE_ANY:          return "CPU_TYPE_ANY";
       |              ^~~~~~~~~~~~
 
---- ./Makefile.kmk.orig	2020-02-20 03:40:14.049126175 +0000
-+++ ./Makefile.kmk	2020-02-20 03:40:41.843981024 +0000
-@@ -188,15 +188,6 @@ ifeq ($(KBUILD_TARGET),darwin)
-  					"$(if $(VBOX_WITH_HARDENING),/Applications/VirtualBox.app/Contents/Frameworks,@rpath)/$(qtmod).framework/Versions/5/$(qtmod)" ) ) \
-  			"$(2)",) # HACK ALERT! Using $(source_type_prefix) to detect EXEC_SOURCES.
- else # win x11
-- if1of ($(KBUILD_TARGET), linux solaris)
--  ifndef VBOX_ONLY_BUILD
--   ifneq ($(VBOX_GCC_VERSION_CXX),)
--    ifeq ($(int-ge $(VBOX_GCC_VERSION_CXX),40400),)
--     $(error gcc >= 4.4 required when compiling against Qt5!)
--    endif
--   endif
--  endif
-- endif
-  if defined(VBOX_WITH_ORACLE_QT) || defined(VBOX_WITH_QT_PAYLOAD)
-   include $(KBUILD_PATH)/units/qt5.kmk
-   ifeq ($(KBUILD_TARGET),win)
---- VirtualBox-6.1.10.orig/src/VBox/Debugger/DBGCDumpImage.cpp
-+++ VirtualBox-6.1.10/src/VBox/Debugger/DBGCDumpImage.cpp
-@@ -468,7 +468,7 @@ static const char *dbgcMachoCpuType(int3
+--- VirtualBox-6.1.6/src/VBox/Debugger/DBGCDumpImage.cpp.orig	2020-04-09 20:37:26.000000000 +0300
++++ VirtualBox-6.1.6/src/VBox/Debugger/DBGCDumpImage.cpp	2020-05-08 01:32:01.400447560 +0300
+@@ -468,7 +468,7 @@ static const char *dbgcMachoCpuType(uint
  {
      switch (iType)
      {
 -        case CPU_TYPE_ANY:          return "CPU_TYPE_ANY";
-+        default:		    return "CPU_TYPE_ANY";
++        default:                    return "CPU_TYPE_ANY";
          case CPU_TYPE_VAX:          return "VAX";
          case CPU_TYPE_MC680x0:      return "MC680x0";
          case CPU_TYPE_X86:          return "X86";
