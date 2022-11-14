@@ -623,11 +623,11 @@ install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
 
 # Guest-additions tools
 install -m 0755 -t %{buildroot}%{_sbindir}   \
-    obj/bin/additions/VBoxService       \
+    obj/bin/additions/VBoxService            \
     obj/bin/additions/mount.vboxsf
 install -m 0755 -t %{buildroot}%{_bindir}    \
     obj/bin/additions/VBoxDRMClient          \
-    obj/bin/additions/VBoxClient        \
+    obj/bin/additions/VBoxClient             \
     obj/bin/additions/VBoxControl
 
 # Guest libraries
@@ -899,9 +899,9 @@ getent passwd vboxadd >/dev/null || \
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %{_unitdir}/vboxclient.service
-%{_udevrulesdir}/60-vboxguest.rules
 %{_unitdir}/vboxservice.service
 %{_presetdir}/96-vboxguest.preset
+%{_udevrulesdir}/60-vboxguest.rules
 %endif
 
 %files kmodsrc
