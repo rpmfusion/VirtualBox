@@ -45,7 +45,7 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    7.0.2
+Version:    7.0.4
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -84,8 +84,6 @@ Patch4:     VirtualBox-5.1.0-lib64-VBox.sh.patch
 #to revert on EL7
 Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
 #from Debian
-Patch30:    system-libs_cutted.patch
-Patch31:    fix-build.patch
 # from ArchLinux
 Patch40:    007-python2-path.patch
 # from Mageia
@@ -346,8 +344,6 @@ rm -r src/libs/libtpms-0.9.0/
 %if 0%{?rhel} && 0%{?rhel} < 8
 %patch29 -p2 -R -b .gsoap3
 %endif
-%patch30 -p1 -b .use_vorbis_and_ogg_system
-%patch31 -p1 -b .fix_build_noneed_kBuildUnits
 %if %{with python3}
 %patch40 -p1 -b .python2_path
 %endif
@@ -380,6 +376,7 @@ rm -r src/libs/libtpms-0.9.0/
 %if !%{with python3}
   --disable-python \
 %endif
+    --enable-libogg --enable-libvorbis
 
 %if !%{with docs}
 cp %{SOURCE1} UserManual.pdf
@@ -908,6 +905,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Nov 19 2022 Sérgio Basto <sergio@serjux.com> - 7.0.4-1
+- Update VirtualBox to 7.0.4
+- Drop system-libs.patch and fix-build.patch already upstreamed
+
 * Wed Oct 26 2022 Sérgio Basto <sergio@serjux.com> - 7.0.2-1
 - Update to 7.0.2
 - Drop python2 support
