@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    7.0.4
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -700,7 +700,7 @@ fi
 %systemd_preun vboxdrv.service
 
 %postun server
-%systemd_postun_with_restart vboxdrv.service
+%systemd_postun vboxdrv.service
 
 %triggerun -- VirtualBox-server < 0:6.1.10-4
 /usr/bin/systemctl --no-reload preset vboxdrv.service || :
@@ -905,6 +905,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Dec 14 2022 Sérgio Basto <sergio@serjux.com> - 7.0.4-2
+- we should restart vboxdrv just after akmods builds
+
 * Sat Nov 19 2022 Sérgio Basto <sergio@serjux.com> - 7.0.4-1
 - Update VirtualBox to 7.0.4
 - Drop system-libs.patch and fix-build.patch already upstreamed
