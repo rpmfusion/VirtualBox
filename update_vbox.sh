@@ -1,7 +1,7 @@
-VERSION=7.0.4
+VERSION=7.0.6
 REL=1
-RAWHIDE=38
-REPOS="f37 f36 f35 el9 el8 el7"
+#RAWHIDE=38
+REPOS="f37 f36 f35 el9 el8"
 if [ -z "$1" ]
 then
       stage=0
@@ -28,7 +28,7 @@ echo Press enter scratch-build or n to skip ; read dummy;
     fi
 echo Press enter to build on corp -build or n to skip ; read dummy;
     if [[ "$dummy" != "n" ]]; then
-        rfpkg srpm && copr-cli build sergiomb/vboxfor23 VirtualBox-$VERSION-$REL.fc$RAWHIDE.src.rpm
+        rfpkg copr-build sergiomb/vboxfor23
     fi
 fi
 
