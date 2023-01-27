@@ -81,6 +81,8 @@ Patch2:     VirtualBox-6.1.0-strings.patch
 Patch3:     VirtualBox-7.0.2-default-to-Fedora.patch
 Patch4:     VirtualBox-5.1.0-lib64-VBox.sh.patch
 #Patch27:    VirtualBox-gcc.patch
+Patch28:    virtualbox-gcc13_cstdint.patch
+
 #to revert on EL7
 Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
 #from Debian
@@ -341,6 +343,7 @@ rm -r src/libs/libtpms-0.9.0/
 %patch3 -p1 -b .default_os_fedora
 %patch4 -p1 -b .lib64-VBox.sh
 #patch27 -p1 -b .gcc
+%patch28 -p1 -b .gcc
 %if 0%{?rhel} && 0%{?rhel} < 8
 %patch29 -p2 -R -b .gsoap3
 %endif
@@ -907,6 +910,7 @@ getent passwd vboxadd >/dev/null || \
 %changelog
 * Wed Jan 18 2023 Sérgio Basto <sergio@serjux.com> - 7.0.6-1
 - Update VirtualBox to 7.0.6
+- Add fix to gcc13
 
 * Wed Dec 14 2022 Sérgio Basto <sergio@serjux.com> - 7.0.4-2
 - we should restart vboxdrv just after akmods builds
