@@ -97,7 +97,6 @@ Patch54:    VirtualBox-7.0.2-ExtPacks-VBoxDTrace-no-publisher-in-version.patch
 Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 # from OpenSuse
 #Patch70:    vbox-python-selection.patch
-Patch72:    virtualbox-snpritnf-buffer-overflow.patch
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
 Patch88:    VirtualBox-lzf.patch
@@ -356,7 +355,6 @@ rm -r src/libs/libtpms-0.9.0/
 %patch54 -p1 -b .dtrace
 %patch60 -p1 -b .xclient
 #patch70 -p1 -b .python-detection
-%patch72 -p1 -b .snpritnf-buffer-overflow
 %patch80 -p1 -b .gcc10
 %patch88 -p1 -b .lzf
 %patch90 -p1 -b .python3.11

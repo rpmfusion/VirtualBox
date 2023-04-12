@@ -1,6 +1,6 @@
---- VirtualBox-6.1.34.orig/src/bldprogs/scm.cpp
-+++ VirtualBox-6.1.34/src/bldprogs/scm.cpp
-@@ -2206,7 +2206,7 @@ static int scmProcessFileInner(PSCMRWSTA
+--- VirtualBox-7.0.6.orig/src/bldprogs/scm.cpp
++++ VirtualBox-7.0.6/src/bldprogs/scm.cpp
+@@ -2335,7 +2335,7 @@ static int scmProcessFileInner(PSCMRWSTA
                              pszTreatAs = "shell";
                          else if (   (cchFirst >= 15 && strncmp(pchFirst, "/usr/bin/python", 15) == 0)
                                   || (cchFirst >= 19 && strncmp(pchFirst, "/usr/bin/env python", 19) == 0) )
@@ -9,9 +9,9 @@
                          else if (   (cchFirst >= 13 && strncmp(pchFirst, "/usr/bin/perl", 13) == 0)
                                   || (cchFirst >= 17 && strncmp(pchFirst, "/usr/bin/env perl", 17) == 0) )
                              pszTreatAs = "perl";
---- VirtualBox-6.1.34.orig/src/VBox/Installer/linux/rpm/VirtualBox.tmpl.spec
-+++ VirtualBox-6.1.34/src/VBox/Installer/linux/rpm/VirtualBox.tmpl.spec
-@@ -22,6 +22,9 @@
+--- VirtualBox-7.0.6.orig/src/VBox/Installer/linux/rpm/VirtualBox.tmpl.spec
++++ VirtualBox-7.0.6/src/VBox/Installer/linux/rpm/VirtualBox.tmpl.spec
+@@ -32,6 +32,9 @@
  %define VBOXDOCDIR %{_defaultdocdir}/%NAME%
  %global __requires_exclude_from ^/usr/lib/virtualbox/VBoxPython.*$|^/usr/lib/python.*$|^.*\\.py$
  %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
@@ -21,19 +21,21 @@
  
  Summary:   Oracle VM VirtualBox
  Name:      %NAME%
---- VirtualBox-6.1.34.orig/src/libs/xpcom18a4/python/src/ErrorUtils.cpp
-+++ VirtualBox-6.1.34/src/libs/xpcom18a4/python/src/ErrorUtils.cpp
-@@ -439,6 +439,8 @@ char *PyTraceback_AsString(PyObject *exc
+--- VirtualBox-7.0.6.orig/src/libs/xpcom18a4/python/src/ErrorUtils.cpp
++++ VirtualBox-7.0.6/src/libs/xpcom18a4/python/src/ErrorUtils.cpp
+@@ -438,7 +438,9 @@ char *PyTraceback_AsString(PyObject *exc
+ 
  	{ // a temp scope so I can use temp locals.
  #if PY_MAJOR_VERSION <= 2
- 	char *tempResult = PyString_AsString(obResult);
+-	char *tempResult = PyString_AsString(obResult);
++	char *tempResult = (char *)PyString_AsString(obResult);
 +#elif PY_MINOR_VERSION <= 6
-+	char *tempResult = PyUnicode_AsUTF8(obResult);
++	char *tempResult = (char *)PyUnicode_AsUTF8(obResult);
  #else
      /* PyUnicode_AsUTF8() is const char * as of Python 3.7, char * earlier. */
  	const char *tempResult = (const char *)PyUnicode_AsUTF8(obResult);
---- VirtualBox-6.1.34.orig/src/libs/xpcom18a4/python/src/PyGBase.cpp
-+++ VirtualBox-6.1.34/src/libs/xpcom18a4/python/src/PyGBase.cpp
+--- VirtualBox-7.0.6.orig/src/libs/xpcom18a4/python/src/PyGBase.cpp
++++ VirtualBox-7.0.6/src/libs/xpcom18a4/python/src/PyGBase.cpp
 @@ -183,7 +183,11 @@ PyG_Base::~PyG_Base()
  // Get the correct interface pointer for this object given the IID.
  void *PyG_Base::ThisAsIID( const nsIID &iid )
@@ -47,9 +49,9 @@
  	if (iid.Equals(NS_GET_IID(nsISupports)))
  		return (nsISupports *)(nsIInternalPython *)this;
  	if (iid.Equals(NS_GET_IID(nsISupportsWeakReference)))
---- VirtualBox-6.1.34.orig/src/libs/xpcom18a4/python/gen_python_deps.py
-+++ VirtualBox-6.1.34/src/libs/xpcom18a4/python/gen_python_deps.py
-@@ -86,7 +86,7 @@ def main(argv):
+--- VirtualBox-7.0.6.orig/src/libs/xpcom18a4/python/gen_python_deps.py
++++ VirtualBox-7.0.6/src/libs/xpcom18a4/python/gen_python_deps.py
+@@ -96,7 +96,7 @@ def main(argv):
      else:
          multi = 1
  
@@ -58,7 +60,7 @@
          prefixes = ["/usr"]
          versions = [str(sys.version_info[0])+'.'+str(sys.version_info[1]),
                      str(sys.version_info[0])+'.'+str(sys.version_info[1])+'m']
-@@ -114,24 +114,25 @@ def main(argv):
+@@ -124,24 +124,25 @@ def main(argv):
              continue
          for p in prefixes:
              c = checkPair(p, v, dllpre, dllsuff, bitness_magic)
