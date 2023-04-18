@@ -45,7 +45,7 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    7.0.6
+Version:    7.0.8
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -99,10 +99,7 @@ Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 #Patch70:    vbox-python-selection.patch
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
-Patch88:    VirtualBox-lzf.patch
 Patch90:    VirtualBox-python3.11.patch
-# Force the build of xpcom with -std=gnu++17, mandated by Python 3.11
-Patch92:    VirtualBox-6.1.34-build-xpcom18a4-with-c++17.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -326,11 +323,11 @@ rm -r src/libs/libpng-1.6.*/
 rm -r src/libs/libxml2-2.9.*/
 rm -r src/libs/openssl-3.*/
 rm -r src/libs/zlib-1.2.*/
-rm -r src/libs/curl-7.*/
+rm -r src/libs/curl-8.*/
 rm -r src/libs/libvorbis-1.3.*/
 rm -r src/libs/libogg-1.3.*/
 %if %{with system_libtpms}
-rm -r src/libs/libtpms-0.9.0/
+rm -r src/libs/libtpms-0.9.*/
 %endif
 %if %{with dxvk_native}
 #rm -r src/libs/dxvk-native-1.9.*/
@@ -356,11 +353,7 @@ rm -r src/libs/libtpms-0.9.0/
 %patch60 -p1 -b .xclient
 #patch70 -p1 -b .python-detection
 %patch80 -p1 -b .gcc10
-%patch88 -p1 -b .lzf
 %patch90 -p1 -b .python3.11
-%if 0%{?fedora} >= 36 || 0%{?rhel} >= 9
-%patch92 -p1 -b .c++17
-%endif
 
 
 %build
@@ -906,6 +899,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Apr 18 2023 Sérgio Basto <sergio@serjux.com> - 7.0.8-1
+- Update VirtualBox to 7.0.8
+
 * Wed Jan 18 2023 Sérgio Basto <sergio@serjux.com> - 7.0.6-1
 - Update VirtualBox to 7.0.6
 - Add fix to gcc13

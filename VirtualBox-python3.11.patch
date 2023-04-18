@@ -9,10 +9,9 @@
    for p in $PYTHONDIR; do
      for d in $SUPPYTHONLIBS; do
        for b in lib/x86_64-linux-gnu lib/i386-linux-gnu lib64 lib/64 lib; do
-diff -rup VirtualBox-6.1.36/src/libs/xpcom18a4/python/Makefile.kmk VirtualBox-6.1.34.orig/src/libs/xpcom18a4/python/Makefile.kmk
---- VirtualBox-6.1.36/src/libs/xpcom18a4/python/Makefile.kmk	2022-07-19 22:01:39.000000000 +0100
-+++ VirtualBox-6.1.34.orig/src/libs/xpcom18a4/python/Makefile.kmk	2022-07-25 14:00:03.971778289 +0100
-@@ -26,7 +26,7 @@ endif
+--- ./src/libs/xpcom18a4/python/Makefile.kmk.python3.11	2023-04-17 16:58:21.000000000 +0100
++++ ./src/libs/xpcom18a4/python/Makefile.kmk	2023-04-18 20:34:47.463630061 +0100
+@@ -30,7 +30,7 @@ include $(KBUILD_PATH)/subheader.kmk
  
  #
  # List of supported Python versions, defining a number of
@@ -21,68 +20,68 @@ diff -rup VirtualBox-6.1.36/src/libs/xpcom18a4/python/Makefile.kmk VirtualBox-6.
  # which get picked up below.
  #
  ifeq ($(KBUILD_TARGET),darwin) # Relatively predictable, don't script.
-@@ -624,6 +624,52 @@ VBoxPython3_10m_x86_LIBS       = $(VBOX_
+@@ -665,6 +665,52 @@ ifndef VBOX_ONLY_SDK
+    endif
    endif
-  endif
- endif
-+
-+ifdef VBOX_PYTHON311_INC
-+#
-+# Python 3.11 version
-+#
-+DLLS += VBoxPython3_11
-+VBoxPython3_11_EXTENDS    = VBoxPythonBase
-+VBoxPython3_11_EXTENDS_BY = appending
-+VBoxPython3_11_TEMPLATE   = XPCOM
-+VBoxPython3_11_INCS       = $(VBOX_PYTHON311_INC)
-+VBoxPython3_11_LIBS       = $(VBOX_PYTHON311_LIB)
-+
-+ ifdef VBOX_WITH_32_ON_64_MAIN_API
-+  ifdef VBOX_PYTHON311_LIB_X86
-+DLLS += VBoxPython3_11_x86
-+VBoxPython3_11_x86_EXTENDS    = VBoxPythonBase_x86
-+VBoxPython3_11_x86_EXTENDS_BY = appending
-+VBoxPython3_11_x86_TEMPLATE   = XPCOM
-+VBoxPython3_11_x86_INCS       = $(VBOX_PYTHON311_INC)
-+VBoxPython3_11_x86_LIBS       = $(VBOX_PYTHON311_LIB_X86)
-+  endif
-+ endif
-+endif
-+
-+ifdef VBOX_PYTHON311M_INC
-+#
-+# Python 3.11 version with pymalloc
-+#
-+DLLS += VBoxPython3_11m
-+VBoxPython3_11m_EXTENDS    = VBoxPythonBase_m
-+VBoxPython3_11m_EXTENDS_BY = appending
-+VBoxPython3_11m_TEMPLATE   = XPCOM
-+VBoxPython3_11m_INCS       = $(VBOX_PYTHON311M_INC)
-+VBoxPython3_11m_LIBS       = $(VBOX_PYTHON311M_LIB)
-+
-+ ifdef VBOX_WITH_32_ON_64_MAIN_API
-+  ifdef VBOX_PYTHON311M_LIB_X86
-+DLLS += VBoxPython3_11m_x86
-+VBoxPython3_11m_x86_EXTENDS    = VBoxPythonBase_x86_m
-+VBoxPython3_11m_x86_EXTENDS_BY = appending
-+VBoxPython3_11m_x86_TEMPLATE_  = XPCOM
-+VBoxPython3_11m_x86_INCS       = $(VBOX_PYTHON311M_INC)
-+VBoxPython3_11m_x86_LIBS       = $(VBOX_PYTHON311M_LIB_X86)
-+  endif
-+ endif
-+endif
  
- ifdef VBOX_PYTHONDEF_INC
- #
-@@ -744,7 +790,7 @@ endif
- # TODO: ASSUMING that we don't need a different headers for pymalloc
- #       ('m' builds < 3.8) and CRT malloc.
- #
--VBOX_PYTHON_LIMITED_API_VER := $(firstword $(foreach ver, 35 36 38 39 310   34 33 \
-+VBOX_PYTHON_LIMITED_API_VER := $(firstword $(foreach ver, 35 36 38 39 310 311  34 33 \
- ,$(if-expr defined(VBOX_PYTHON$(ver)_INC),$(ver),)$(if-expr defined(VBOX_PYTHON$(ver)M_INC),$(ver)M,)))
++  ifdef VBOX_PYTHON311_INC
++  #
++  # Python 3.11 version
++  #
++  DLLS += VBoxPython3_11
++  VBoxPython3_11_EXTENDS    = VBoxPythonBase
++  VBoxPython3_11_EXTENDS_BY = appending
++  VBoxPython3_11_TEMPLATE   = XPCOM
++  VBoxPython3_11_INCS       = $(VBOX_PYTHON311_INC)
++  VBoxPython3_11_LIBS       = $(VBOX_PYTHON311_LIB)
++
++   ifdef VBOX_WITH_32_ON_64_MAIN_API
++    ifdef VBOX_PYTHON311_LIB_X86
++  DLLS += VBoxPython3_11_x86
++  VBoxPython3_11_x86_EXTENDS    = VBoxPythonBase_x86
++  VBoxPython3_11_x86_EXTENDS_BY = appending
++  VBoxPython3_11_x86_TEMPLATE   = XPCOM
++  VBoxPython3_11_x86_INCS       = $(VBOX_PYTHON311_INC)
++  VBoxPython3_11_x86_LIBS       = $(VBOX_PYTHON311_LIB_X86)
++    endif
++   endif
++  endif
++
++  ifdef VBOX_PYTHON311M_INC
++  #
++  # Python 3.11 version with pymalloc
++  #
++  DLLS += VBoxPython3_11m
++  VBoxPython3_11m_EXTENDS    = VBoxPythonBase_m
++  VBoxPython3_11m_EXTENDS_BY = appending
++  VBoxPython3_11m_TEMPLATE   = XPCOM
++  VBoxPython3_11m_INCS       = $(VBOX_PYTHON311M_INC)
++  VBoxPython3_11m_LIBS       = $(VBOX_PYTHON311M_LIB)
++
++   ifdef VBOX_WITH_32_ON_64_MAIN_API
++    ifdef VBOX_PYTHON311M_LIB_X86
++  DLLS += VBoxPython3_11m_x86
++  VBoxPython3_11m_x86_EXTENDS    = VBoxPythonBase_x86_m
++  VBoxPython3_11m_x86_EXTENDS_BY = appending
++  VBoxPython3_11m_x86_TEMPLATE_  = XPCOM
++  VBoxPython3_11m_x86_INCS       = $(VBOX_PYTHON311M_INC)
++  VBoxPython3_11m_x86_LIBS       = $(VBOX_PYTHON311M_LIB_X86)
++    endif
++   endif
++  endif
++
+   ifdef VBOX_PYTHONDEF_INC
+    #
+    # Python without versioning
+@@ -707,7 +753,7 @@ ifndef VBOX_ONLY_SDK
+   # TODO: ASSUMING that we don't need a different headers for pymalloc
+   #       ('m' builds < 3.8) and CRT malloc.
+   #
+-  VBOX_PYTHON_LIMITED_API_VER := $(firstword $(foreach ver, 35 36 38 39 310   34 33 \
++  VBOX_PYTHON_LIMITED_API_VER := $(firstword $(foreach ver, 35 36 38 39 310 311  34 33 \
+   	,$(if-expr defined(VBOX_PYTHON$(ver)_INC),$(ver),)$(if-expr defined(VBOX_PYTHON$(ver)M_INC),$(ver)M,)))
    ifneq ($(VBOX_PYTHON_LIMITED_API_VER),)
- DLLS += VBoxPython3
+    DLLS += VBoxPython3
 --- ./src/libs/xpcom18a4/python/src/module/_xpcom.cpp.orig	2022-10-30 04:19:33.834495672 +0000
 +++ ./src/libs/xpcom18a4/python/src/module/_xpcom.cpp	2022-10-30 04:24:11.895463023 +0000
 @@ -84,7 +84,11 @@ extern PYXPCOM_EXPORT void PyXPCOM_Inter
