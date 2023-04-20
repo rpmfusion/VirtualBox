@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    7.0.8
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -276,11 +276,12 @@ Requires:   %(xserver-sdk-abi-requires xinput)
 
 
 %description guest-additions
-This subpackage is like the VirtualBox Guest Additions but just for Fedora,
-therefore it should be installed only in a Fedora guest system.
-This subpackage provides tools that use kernel modules for supporting
-integration with the Host, including file sharing, clipboard sharing,
-X.org X11 video and mouse driver, USB and webcam proxy and Seamless mode.
+This package replaces the application of Virtualbox's own methodology to
+install Guest Additions (in menu: Devices | Insert Guest Additions CD-image file).
+This subpackage provides tools that use kernel modules which support better
+integration of VirtualBox guests with the Host, including file sharing, clipboard sharing,
+video and mouse driver, USB and webcam proxy and Seamless mode.
+
 
 %package kmodsrc
 Summary:    %{name} kernel module source code
@@ -407,16 +408,16 @@ kmk %{_smp_mflags}    \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
 %{!?legacy_vboxvideo_drv:   VBOX_NO_LEGACY_XORG_X11=1 }        \
-    SDK_VBOX_LIBPNG_INCS=/usr/include/libpng16                 \
-    SDK_VBOX_LIBXML2_INCS=/usr/include/libxml2                 \
-    SDK_VBOX_LZF_LIBS="lzf"                                    \
-    SDK_VBOX_LZF_INCS="/usr/include/liblzf"                    \
+    SDK_VBoxLibPng_INCS=/usr/include/libpng16                 \
+    SDK_VBoxLibXml2_INCS=/usr/include/libxml2                 \
+    SDK_VBoxLzf_LIBS="lzf"                                    \
+    SDK_VBoxLzf_INCS="/usr/include/liblzf"                    \
     SDK_VBOX_OPENSSL_INCS=""                                   \
     SDK_VBOX_OPENSSL_LIBS="ssl crypto"                         \
-    SDK_VBOX_ZLIB_INCS=""                                      \
+    SDK_VBoxZlib_INCS=""                                      \
 %{?with_system_libtpms:   SDK_VBOX_LIBTPMS_INCS="/usr/include/libtpms"}  \
-    SDK_VBOX_VORBIS_INCS="/usr/include/vorbis"                 \
-    SDK_VBOX_OGG_INCS="/usr/include/ogg"                       \
+    SDK_VBoxLibVorbis_INCS="/usr/include/vorbis"                 \
+    SDK_VBoxLibOgg_INCS="/usr/include/ogg"                       \
 %{!?with_dxvk_native: VBOX_WITH_DXVK= }             \
 %{?with_docs:   VBOX_WITH_DOCS=1 }                             \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java  \
@@ -431,7 +432,7 @@ kmk %{_smp_mflags}    \
 
 
 # build fails with system dxvk_native
-#{?with_dxvk_native: SDK_VBOX_DXVK_INCS="/usr/include/dxvk-native/native/directx /usr/include/dxvk-native/native/windows"}             \
+#{?with_dxvk_native: SDK_VBoxDxVk_INCS="/usr/include/dxvk-native/native/directx /usr/include/dxvk-native/native/windows"}             \
 #
 # In file included from /usr/include/dxvk-native/native/windows/windows.h:3,
 #from /usr/include/dxvk-native/native/directx/d3d11_1.h:12,
@@ -741,9 +742,9 @@ fi
 # Add a group "vboxsf" for Shared Folders access
 # All users which want to access the auto-mounted Shared Folders have to
 # be added to this group.
-getent group vboxsf >/dev/null || groupadd -r vboxsf
+getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
 getent passwd vboxadd >/dev/null || \
-    useradd -r -g 1 -d /var/run/vboxadd -s /sbin/nologin vboxadd
+    useradd -r -g 1 -d /var/run/vboxadd -s /sbin/nologin vboxadd 2>&1
 
 # Guest additions install
 %post guest-additions
@@ -899,6 +900,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Apr 19 2023 Sérgio Basto <sergio@serjux.com> - 7.0.8-2
+- sync with virtualbox-guest-additions.spec
+- Replaces with sed -i "s/VBOX_ZLIB_STATIC/VBoxZlibStatic/; s/VBOX_ZLIB-x86/VBoxZlib-x86/; s/VBOX_ZLIB/VBoxZlib/; s/VBOX_LIBXML2/VBoxLibXml2/; s/VBOX_VPX/VBoxLibVpx/;s/VBOX_LZF/VBoxLzf/;s/VBOX_LIBPNG/VBoxLibPng/; s/VBOX_LIBCURL/VBoxLibCurl/;s/VBOX_DXVK/VBoxDxVk/;s/VBOX_OGG/VBoxLibOgg/;s/VBOX_VORBIS/VBoxLibVorbis/; s/VBOX_TPMS/VBoxLibTpms/" VirtualBox.spec
+
 * Tue Apr 18 2023 Sérgio Basto <sergio@serjux.com> - 7.0.8-1
 - Update VirtualBox to 7.0.8
 
