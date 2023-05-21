@@ -1,6 +1,6 @@
 --- ./src/VBox/Frontends/VirtualBox/src/main.cpp.orig	2019-12-19 22:58:49.615873442 +0000
 +++ ./src/VBox/Frontends/VirtualBox/src/main.cpp	2019-12-19 23:03:23.696288683 +0000
-@@ -86,10 +86,12 @@ QString g_QStrHintLinuxNoMemory = QAppli
+@@ -97,12 +97,14 @@ QString g_QStrHintLinuxNoMemory = QAppli
      );
  
  QString g_QStrHintLinuxNoDriver = QApplication::tr(
@@ -15,9 +15,12 @@
 +    "kernel driver, doing as root:"
 +    "  <font color=blue>akmods; systemctl restart vboxdrv.service</font><br/><br/>"
      "If your system has EFI Secure Boot enabled you may also need to sign "
-     "the kernel modules (vboxdrv, vboxnetflt, vboxnetadp, vboxpci) before "
+-    "the kernel modules (vboxdrv, vboxnetflt, vboxnetadp, vboxpci) before "
++    "the kernel modules (vboxdrv, vboxnetflt, vboxnetadp) before "
      "you can load them. Please see your Linux system's documentation for "
-@@ -99,26 +101,29 @@ QString g_QStrHintLinuxNoDriver = QAppli
+     "more information."
+     );
+@@ -110,26 +112,29 @@ QString g_QStrHintLinuxNoDriver = QAppli
  QString g_QStrHintOtherWrongDriverVersion = QApplication::tr(
      "The VirtualBox kernel modules do not match this version of "
      "VirtualBox. The installation of VirtualBox was apparently not "
@@ -25,7 +28,7 @@
 -    "VirtualBox."
 -    );
 +    "successful. Executing<br/><br/>"
-+    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxpci vboxdrv; systemctl restart vboxdrv.service</font> as root<br/><br/>"
++    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxdrv; systemctl restart vboxdrv.service</font> as root<br/><br/>"
 +    "may correct this. Make sure that you do not mix the "
 +    "RPMFusion version and the Oracle version of VirtualBox."
 +
@@ -38,7 +41,7 @@
 -    "  <font color=blue>'/sbin/vboxconfig'</font><br/><br/>"
 -    "may correct this. Make sure that you are not mixing builds "
 -    "of VirtualBox from different sources."
-+    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxpci vboxdrv; systemctl restart vboxdrv.service</font> as root<br/><br/>"
++    "  <font color=blue>rmmod vboxnetadp vboxnetflt vboxdrv; systemctl restart vboxdrv.service</font> as root<br/><br/>"
 +    "may correct this. Make sure that you do not mix the "
 +    "RPMFusion version and the Oracle version of VirtualBox."
      );

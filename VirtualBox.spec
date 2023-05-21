@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    7.0.8
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -900,6 +900,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun May 21 2023 Sérgio Basto <sergio@serjux.com> - 7.0.8-3
+- (#6660) Fix the documentation, the vboxpci module is not shipped since VirtualBox 6.1.0
+
 * Wed Apr 19 2023 Sérgio Basto <sergio@serjux.com> - 7.0.8-2
 - sync with virtualbox-guest-additions.spec
 - Replaces with sed -i "s/VBOX_ZLIB_STATIC/VBoxZlibStatic/; s/VBOX_ZLIB-x86/VBoxZlib-x86/; s/VBOX_ZLIB/VBoxZlib/; s/VBOX_LIBXML2/VBoxLibXml2/; s/VBOX_VPX/VBoxLibVpx/;s/VBOX_LZF/VBoxLzf/;s/VBOX_LIBPNG/VBoxLibPng/; s/VBOX_LIBCURL/VBoxLibCurl/;s/VBOX_DXVK/VBoxDxVk/;s/VBOX_OGG/VBoxLibOgg/;s/VBOX_VORBIS/VBoxLibVorbis/; s/VBOX_TPMS/VBoxLibTpms/" VirtualBox.spec
