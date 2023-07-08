@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    7.0.8
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -900,6 +900,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Jul 08 2023 Leigh Scott <leigh123linux@gmail.com> - 7.0.8-4
+- Rebuilt for Python 3.12
+
 * Sun May 21 2023 Sérgio Basto <sergio@serjux.com> - 7.0.8-3
 - (#6660) Fix the documentation, the vboxpci module is not shipped since VirtualBox 6.1.0
 
