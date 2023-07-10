@@ -99,7 +99,7 @@ Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 #Patch70:    vbox-python-selection.patch
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
-Patch90:    VirtualBox-python3.11.patch
+Patch90:    VirtualBox-python3.12.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3093
