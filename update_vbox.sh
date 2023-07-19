@@ -1,4 +1,4 @@
-VERSION=7.0.8
+VERSION=7.0.10
 REL=1
 RAWHIDE=39
 REPOS="f38 f37 f36 el9 el8"
@@ -21,7 +21,10 @@ rm UserManual.pdf
 spectool -g VirtualBox.spec
 # we need update sources files to avoid download the wrong UserManual.pdf
 rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
+echo "checking patches"
+rfpkg prep
 fi
+
 echo Press enter scratch-build or n to skip ; read dummy;
     if [[ "$dummy" != "n" ]]; then
         rfpkg scratch-build --srpm

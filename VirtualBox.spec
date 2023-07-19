@@ -45,8 +45,8 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    7.0.8
-Release:    4%{?dist}
+Version:    7.0.10
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -335,26 +335,26 @@ rm -r src/libs/libtpms-0.9.*/
 %endif
 #rm -r src/libs/softfloat-3e/
 
-%patch1 -p1 -b .noupdates
-%patch2 -p1 -b .strings
-%patch3 -p1 -b .default_os_fedora
-%patch4 -p1 -b .lib64-VBox.sh
-#patch27 -p1 -b .gcc
-%patch28 -p1 -b .gcc
+%patch -P 1 -p1 -b .noupdates
+%patch -P 2 -p1 -b .strings
+%patch -P 3 -p1 -b .default_os_fedora
+%patch -P 4 -p1 -b .lib64-VBox.sh
+#patch -P 27 -p1 -b .gcc
+%patch -P 28 -p1 -b .gcc
 %if 0%{?rhel} && 0%{?rhel} < 8
-%patch29 -p2 -R -b .gsoap3
+%patch -P 29 -p2 -R -b .gsoap3
 %endif
 %if %{with python3}
-%patch40 -p1 -b .python2_path
+%patch -P 40 -p1 -b .python2_path
 %endif
-%patch50 -p1 -b .mageia-support
-%patch52 -p1 -b .qt
-%patch53 -p1 -b .qt2
-%patch54 -p1 -b .dtrace
-%patch60 -p1 -b .xclient
-#patch70 -p1 -b .python-detection
-%patch80 -p1 -b .gcc10
-%patch90 -p1 -b .python3.11
+%patch -P 50 -p1 -b .mageia-support
+%patch -P 52 -p1 -b .qt
+%patch -P 53 -p1 -b .qt2
+%patch -P 54 -p1 -b .dtrace
+%patch -P 60 -p1 -b .xclient
+#patch -P 70 -p1 -b .python-detection
+%patch -P 80 -p1 -b .gcc10
+%patch -P 90 -p1 -b .python3.12
 
 
 %build
@@ -900,6 +900,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Jul 19 2023 Sérgio Basto <sergio@serjux.com> - 7.0.10-1
+- Update VirtualBox to 7.0.10
+
 * Sat Jul 08 2023 Leigh Scott <leigh123linux@gmail.com> - 7.0.8-4
 - Rebuilt for Python 3.12
 
