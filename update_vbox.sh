@@ -1,7 +1,7 @@
 VERSION=7.0.10
 REL=1
 RAWHIDE=39
-REPOS="f38 f37 f36 el9 el8"
+REPOS="f38 f37 el9 el8"
 if [ -z "$1" ]
 then
       stage=0
@@ -40,13 +40,18 @@ then
 echo STAGE 1
 echo Press enter to commit; read dummy;
 rfpkg ci -c && git show
-echo Press enter to push and build on rawhide; read dummy;
-rfpkg push && rfpkg build --nowait
 fi
 
 if test $stage -le 2
 then
 echo STAGE 2
+echo Press enter to push and build on rawhide; read dummy;
+rfpkg push && rfpkg build --nowait
+fi
+
+if test $stage -le 3
+then
+echo STAGE 3
 for repo in $REPOS ; do
 echo Press enter to build on branch $repo or n to skip; read dummy;
 if [[ "$dummy" != "n" ]]; then
