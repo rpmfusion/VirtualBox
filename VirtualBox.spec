@@ -45,7 +45,7 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    7.0.10
+Version:    7.0.12
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -900,6 +900,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Oct 17 2023 Sérgio Basto <sergio@serjux.com> - 7.0.12-1
+- Update VirtualBox to 7.0.12
+
 * Wed Jul 19 2023 Sérgio Basto <sergio@serjux.com> - 7.0.10-1
 - Update VirtualBox to 7.0.10
 

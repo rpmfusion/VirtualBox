@@ -102,10 +102,10 @@ diff -Nurp VirtualBox-7.0.2.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qr
 diff -Nurp VirtualBox-7.0.2.orig/src/VBox/Installer/linux/distributions_rpm VirtualBox-7.0.2/src/VBox/Installer/linux/distributions_rpm
 --- VirtualBox-7.0.2.orig/src/VBox/Installer/linux/distributions_rpm	2022-10-19 21:28:54.000000000 +0300
 +++ VirtualBox-7.0.2/src/VBox/Installer/linux/distributions_rpm	2022-10-22 12:48:25.951111079 +0300
-@@ -8,6 +8,21 @@ openSUSE114     = OPENSUSE_11_4
- openSUSE113     = OPENSUSE_11_3
- sles11.0        = SLES_11_0
- sles10.1        = SLES_10_1
+@@ -2,6 +2,21 @@ openSUSETW      = OPENSUSE_TW
+ openSUSE155     = OPENSUSE_15_5
+ openSUSE154     = OPENSUSE_15_4
+ openSUSE153     = OPENSUSE_15_3
 +mga15           = MAGEIA_15
 +mga14           = MAGEIA_14
 +mga13           = MAGEIA_13
@@ -121,9 +121,9 @@ diff -Nurp VirtualBox-7.0.2.orig/src/VBox/Installer/linux/distributions_rpm Virt
 +mga3            = MAGEIA_3
 +mga2            = MAGEIA_2
 +mga1            = MAGEIA_1
- mdv2011.0       = MANDRIVA_2011_0
+ fedora38        = FEDORA_38
+ fedora37        = FEDORA_37
  fedora36        = FEDORA_36
- fedora35        = FEDORA_35
 diff -Nurp VirtualBox-7.0.2.orig/src/VBox/Installer/linux/VBoxSysInfo.sh VirtualBox-7.0.2/src/VBox/Installer/linux/VBoxSysInfo.sh
 --- VirtualBox-7.0.2.orig/src/VBox/Installer/linux/VBoxSysInfo.sh	2022-10-19 21:28:54.000000000 +0300
 +++ VirtualBox-7.0.2/src/VBox/Installer/linux/VBoxSysInfo.sh	2022-10-22 12:48:15.439111393 +0300
