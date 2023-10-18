@@ -38,7 +38,7 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    6.1.40
+Version:    6.1.48
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -93,10 +93,6 @@ Patch72:    virtualbox-snpritnf-buffer-overflow.patch
 Patch73:    vb-6.1.16-modal-dialog-parent.patch
 
 Patch80:    VirtualBox-6.1.4-gcc10.patch
-Patch88:    VirtualBox-lzf.patch
-Patch90:    VirtualBox-python3.11.patch
-# Force the build of xpcom with -std=gnu++17, mandated by Python 3.11
-Patch92:    VirtualBox-6.1.34-build-xpcom18a4-with-c++17.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -344,11 +340,6 @@ rm -r src/libs/zlib-1.2.*/
 %patch72 -p1 -b .snpritnf-buffer-overflow
 %patch73 -p1 -b .modal-dialog-parent
 %patch80 -p1 -b .gcc10
-%patch88 -p1 -b .lzf
-%patch90 -p1 -b .python3.11
-%if 0%{?fedora} >= 36 || 0%{?rhel} >= 9
-%patch92 -p1 -b .c++17
-%endif
 
 
 %build
@@ -905,6 +896,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Oct 18 2023 Sérgio Basto <sergio@serjux.com> - 6.1.48-1
+- Update VirtualBox to 6.1.48
+
 * Wed Oct 12 2022 Sérgio Basto <sergio@serjux.com> - 6.1.40-1
 - Update VirtualBox to 6.1.40
 

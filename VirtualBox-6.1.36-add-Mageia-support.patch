@@ -136,10 +136,9 @@ diff -Nurp VirtualBox-6.1.36.orig/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.q
 diff -Nurp VirtualBox-6.1.36.orig/src/VBox/Installer/linux/distributions_rpm VirtualBox-6.1.36/src/VBox/Installer/linux/distributions_rpm
 --- VirtualBox-6.1.36.orig/src/VBox/Installer/linux/distributions_rpm	2022-07-19 23:58:50.000000000 +0300
 +++ VirtualBox-6.1.36/src/VBox/Installer/linux/distributions_rpm	2022-07-20 21:07:15.252840918 +0300
-@@ -8,6 +8,21 @@ openSUSE114     = OPENSUSE_11_4
- openSUSE113     = OPENSUSE_11_3
- sles11.0        = SLES_11_0
- sles10.1        = SLES_10_1
+ openSUSE155     = OPENSUSE_15_5
+ openSUSE154     = OPENSUSE_15_4
+ openSUSE153     = OPENSUSE_15_3
 +mga15           = MAGEIA_15
 +mga14           = MAGEIA_14
 +mga13           = MAGEIA_13
@@ -155,9 +154,9 @@ diff -Nurp VirtualBox-6.1.36.orig/src/VBox/Installer/linux/distributions_rpm Vir
 +mga3            = MAGEIA_3
 +mga2            = MAGEIA_2
 +mga1            = MAGEIA_1
- mdv2011.0       = MANDRIVA_2011_0
+ fedora38        = FEDORA_38
+ fedora37        = FEDORA_37
  fedora36        = FEDORA_36
- fedora35        = FEDORA_35
 diff -Nurp VirtualBox-6.1.36.orig/src/VBox/Installer/linux/VBoxSysInfo.sh VirtualBox-6.1.36/src/VBox/Installer/linux/VBoxSysInfo.sh
 --- VirtualBox-6.1.36.orig/src/VBox/Installer/linux/VBoxSysInfo.sh	2022-07-19 23:58:50.000000000 +0300
 +++ VirtualBox-6.1.36/src/VBox/Installer/linux/VBoxSysInfo.sh	2022-07-20 21:07:15.252840918 +0300
