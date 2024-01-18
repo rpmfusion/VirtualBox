@@ -45,7 +45,7 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    7.0.12
+Version:    7.0.14
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -82,6 +82,7 @@ Patch3:     VirtualBox-7.0.2-default-to-Fedora.patch
 Patch4:     VirtualBox-5.1.0-lib64-VBox.sh.patch
 #Patch27:    VirtualBox-gcc.patch
 Patch28:    virtualbox-gcc13_cstdint.patch
+Patch30:    libxml-2.12.patch
 
 #to revert on EL7
 Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
@@ -343,6 +344,9 @@ rm -r src/libs/libtpms-0.9.*/
 %patch -P 28 -p1 -b .gcc
 %if 0%{?rhel} && 0%{?rhel} < 8
 %patch -P 29 -p2 -R -b .gsoap3
+%endif
+%if 0%{?fedora} > 39
+%patch -P 30 -p1 -b .libxml
 %endif
 %if %{with python3}
 %patch -P 40 -p1 -b .python2_path
@@ -900,6 +904,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Jan 17 2024 Sérgio Basto <sergio@serjux.com> - 7.0.14-1
+- Update VirtualBox to 7.0.14
+
 * Tue Oct 17 2023 Sérgio Basto <sergio@serjux.com> - 7.0.12-1
 - Update VirtualBox to 7.0.12
 
