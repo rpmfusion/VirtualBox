@@ -117,6 +117,7 @@ BuildRequires:  opus-devel
 BuildRequires:  pulseaudio-libs-devel
 %if %{with python3}
 BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
 %endif
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
