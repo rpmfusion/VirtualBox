@@ -1,7 +1,7 @@
 VERSION=7.0.14
 REL=1
 RAWHIDE=40
-REPOS="f39 f38 f37 el9 el8"
+REPOS="f39 f38 el9 el8"
 if [ -z "$1" ]
 then
       stage=0
@@ -50,7 +50,7 @@ if test $stage -le 3
 then
 echo STAGE 3
 echo Press enter to push and build on rawhide; read dummy;
-rfpkg push && rfpkg build --nowait
+rfpkg push && rfpkg build
 fi
 
 if test $stage -le 4
