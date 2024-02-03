@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    7.0.14
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -905,6 +905,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Feb 03 2024 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 7.0.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
 * Wed Jan 17 2024 Sérgio Basto <sergio@serjux.com> - 7.0.14-1
 - Update VirtualBox to 7.0.14
 
