@@ -45,8 +45,8 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    7.0.14
-Release:    2%{?dist}
+Version:    7.0.16
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -81,11 +81,7 @@ Patch2:     VirtualBox-6.1.0-strings.patch
 Patch3:     VirtualBox-7.0.2-default-to-Fedora.patch
 Patch4:     VirtualBox-5.1.0-lib64-VBox.sh.patch
 #Patch27:    VirtualBox-gcc.patch
-Patch28:    virtualbox-gcc13_cstdint.patch
-Patch30:    libxml-2.12.patch
 
-#to revert on EL7
-Patch29:    590355dbdcffa4081c377fd31565e172785b390c.patch
 #from Debian
 # from ArchLinux
 Patch40:    007-python2-path.patch
@@ -323,7 +319,7 @@ rm -r src/VBox/Additions/3D/mesa/mesa-21.3.8/
 
 rm -r src/libs/liblzf-3.*/
 rm -r src/libs/libpng-1.6.*/
-rm -r src/libs/libxml2-2.9.*/
+rm -r src/libs/libxml2-2.*/
 rm -r src/libs/openssl-3.*/
 rm -r src/libs/zlib-1.2.*/
 rm -r src/libs/curl-8.*/
@@ -342,13 +338,6 @@ rm -r src/libs/libtpms-0.9.*/
 %patch -P 3 -p1 -b .default_os_fedora
 %patch -P 4 -p1 -b .lib64-VBox.sh
 #patch -P 27 -p1 -b .gcc
-%patch -P 28 -p1 -b .gcc
-%if 0%{?rhel} && 0%{?rhel} < 8
-%patch -P 29 -p2 -R -b .gsoap3
-%endif
-%if 0%{?fedora} > 39
-%patch -P 30 -p1 -b .libxml
-%endif
 %if %{with python3}
 %patch -P 40 -p1 -b .python2_path
 %endif
@@ -905,6 +894,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Apr 16 2024 Sérgio Basto <sergio@serjux.com> - 7.0.16-1
+- Update VirtualBox to 7.0.16
+
 * Sat Feb 03 2024 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 7.0.14-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 

@@ -1,7 +1,7 @@
-VERSION=7.0.14
+VERSION=7.0.16
 REL=1
-RAWHIDE=40
-REPOS="f39 f38 el9 el8"
+RAWHIDE=41
+REPOS="f40 f39 el9 el8"
 if [ -z "$1" ]
 then
       stage=0
@@ -29,11 +29,11 @@ fi
 if test $stage -le 1
 then
 echo STAGE 1
-echo Press enter scratch-build or n to skip ; read dummy;
+echo Press enter to scratch-build or n to skip ; read dummy;
     if [[ "$dummy" != "n" ]]; then
         rfpkg scratch-build --srpm
     fi
-echo Press enter to build on corp -build or n to skip ; read dummy;
+echo Press enter to corp-build or n to skip ; read dummy;
     if [[ "$dummy" != "n" ]]; then
         rfpkg copr-build sergiomb/vboxfor23
     fi
