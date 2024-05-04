@@ -45,7 +45,7 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    7.0.16
+Version:    7.0.18
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -82,9 +82,6 @@ Patch3:     VirtualBox-7.0.2-default-to-Fedora.patch
 Patch4:     VirtualBox-5.1.0-lib64-VBox.sh.patch
 #Patch27:    VirtualBox-gcc.patch
 
-#from Debian
-# from ArchLinux
-Patch40:    007-python2-path.patch
 # from Mageia
 Patch50:    VirtualBox-7.0.2-update-Mageia-support.patch
 Patch52:    VirtualBox-6.1.14-fix-missing-includes-with-qt-5.15.patch
@@ -338,9 +335,6 @@ rm -r src/libs/libtpms-0.9.*/
 %patch -P 3 -p1 -b .default_os_fedora
 %patch -P 4 -p1 -b .lib64-VBox.sh
 #patch -P 27 -p1 -b .gcc
-%if %{with python3}
-%patch -P 40 -p1 -b .python2_path
-%endif
 %patch -P 50 -p1 -b .mageia-support
 %patch -P 52 -p1 -b .qt
 %patch -P 53 -p1 -b .qt2
@@ -894,6 +888,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri May 03 2024 Sérgio Basto <sergio@serjux.com> - 7.0.18-1
+- Update VirtualBox to 7.0.18
+
 * Tue Apr 16 2024 Sérgio Basto <sergio@serjux.com> - 7.0.16-1
 - Update VirtualBox to 7.0.16
 
