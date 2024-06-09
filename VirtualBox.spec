@@ -46,7 +46,7 @@
 
 Name:       VirtualBox
 Version:    7.0.18
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -260,7 +260,7 @@ Group:      System Environment/Base
 Requires:   %{name}-kmod = %{version}
 Provides:   %{name}-kmod-common = %{version}-%{release}
 Requires:   xorg-x11-server-Xorg
-Requires:   xorg-x11-xinit
+Requires:   xorg-x11-xinit wget coreutils
 Provides:   %{name}-guest = %{version}-%{release}
 Obsoletes:  %{name}-guest < %{version}-%{release}
 %if "%(xserver-sdk-abi-requires 2>/dev/null)"
@@ -739,6 +739,8 @@ getent passwd vboxadd >/dev/null || \
 /sbin/ldconfig
 %systemd_post vboxclient.service
 %systemd_post vboxservice.service
+mkdir -p /usr/share/virtualbox/
+wget "https://download.virtualbox.org/virtualbox/7.0.18/VBoxGuestAdditions_7.0.18.iso" -O /usr/share/virtualbox/VBoxGuestAdditions.iso
 
 #chcon -u system_u -t mount_exec_t "$lib_path/$PACKAGE/mount.vboxsf" > /dev/null 2>&1
 # for i in "$lib_path"/*.so
@@ -757,6 +759,7 @@ getent passwd vboxadd >/dev/null || \
 %preun guest-additions
 %systemd_preun vboxclient.service
 %systemd_preun vboxservice.service
+rm -rf /usr/share/virtualbox/
 
 %postun guest-additions
 /sbin/ldconfig
