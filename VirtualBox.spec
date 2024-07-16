@@ -42,7 +42,11 @@
     %bcond_with dxvk_native
 %endif
 
+%if 0%{?fedora} > 40
+%bcond_with python3
+%else
 %bcond_without python3
+%endif
 
 Name:       VirtualBox
 Version:    7.0.20
