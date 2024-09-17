@@ -53,8 +53,8 @@ Version:    7.1.0
 Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
-License:    GPLv2 or (GPLv2 and CDDL)
-URL:        http://www.virtualbox.org/wiki/VirtualBox
+License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
+URL:        https://www.virtualbox.org/wiki/VirtualBox
 
 ExclusiveArch:  x86_64
 
@@ -293,7 +293,6 @@ rm -r src/VBox/Additions/WINNT
 rm -r src/VBox/Additions/os2
 rm -r kBuild/
 rm -r tools/
-
 # Remove bundle X11 sources and some lib sources, before patching.
 rm -r src/VBox/Additions/x11/x11include/
 rm -r src/VBox/Additions/3D/mesa/mesa-21.3.8/
@@ -371,24 +370,24 @@ umask 0022
 # really been installed to. Therefore we do not override any of
 # the installation paths, but install the tree with the default
 # layout under 'obj' and shuffle files around in %%install.
-kmk %{_smp_mflags}    \
-    KBUILD_VERBOSE=2   \
-    PATH_OUT="$PWD/obj"      \
-    TOOL_YASM_AS=yasm   \
+kmk %{_smp_mflags}                                             \
+    KBUILD_VERBOSE=2                                           \
+    PATH_OUT="$PWD/obj"                                        \
+    TOOL_YASM_AS=yasm                                          \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox \
     VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox    \
     VBOX_WITH_VBOX_IMG=1 \
     VBOX_WITH_VBOXIMGMOUNT=1 \
     VBOX_WITH_SYSFS_BY_DEFAULT=1 \
-    VBOX_USE_SYSTEM_XORG_HEADERS=1 \
+    VBOX_USE_SYSTEM_XORG_HEADERS=1                             \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
-    VBOX_NO_LEGACY_XORG_X11=1 \
+    VBOX_NO_LEGACY_XORG_X11=1                                  \
     SDK_VBoxLibPng_INCS=/usr/include/libpng16                 \
     SDK_VBoxLibXml2_INCS=/usr/include/libxml2                 \
     SDK_VBoxLzf_LIBS="lzf"                                    \
     SDK_VBoxLzf_INCS="/usr/include/liblzf"                    \
-    SDK_VBOX_OPENSSL_INCS=""                                   \
-    SDK_VBOX_OPENSSL_LIBS="ssl crypto"                         \
+    SDK_VBoxOpenSslStatic_INCS="/usr/include/openssl"                                   \
+    SDK_VBoxOpenSslStatic_LIBS="ssl crypto"                         \
     SDK_VBoxZlib_INCS=""                                      \
 %{?with_system_libtpms:   SDK_VBOX_LIBTPMS_INCS="/usr/include/libtpms"}  \
     SDK_VBoxLibVorbis_INCS="/usr/include/vorbis"                 \
