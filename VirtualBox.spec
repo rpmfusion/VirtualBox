@@ -22,7 +22,6 @@
 # Now we use upstream pdf
 %bcond_with docs
 %bcond_without vnc
-%bcond_with legacy_vboxvideo_drv
 
 %if 0%{?fedora} > 27 || 0%{?rhel} >= 9
     %bcond_with guest_additions
@@ -51,7 +50,7 @@
 
 Name:       VirtualBox
 Version:    7.1.0
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPLv2 or (GPLv2 and CDDL)
@@ -161,10 +160,6 @@ BuildRequires:  libstdc++-static
 
 # For the X11 module
 BuildRequires:  libdrm-devel
-%if %{with legacy_vboxvideo_drv}
-BuildRequires:  libpciaccess-devel
-BuildRequires:  pixman-devel
-%endif
 BuildRequires:  xorg-x11-proto-devel
 BuildRequires:  libXcomposite-devel
 BuildRequires:  libXcursor-devel
@@ -387,7 +382,7 @@ kmk %{_smp_mflags}    \
     VBOX_WITH_SYSFS_BY_DEFAULT=1 \
     VBOX_USE_SYSTEM_XORG_HEADERS=1 \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
-%{!?legacy_vboxvideo_drv:   VBOX_NO_LEGACY_XORG_X11=1 }        \
+    VBOX_NO_LEGACY_XORG_X11=1 \
     SDK_VBoxLibPng_INCS=/usr/include/libpng16                 \
     SDK_VBoxLibXml2_INCS=/usr/include/libxml2                 \
     SDK_VBoxLzf_LIBS="lzf"                                    \
@@ -574,22 +569,6 @@ install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 %if %{with guest_additions}
 # Guest X.Org drivers
 mkdir -p %{buildroot}%{_libdir}/security
-
-# Michael Thayer from Oracle wrote: I have applied the patch [1] I posted so that you
-# can build with VBOX_USE_SYSTEM_XORG_HEADERS=1 set in future to only
-# build the X.Org drivers against the installed system headers.
-# also wrote:
-# As vboxmouse_drv is not needed at all for X.Org Server 1.7 and later do not
-# build it in this case.
-# and
-# Build using local X.Org headers.  We assume X.Org Server 1.7 or later.
-#
-# [1] https://www.virtualbox.org/changeset/43588/vbox
-
-%if %{with legacy_vboxvideo_drv}
-install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
-    %{buildroot}%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
-%endif
 
 # Guest-additions tools
 install -m 0755 -t %{buildroot}%{_sbindir}   \
@@ -861,9 +840,6 @@ getent passwd vboxadd >/dev/null || \
 %{_sbindir}/VBoxService
 %{_sbindir}/mount.vboxsf
 %{_libdir}/security/pam_vbox.so
-%if %{with legacy_vboxvideo_drv}
-%{_libdir}/xorg/modules/drivers/*
-%endif
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %{_unitdir}/vboxclient.service
@@ -878,6 +854,9 @@ getent passwd vboxadd >/dev/null || \
 %changelog
 * Tue Sep 17 2024 Sérgio Basto <sergio@serjux.com> - 7.1.0-2
 - Also drop VirtualBox-python3.12.patch
+- Drop support to enable the build of old vboxvideo (guest drive)
+  is disabled with VBOX_NO_LEGACY_XORG_X11=1 , no need to patch the code !
+  https://www.virtualbox.org/changeset/64270/vbox
 
 * Mon Sep 16 2024 Sérgio Basto <sergio@serjux.com> - 7.1.0-1
 - Update VirtualBox to 7.1.0
