@@ -43,6 +43,7 @@
 %endif
 
 %if 0%{?fedora} > 40
+# Python is not detected, yet
 %bcond_with python3
 %else
 %bcond_without python3
@@ -94,7 +95,6 @@ Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 # from Arch
 Patch70:    009-properly-handle-i3wm.patch
 
-Patch90:    VirtualBox-python3.12.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -336,7 +336,6 @@ rm -r src/libs/libtpms-0.9.*/
 %patch -P 60 -p1 -b .xclient
 
 %patch -P 70 -p1 -b .i3wm
-#patch -P 90 -p1 -b .python3.12
 
 
 %build
@@ -877,6 +876,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Sep 17 2024 Sérgio Basto <sergio@serjux.com> - 7.1.0-2
+- Also drop VirtualBox-python3.12.patch
+
 * Mon Sep 16 2024 Sérgio Basto <sergio@serjux.com> - 7.1.0-1
 - Update VirtualBox to 7.1.0
 
