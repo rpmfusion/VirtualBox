@@ -1,0 +1,30 @@
+--- ./src/VBox/Frontends/VirtualBox/src/settings/editors/UINameAndSystemEditor.cpp.default_os_fedora	2024-09-11 22:22:11.439715400 +0100
++++ ./src/VBox/Frontends/VirtualBox/src/settings/editors/UINameAndSystemEditor.cpp	2024-09-11 22:40:04.046997666 +0100
+@@ -775,10 +775,10 @@ void UINameAndSystemEditor::selectPrefer
+         iChosenIndex = m_pComboDistribution->findText(distribution());
+     }
+ 
+-    /* Try to choose Oracle Linux for Linux family: */
++    /* Try to choose Fedora Linux for Linux family: */
+     if (   iChosenIndex == -1
+         && familyId() == "Linux")
+-        iChosenIndex = m_pComboDistribution->findText("Oracle", Qt::MatchContains);
++        iChosenIndex = m_pComboDistribution->findText("Fedora", Qt::MatchContains);
+ 
+     /* Choose the item under the index we found or 1st one item otherwise: */
+     m_pComboDistribution->setCurrentIndex(iChosenIndex != -1 ? iChosenIndex : 0);
+@@ -811,11 +811,11 @@ void UINameAndSystemEditor::selectPrefer
+         iChosenIndex = m_pComboType->findData(strDefaultID);
+     }
+ 
+-    /* Try to choose Oracle Linux x64 for Oracle distribution: */
++    /* Try to choose Fedora Linux x64 for Fedora distribution: */
+     if (   iChosenIndex == -1
+-        && distribution() == "Oracle")
++        && distribution() == "Fedora")
+     {
+-        const QString strDefaultID = GUEST_OS_ID_STR_X64("Oracle");
++        const QString strDefaultID = GUEST_OS_ID_STR_X64("Fedora");
+         iChosenIndex = m_pComboType->findData(strDefaultID);
+     }
+ 
