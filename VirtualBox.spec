@@ -49,8 +49,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.1.0
-Release:    2%{?dist}
+Version:    7.1.2
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -851,6 +851,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Sep 27 2024 Sérgio Basto <sergio@serjux.com> - 7.1.2-1
+- Update VirtualBox to 7.1.2
+
 * Tue Sep 17 2024 Sérgio Basto <sergio@serjux.com> - 7.1.0-2
 - Also drop VirtualBox-python3.12.patch
 - Drop support to enable the build of old vboxvideo (guest drive)
