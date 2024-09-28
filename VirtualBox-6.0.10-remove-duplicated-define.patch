@@ -1,0 +1,29 @@
+
+Already defined in Mga8+:
+
+/home/iurt/rpmbuild/BUILD/VirtualBox-6.0.10/include/VBox/VBoxGL2D.h:116:19: error: conflicting declaration 'typedef ptrdiff_t GLsizeiptr'
+ typedef ptrdiff_t GLsizeiptr;
+                   ^~~~~~~~~~
+In file included from /usr/lib/qt5/include/QtGui/qopengl.h:146,
+                 from /usr/lib/qt5/include/QtOpenGL/qgl.h:45,
+                 from /usr/lib/qt5/include/QtOpenGL/QGLWidget:1,
+                 from /home/iurt/rpmbuild/BUILD/VirtualBox-6.0.10/src/VBox/Frontends/VirtualBox/src/VBoxGLSupportInfo.cpp:22:
+/usr/lib/qt5/include/QtGui/qopenglext.h:475:30: note: previous declaration as 'typedef long int GLsizeiptr'
+ typedef signed long int      GLsizeiptr;
+
+diff -Nurp VirtualBox-6.0.10.orig/include/VBox/VBoxGL2D.h VirtualBox-6.0.10/include/VBox/VBoxGL2D.h
+--- VirtualBox-6.0.10.orig/include/VBox/VBoxGL2D.h	2019-07-12 11:28:22.000000000 +0300
++++ VirtualBox-6.0.10/include/VBox/VBoxGL2D.h	2019-07-20 21:13:31.481755822 +0300
+@@ -110,12 +110,6 @@ typedef GLvoid (APIENTRY *PFNVBOXVHWA_UN
+ typedef GLvoid (APIENTRY *PFNVBOXVHWA_UNIFORM3I)(GLint location, GLint v0, GLint v1, GLint v2);
+ typedef GLvoid (APIENTRY *PFNVBOXVHWA_UNIFORM4I)(GLint location, GLint v0, GLint v1, GLint v2, GLint v3);
+ 
+-/* GL_ARB_pixel_buffer_object*/
+-#ifndef Q_WS_MAC
+-/* apears to be defined on mac */
+-typedef ptrdiff_t GLsizeiptr;
+-#endif
+-
+ #ifndef GL_READ_ONLY
+ # define GL_READ_ONLY                   0x88B8
+ #endif

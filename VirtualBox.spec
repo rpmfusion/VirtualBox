@@ -22,6 +22,7 @@
 # Now we use upstream pdf
 %bcond_with docs
 %bcond_without vnc
+%bcond_with legacy_vboxvideo_drv
 
 %if 0%{?fedora} > 27 || 0%{?rhel} >= 9
     %bcond_with guest_additions
@@ -41,20 +42,15 @@
     %bcond_with dxvk_native
 %endif
 
-%if 0%{?fedora} > 40
-# Python is not detected, yet
-%bcond_with python3
-%else
 %bcond_without python3
-%endif
 
 Name:       VirtualBox
-Version:    7.1.0
-Release:    2%{?dist}
+Version:    7.0.20
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
-License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
-URL:        https://www.virtualbox.org/wiki/VirtualBox
+License:    GPLv2 or (GPLv2 and CDDL)
+URL:        http://www.virtualbox.org/wiki/VirtualBox
 
 ExclusiveArch:  x86_64
 
@@ -82,18 +78,22 @@ Source27:   os_mageia_64_x4.png
 
 Patch1:     VirtualBox-7.0.2-noupdate.patch
 Patch2:     VirtualBox-6.1.0-strings.patch
-Patch3:     VirtualBox-7.1.0-default-to-Fedora.patch
+Patch3:     VirtualBox-7.0.2-default-to-Fedora.patch
 Patch4:     VirtualBox-5.1.0-lib64-VBox.sh.patch
+#Patch27:    VirtualBox-gcc.patch
 
 # from Mageia
 Patch50:    VirtualBox-7.0.2-update-Mageia-support.patch
+Patch52:    VirtualBox-6.1.14-fix-missing-includes-with-qt-5.15.patch
+Patch53:    VirtualBox-6.0.10-remove-duplicated-define.patch
 Patch54:    VirtualBox-7.0.2-ExtPacks-VBoxDTrace-no-publisher-in-version.patch
 # from Fedora
 Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 # from OpenSuse
-# from Arch
-Patch70:    009-properly-handle-i3wm.patch
+#Patch70:    vbox-python-selection.patch
 
+Patch80:    VirtualBox-6.1.4-gcc10.patch
+Patch90:    VirtualBox-python3.12.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3093
@@ -114,9 +114,14 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 %endif
 BuildRequires:  desktop-file-utils
 BuildRequires:  libcap-devel
-BuildRequires:  pkgconfig(Qt6Core)
-BuildRequires:  pkgconfig(Qt6Help)
-BuildRequires:  pkgconfig(Qt6Scxml)
+BuildRequires:  pkgconfig(Qt5Core)
+BuildRequires:  pkgconfig(Qt5Gui)
+BuildRequires:  pkgconfig(Qt5Help)
+BuildRequires:  pkgconfig(Qt5OpenGL)
+BuildRequires:  pkgconfig(Qt5PrintSupport)
+BuildRequires:  pkgconfig(Qt5Widgets)
+BuildRequires:  pkgconfig(Qt5X11Extras)
+BuildRequires:  pkgconfig(Qt5Xml)
 
 %if %{with webservice}
 BuildRequires:  gsoap-devel
@@ -160,6 +165,10 @@ BuildRequires:  libstdc++-static
 
 # For the X11 module
 BuildRequires:  libdrm-devel
+%if %{with legacy_vboxvideo_drv}
+BuildRequires:  libpciaccess-devel
+BuildRequires:  pixman-devel
+%endif
 BuildRequires:  xorg-x11-proto-devel
 BuildRequires:  libXcomposite-devel
 BuildRequires:  libXcursor-devel
@@ -177,8 +186,8 @@ BuildRequires:  libvncserver-devel
 %if %{with system_libtpms}
 BuildRequires:	pkgconfig(libtpms)
 %endif
-#BuildRequires:	pkgconfig(ogg)
-#BuildRequires:	pkgconfig(vorbis)
+BuildRequires:	pkgconfig(ogg)
+BuildRequires:	pkgconfig(vorbis)
 %if %{with dxvk_native}
 BuildRequires:	glslang
 #BuildRequires:  dxvk-native-devel
@@ -202,7 +211,7 @@ OS/2, and OpenBSD.
 
 
 %package server
-Summary:    Core part (host server) for %{name}
+Summary:    core part (host server) for %{name}
 Group:      Development/Tools
 Requires:   %{name}-kmod = %{version}
 Requires:   hicolor-icon-theme
@@ -292,7 +301,11 @@ find -name '*.py[co]' -delete
 rm -r src/VBox/Additions/WINNT
 rm -r src/VBox/Additions/os2
 rm -r kBuild/
+#mv tools/kBuildUnits .
 rm -r tools/
+#mkdir tools
+#mv kBuildUnits tools/
+
 # Remove bundle X11 sources and some lib sources, before patching.
 rm -r src/VBox/Additions/x11/x11include/
 rm -r src/VBox/Additions/3D/mesa/mesa-21.3.8/
@@ -300,9 +313,6 @@ rm -r src/VBox/Additions/3D/mesa/mesa-21.3.8/
 #rm include/VBox/HostServices/wglext.h
 # src/VBox/GuestHost/OpenGL/include/GL/glext.h have VBOX definitions
 #rm -r src/VBox/GuestHost/OpenGL/include/GL
-rm -r src/VBox/Runtime/r3/darwin
-rm -r src/VBox/Runtime/r0drv/darwin
-rm -r src/VBox/Runtime/darwin
 
 rm -r src/libs/liblzf-3.*/
 rm -r src/libs/libpng-1.6.*/
@@ -324,12 +334,15 @@ rm -r src/libs/libtpms-0.9.*/
 %patch -P 2 -p1 -b .strings
 %patch -P 3 -p1 -b .default_os_fedora
 %patch -P 4 -p1 -b .lib64-VBox.sh
-
-#patch -P 50 -p1 -b .mageia-support
+#patch -P 27 -p1 -b .gcc
+%patch -P 50 -p1 -b .mageia-support
+%patch -P 52 -p1 -b .qt
+%patch -P 53 -p1 -b .qt2
 %patch -P 54 -p1 -b .dtrace
 %patch -P 60 -p1 -b .xclient
-
-%patch -P 70 -p1 -b .i3wm
+#patch -P 70 -p1 -b .python-detection
+%patch -P 80 -p1 -b .gcc10
+%patch -P 90 -p1 -b .python3.12
 
 
 %build
@@ -346,6 +359,7 @@ rm -r src/libs/libtpms-0.9.*/
 %if !%{with python3}
   --disable-python \
 %endif
+    --enable-libogg --enable-libvorbis
 
 %if !%{with docs}
 cp %{SOURCE1} UserManual.pdf
@@ -370,24 +384,24 @@ umask 0022
 # really been installed to. Therefore we do not override any of
 # the installation paths, but install the tree with the default
 # layout under 'obj' and shuffle files around in %%install.
-kmk %{_smp_mflags}                                             \
-    KBUILD_VERBOSE=2                                           \
-    PATH_OUT="$PWD/obj"                                        \
-    TOOL_YASM_AS=yasm                                          \
+kmk %{_smp_mflags}    \
+    KBUILD_VERBOSE=2   \
+    PATH_OUT="$PWD/obj"      \
+    TOOL_YASM_AS=yasm   \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox \
     VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox    \
     VBOX_WITH_VBOX_IMG=1 \
     VBOX_WITH_VBOXIMGMOUNT=1 \
     VBOX_WITH_SYSFS_BY_DEFAULT=1 \
-    VBOX_USE_SYSTEM_XORG_HEADERS=1                             \
+    VBOX_USE_SYSTEM_XORG_HEADERS=1 \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
-    VBOX_NO_LEGACY_XORG_X11=1                                  \
+%{!?legacy_vboxvideo_drv:   VBOX_NO_LEGACY_XORG_X11=1 }        \
     SDK_VBoxLibPng_INCS=/usr/include/libpng16                 \
     SDK_VBoxLibXml2_INCS=/usr/include/libxml2                 \
     SDK_VBoxLzf_LIBS="lzf"                                    \
     SDK_VBoxLzf_INCS="/usr/include/liblzf"                    \
-    SDK_VBoxOpenSslStatic_INCS="/usr/include/openssl"                                   \
-    SDK_VBoxOpenSslStatic_LIBS="ssl crypto"                         \
+    SDK_VBOX_OPENSSL_INCS=""                                   \
+    SDK_VBOX_OPENSSL_LIBS="ssl crypto"                         \
     SDK_VBoxZlib_INCS=""                                      \
 %{?with_system_libtpms:   SDK_VBOX_LIBTPMS_INCS="/usr/include/libtpms"}  \
     SDK_VBoxLibVorbis_INCS="/usr/include/vorbis"                 \
@@ -484,7 +498,9 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/VBoxExtPackHelperApp \
     obj/bin/VBoxManage  \
     obj/bin/VBoxSVC     \
+    obj/bin/VBoxTestOGL \
     obj/bin/VBoxVMMPreload \
+    obj/bin/VBoxXPCOMIPCD   \
     obj/bin/VBoxSysInfo.sh  \
     obj/bin/vboxweb-service.sh \
 %if %{with python3}
@@ -499,8 +515,6 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/vboxwebsrv  \
     obj/bin/webtest     \
 %endif
-
-#    obj/bin/VBoxSDL   \
 
 # Wrapper with Launchers
 ln -s VBox %{buildroot}%{_bindir}/VirtualBox
@@ -540,10 +554,12 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
 
 # Python
 %if %{with python3}
-pushd obj/bin/sdk/installer/python
+pushd obj/bin/sdk/installer
 export VBOX_INSTALL_PATH=%{_libdir}/virtualbox
 %{__python3} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
-%py3_shebang_fix -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}${VBOX_INSTALL_PATH}/vboxshell.py
+if [ -x /usr/bin/pathfix.py ]; then
+    pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}${VBOX_INSTALL_PATH}/vboxshell.py
+fi
 popd
 %endif
 
@@ -568,6 +584,22 @@ install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 %if %{with guest_additions}
 # Guest X.Org drivers
 mkdir -p %{buildroot}%{_libdir}/security
+
+# Michael Thayer from Oracle wrote: I have applied the patch [1] I posted so that you
+# can build with VBOX_USE_SYSTEM_XORG_HEADERS=1 set in future to only
+# build the X.Org drivers against the installed system headers.
+# also wrote:
+# As vboxmouse_drv is not needed at all for X.Org Server 1.7 and later do not
+# build it in this case.
+# and
+# Build using local X.Org headers.  We assume X.Org Server 1.7 or later.
+#
+# [1] https://www.virtualbox.org/changeset/43588/vbox
+
+%if %{with legacy_vboxvideo_drv}
+install -m 0755 -D obj/bin/additions/vboxvideo_drv_system.so \
+    %{buildroot}%{_libdir}/xorg/modules/drivers/vboxvideo_drv.so
+%endif
 
 # Guest-additions tools
 install -m 0755 -t %{buildroot}%{_sbindir}   \
@@ -771,6 +803,7 @@ getent passwd vboxadd >/dev/null || \
 %{_libdir}/virtualbox/VBoxExtPackHelperApp
 %{_libdir}/virtualbox/VBoxManage
 %{_libdir}/virtualbox/VBoxSVC
+%{_libdir}/virtualbox/VBoxXPCOMIPCD
 %{_libdir}/virtualbox/VBoxBalloonCtrl
 %{_libdir}/virtualbox/SUPInstall
 %{_libdir}/virtualbox/SUPLoggerCtl
@@ -798,6 +831,7 @@ getent passwd vboxadd >/dev/null || \
 %files
 %{_bindir}/VirtualBox
 %{_bindir}/virtualbox
+%{_libdir}/virtualbox/VBoxTestOGL
 %{_libdir}/virtualbox/VBoxDbg.so
 %{_libdir}/virtualbox/UICommon.so
 %{_libdir}/virtualbox/VirtualBox
@@ -839,6 +873,9 @@ getent passwd vboxadd >/dev/null || \
 %{_sbindir}/VBoxService
 %{_sbindir}/mount.vboxsf
 %{_libdir}/security/pam_vbox.so
+%if %{with legacy_vboxvideo_drv}
+%{_libdir}/xorg/modules/drivers/*
+%endif
 %{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 %{_sysconfdir}/xdg/autostart/vboxclient.desktop
 %{_unitdir}/vboxclient.service
@@ -851,18 +888,6 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
-* Tue Sep 17 2024 Sérgio Basto <sergio@serjux.com> - 7.1.0-2
-- Also drop VirtualBox-python3.12.patch
-- Drop support to enable the build of old vboxvideo (guest drive)
-  is disabled with VBOX_NO_LEGACY_XORG_X11=1 , no need to patch the code !
-  https://www.virtualbox.org/changeset/64270/vbox
-
-* Mon Sep 16 2024 Sérgio Basto <sergio@serjux.com> - 7.1.0-1
-- Update VirtualBox to 7.1.0
-
-* Thu Aug 01 2024 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 7.0.20-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
-
 * Tue Jul 16 2024 Sérgio Basto <sergio@serjux.com> - 7.0.20-1
 - Update VirtualBox to 7.0.20
 
