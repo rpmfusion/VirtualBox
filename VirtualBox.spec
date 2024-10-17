@@ -23,7 +23,7 @@
 %bcond_with docs
 %bcond_without vnc
 
-%if 0%{?fedora} > 27 || 0%{?rhel} >= 9
+%if 0%{?fedora} > 27 || 0%{?rhel} > 8
     %bcond_with guest_additions
 %else
     %bcond_without guest_additions
@@ -50,7 +50,7 @@
 
 Name:       VirtualBox
 Version:    7.1.2
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -91,6 +91,7 @@ Patch54:    VirtualBox-7.0.2-ExtPacks-VBoxDTrace-no-publisher-in-version.patch
 # from Fedora
 Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 # from OpenSuse
+Patch65:    cxx17.patch
 # from Arch
 Patch70:    009-properly-handle-i3wm.patch
 
@@ -177,8 +178,8 @@ BuildRequires:  libvncserver-devel
 %if %{with system_libtpms}
 BuildRequires:	pkgconfig(libtpms)
 %endif
-#BuildRequires:	pkgconfig(ogg)
-#BuildRequires:	pkgconfig(vorbis)
+BuildRequires:	pkgconfig(ogg)
+BuildRequires:	pkgconfig(vorbis)
 %if %{with dxvk_native}
 BuildRequires:	glslang
 #BuildRequires:  dxvk-native-devel
@@ -328,7 +329,7 @@ rm -r src/libs/libtpms-0.9.*/
 #patch -P 50 -p1 -b .mageia-support
 %patch -P 54 -p1 -b .dtrace
 %patch -P 60 -p1 -b .xclient
-
+%patch -P 65 -p1 -b .cxx17
 %patch -P 70 -p1 -b .i3wm
 
 
@@ -351,6 +352,7 @@ rm -r src/libs/libtpms-0.9.*/
 cp %{SOURCE1} UserManual.pdf
 %endif
 
+#--enable-libogg --enable-libvorbis
 #--enable-vde
 #--build-headless --build-libxml2
 #--disable-java
@@ -375,10 +377,15 @@ kmk %{_smp_mflags}                                             \
     PATH_OUT="$PWD/obj"                                        \
     TOOL_YASM_AS=yasm                                          \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox \
+    VBOX_PATH_APP_PRIVATE_ARCH=%{_libdir}/virtualbox    \
     VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox    \
+    VBOX_WITH_ORIGIN=                                   \
+    VBOX_WITH_RUNPATH=%{_libdir}/virtualbox             \
+    VBOX_GUI_WITH_SHARED_LIBRARY=1                      \
+    VBOX_PATH_SHARED_LIBS=%{_libdir}/virtualbox         \
     VBOX_WITH_VBOX_IMG=1 \
     VBOX_WITH_VBOXIMGMOUNT=1 \
-    VBOX_WITH_SYSFS_BY_DEFAULT=1 \
+    VBOX_WITH_UNATTENDED=1  \
     VBOX_USE_SYSTEM_XORG_HEADERS=1                             \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
     VBOX_NO_LEGACY_XORG_X11=1                                  \
@@ -396,13 +403,20 @@ kmk %{_smp_mflags}                                             \
 %{?with_docs:   VBOX_WITH_DOCS=1 }                             \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java  \
     VBOX_WITH_UPDATE_REQUEST=               \
-    VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
+    VBOX_WITH_TESTCASES=                    \
+    VBOX_WITH_TESTSUITE=                    \
+    VBOX_WITH_HOST_SHIPPING_AUDIO_TEST=     \
+    VBOX_WITH_VALIDATIONKIT=                \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
 #    VBOX_WITH_CLOUD_NET:=
-#    VBOX_WITH_TESTCASES= \
-#    VBOX_WITH_VALIDATIONKIT= \
+#    VBOX_WITH_VBOXSDL=1     \
+#    VBoxSDL_INCS += \
+#    VBoxSDL_LIBS
+#    VBOX_WITH_SYSFS_BY_DEFAULT=1 \
+#    VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
 #    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
+#    VBOX_DOCBOOK_WITH_LATEX    := 1
 
 
 # build fails with system dxvk_native
@@ -507,8 +521,8 @@ ln -s VBox %{buildroot}%{_bindir}/VirtualBox
 ln -s VBox %{buildroot}%{_bindir}/virtualbox
 ln -s VBox %{buildroot}%{_bindir}/VBoxManage
 ln -s VBox %{buildroot}%{_bindir}/vboxmanage
-ln -s VBox %{buildroot}%{_bindir}/VBoxSDL
-ln -s VBox %{buildroot}%{_bindir}/vboxsdl
+#ln -s VBox %{buildroot}%{_bindir}/VBoxSDL
+#ln -s VBox %{buildroot}%{_bindir}/vboxsdl
 ln -s VBox %{buildroot}%{_bindir}/VBoxVRDP
 ln -s VBox %{buildroot}%{_bindir}/VBoxHeadless
 ln -s VBox %{buildroot}%{_bindir}/vboxheadless
@@ -656,35 +670,6 @@ fi
 %triggerun -- VirtualBox-server < 0:6.1.10-4
 /usr/bin/systemctl --no-reload preset vboxdrv.service || :
 
-# Need review, I don't know the rules of Icon Cache, mimeinfo and Desktop databases for epel 8
-%if 0%{?rhel} && 0%{?rhel} < 8
-%post
-# Icon Cache
-/bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-# mimeinfo F23 only
-/bin/touch --no-create %{_datadir}/mime/packages &>/dev/null || :
-# Desktop databases F23 and F24 only
-/usr/bin/update-desktop-database &> /dev/null || :
-
-%postun
-if [ $1 -eq 0 ] ; then
-    # Package upgrade, not uninstall
-    # Icon Cache
-    /bin/touch --no-create %{_datadir}/icons/hicolor &>/dev/null
-    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-    # mimeinfo F23 only
-    /usr/bin/update-mime-database %{_datadir}/mime &> /dev/null || :
-fi
-# Desktop databases F23 and F24 only
-/usr/bin/update-desktop-database &> /dev/null || :
-
-%posttrans
-# Icon Cache
-/usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-# mimeinfo F23 only
-/usr/bin/update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
-%endif
-
 %post webservice
 %systemd_post vboxweb.service
 
@@ -752,8 +737,8 @@ getent passwd vboxadd >/dev/null || \
 %{_bindir}/VBoxHeadless
 %{_bindir}/VBoxManage
 %{_bindir}/vboxmanage
-%{_bindir}/VBoxSDL
-%{_bindir}/vboxsdl
+#{_bindir}/VBoxSDL
+#{_bindir}/vboxsdl
 %{_bindir}/VBoxVRDP
 %{_bindir}/VirtualBoxVM
 %{_bindir}/virtualboxvm
@@ -787,6 +772,7 @@ getent passwd vboxadd >/dev/null || \
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetNAT
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxVolInfo
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxHeadless
+#%%attr(4511,root,root) %%{_libdir}/virtualbox/VBoxSDL
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetDHCP
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetAdpCtl
 %attr(4511,root,root) %{_libdir}/virtualbox/VirtualBoxVM
@@ -851,6 +837,10 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Oct 04 2024 Sérgio Basto <sergio@serjux.com> - 7.1.2-2
+- Not build test cases
+- Minor cleanup of scripts for el7
+
 * Fri Sep 27 2024 Sérgio Basto <sergio@serjux.com> - 7.1.2-1
 - Update VirtualBox to 7.1.2
 
