@@ -1,0 +1,166 @@
+diff -up VirtualBox-7.1.2/src/VBox/Additions/linux/installer/vboxadd-x11.sh.mageia VirtualBox-7.1.2/src/VBox/Additions/linux/installer/vboxadd-x11.sh
+--- VirtualBox-7.1.2/src/VBox/Additions/linux/installer/vboxadd-x11.sh.mageia	2024-09-26 15:49:20.000000000 +0200
++++ VirtualBox-7.1.2/src/VBox/Additions/linux/installer/vboxadd-x11.sh	2024-10-15 14:28:19.298410958 +0200
+@@ -104,8 +104,14 @@ install_x11_startup_app() {
+     x11_autostart="/etc/xdg/autostart"
+     kde_autostart="/usr/share/autostart"
+     redhat_dir=/etc/X11/Xsession.d
++    mageia_dir=/etc/X11/xinit.d
+     mandriva_dir=/etc/X11/xinit.d
+     debian_dir=/etc/X11/xinit/xinitrc.d
++    if [ -d "$mageia_dir" -a -w "$mageia_dir" -a -x "$mageia_dir" ]
++    then
++        install -m 0644 $app_src "$mageia_dir/$app_dest"
++        found=1
++    fi
+     if [ -d "$mandriva_dir" -a -w "$mandriva_dir" -a -x "$mandriva_dir" ]
+     then
+         install -m 0644 $app_src "$mandriva_dir/$app_dest"
+diff -up VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp.mageia VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp
+--- VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp.mageia	2024-10-15 14:28:19.298410958 +0200
++++ VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/src/globals/UIIconPool.cpp	2024-10-15 14:31:40.664932567 +0200
+@@ -425,8 +425,8 @@ UIIconPoolGeneral::UIIconPoolGeneral()
+     m_guestOSTypeIconNames.insert(GUEST_OS_ID_STR_X64("OpenMandriva_Lx"),       ":/os_mandriva.png");
+     m_guestOSTypeIconNames.insert(GUEST_OS_ID_STR_X86("PCLinuxOS"),             ":/os_mandriva.png");
+     m_guestOSTypeIconNames.insert(GUEST_OS_ID_STR_X64("PCLinuxOS"),             ":/os_mandriva.png");
+-    m_guestOSTypeIconNames.insert(GUEST_OS_ID_STR_X86("Mageia"),                ":/os_mandriva.png");
+-    m_guestOSTypeIconNames.insert(GUEST_OS_ID_STR_X64("Mageia"),                ":/os_mandriva.png");
++    m_guestOSTypeIconNames.insert(GUEST_OS_ID_STR_X86("Mageia"),                ":/os_mageia.png");
++    m_guestOSTypeIconNames.insert(GUEST_OS_ID_STR_X64("Mageia"),                ":/os_mageia_64.png");
+     m_guestOSTypeIconNames.insert(GUEST_OS_ID_STR_X86("RedHat"),                ":/os_redhat.png");
+     m_guestOSTypeIconNames.insert(GUEST_OS_ID_STR_X64("RedHat"),                ":/os_redhat.png");
+     m_guestOSTypeIconNames.insert(GUEST_OS_ID_STR_X86("RedHat3"),               ":/os_redhat.png");
+diff -up VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc.mageia VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc
+--- VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc.mageia	2024-10-15 14:28:19.298410958 +0200
++++ VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2.qrc	2024-10-15 14:32:19.535419323 +0200
+@@ -105,6 +105,8 @@
+         <file alias="os_linux26.png">images/os_linux26.png</file>
+         <file alias="os_linux.png">images/os_linux.png</file>
+         <file alias="os_macosx.png">images/os_macosx.png</file>
++        <file alias="os_mageia_64.png">images/os_mageia_64.png</file>
++        <file alias="os_mageia.png">images/os_mageia.png</file>
+         <file alias="os_mandriva.png">images/os_mandriva.png</file>
+         <file alias="os_netbsd.png">images/os_netbsd.png</file>
+         <file alias="os_netware.png">images/os_netware.png</file>
+diff -up VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc.mageia VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc
+--- VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc.mageia	2024-10-15 14:28:19.300410983 +0200
++++ VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x2.qrc	2024-10-15 14:29:23.457214386 +0200
+@@ -116,6 +116,8 @@
+         <file alias="os_linux26_x2.png">images/x2/os_linux26_x2.png</file>
+         <file alias="os_linux_x2.png">images/x2/os_linux_x2.png</file>
+         <file alias="os_macosx_x2.png">images/x2/os_macosx_x2.png</file>
++        <file alias="os_mageia_64_x2.png">images/x2/os_mageia_64_x2.png</file>
++        <file alias="os_mageia_x2.png">images/x2/os_mageia_x2.png</file>
+         <file alias="os_mandriva_x2.png">images/x2/os_mandriva_x2.png</file>
+         <file alias="os_netbsd_x2.png">images/x2/os_netbsd_x2.png</file>
+         <file alias="os_netware_x2.png">images/x2/os_netware_x2.png</file>
+diff -up VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc.mageia VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc
+--- VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc.mageia	2024-10-15 14:28:19.300410983 +0200
++++ VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x3.qrc	2024-10-15 14:29:55.841619919 +0200
+@@ -116,6 +116,8 @@
+         <file alias="os_linux26_x3.png">images/x3/os_linux26_x3.png</file>
+         <file alias="os_linux_x3.png">images/x3/os_linux_x3.png</file>
+         <file alias="os_macosx_x3.png">images/x3/os_macosx_x3.png</file>
++        <file alias="os_mageia_64_x3.png">images/x3/os_mageia_64_x3.png</file>
++        <file alias="os_mageia_x3.png">images/x3/os_mageia_x3.png</file>
+         <file alias="os_mandriva_x3.png">images/x3/os_mandriva_x3.png</file>
+         <file alias="os_netbsd_x3.png">images/x3/os_netbsd_x3.png</file>
+         <file alias="os_netware_x3.png">images/x3/os_netware_x3.png</file>
+diff -up VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc.mageia VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc
+--- VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc.mageia	2024-10-15 14:28:19.300410983 +0200
++++ VirtualBox-7.1.2/src/VBox/Frontends/VirtualBox/VirtualBox2_x4.qrc	2024-10-15 14:33:08.152028123 +0200
+@@ -116,6 +116,8 @@
+         <file alias="os_linux26_x4.png">images/x4/os_linux26_x4.png</file>
+         <file alias="os_linux_x4.png">images/x4/os_linux_x4.png</file>
+         <file alias="os_macosx_x4.png">images/x4/os_macosx_x4.png</file>
++        <file alias="os_mageia_64_x4.png">images/x4/os_mageia_64_x4.png</file>
++        <file alias="os_mageia_x4.png">images/x4/os_mageia_x4.png</file>
+         <file alias="os_mandriva_x4.png">images/x4/os_mandriva_x4.png</file>
+         <file alias="os_netbsd_x4.png">images/x4/os_netbsd_x4.png</file>
+         <file alias="os_netware_x4.png">images/x4/os_netware_x4.png</file>
+diff -up VirtualBox-7.1.2/src/VBox/Installer/linux/distributions_rpm.mageia VirtualBox-7.1.2/src/VBox/Installer/linux/distributions_rpm
+--- VirtualBox-7.1.2/src/VBox/Installer/linux/distributions_rpm.mageia	2024-09-26 15:58:45.000000000 +0200
++++ VirtualBox-7.1.2/src/VBox/Installer/linux/distributions_rpm	2024-10-15 14:28:19.300410983 +0200
+@@ -3,6 +3,21 @@ openSUSE156     = OPENSUSE_15_6
+ openSUSE155     = OPENSUSE_15_5
+ openSUSE154     = OPENSUSE_15_4
+ openSUSE153     = OPENSUSE_15_3
++mga15           = MAGEIA_15
++mga14           = MAGEIA_14
++mga13           = MAGEIA_13
++mga12           = MAGEIA_12
++mga11           = MAGEIA_11
++mga10           = MAGEIA_10
++mga9            = MAGEIA_9
++mga8            = MAGEIA_8
++mga7            = MAGEIA_7
++mga6            = MAGEIA_6
++mga5            = MAGEIA_5
++mga4            = MAGEIA_4
++mga3            = MAGEIA_3
++mga2            = MAGEIA_2
++mga1            = MAGEIA_1
+ fedora40        = FEDORA_40
+ fedora38        = FEDORA_38
+ fedora37        = FEDORA_37
+diff -up VirtualBox-7.1.2/src/VBox/Installer/linux/VBoxSysInfo.sh.mageia VirtualBox-7.1.2/src/VBox/Installer/linux/VBoxSysInfo.sh
+--- VirtualBox-7.1.2/src/VBox/Installer/linux/VBoxSysInfo.sh.mageia	2024-09-26 15:58:45.000000000 +0200
++++ VirtualBox-7.1.2/src/VBox/Installer/linux/VBoxSysInfo.sh	2024-10-15 14:28:19.300410983 +0200
+@@ -54,6 +54,11 @@ get_linux_info () {
+         # Debian-based system
+         release=`cat /etc/debian_version`
+         print_linux_info "Debian" $release
++    elif [ -r /etc/mageia-release ]
++    then
++        # Mageia-based system
++        release=`cat /etc/mageia-release | sed -e 's/[A-Za-z ]* release //'`
++        print_linux_info "Mageia" $release
+     elif [ -r /etc/mandriva-release ]
+     then
+         # Mandriva-based system
+diff -up VirtualBox-7.1.2/src/VBox/Main/src-server/ApplianceImpl.cpp.mageia VirtualBox-7.1.2/src/VBox/Main/src-server/ApplianceImpl.cpp
+--- VirtualBox-7.1.2/src/VBox/Main/src-server/ApplianceImpl.cpp.mageia	2024-09-26 15:58:55.000000000 +0200
++++ VirtualBox-7.1.2/src/VBox/Main/src-server/ApplianceImpl.cpp	2024-10-15 14:28:19.300410983 +0200
+@@ -321,6 +321,7 @@ static const osTypePattern g_aOsTypesPat
+     {"SUSE",          VBOXOSTYPE_OpenSUSE},
+     {"Novell",        VBOXOSTYPE_OpenSUSE},
+     {"Red Hat",       VBOXOSTYPE_RedHat},
++    {"Mageia",        VBOXOSTYPE_Mageia},
+     {"Mandriva",      VBOXOSTYPE_Mandriva},
+     {"Ubuntu",        VBOXOSTYPE_Ubuntu},
+     {"Debian",        VBOXOSTYPE_Debian},
+@@ -357,6 +358,7 @@ static const osTypePattern g_aOsTypesPat
+     {"SUSE",          VBOXOSTYPE_OpenSUSE_x64},
+     {"Novell",        VBOXOSTYPE_OpenSUSE_x64},
+     {"Red Hat",       VBOXOSTYPE_RedHat_x64},
++    {"Mageia",        VBOXOSTYPE_Mageia_x64},
+     {"Mandriva",      VBOXOSTYPE_Mandriva_x64},
+     {"Ubuntu",        VBOXOSTYPE_Ubuntu_x64},
+     {"Debian",        VBOXOSTYPE_Debian_x64},
+diff -up VirtualBox-7.1.2/src/VBox/Main/src-server/UnattendedImpl.cpp.mageia VirtualBox-7.1.2/src/VBox/Main/src-server/UnattendedImpl.cpp
+--- VirtualBox-7.1.2/src/VBox/Main/src-server/UnattendedImpl.cpp.mageia	2024-09-26 15:58:57.000000000 +0200
++++ VirtualBox-7.1.2/src/VBox/Main/src-server/UnattendedImpl.cpp	2024-10-15 14:28:19.300410983 +0200
+@@ -1472,6 +1472,12 @@ static bool detectLinuxDistroName(const
+         *penmOsType = (VBOXOSTYPE)((*penmOsType & VBOXOSTYPE_ArchitectureMask) | VBOXOSTYPE_Oracle);
+         pszOsAndVersion = RTStrStripL(pszOsAndVersion + 6);
+     }
++    else if (   RTStrNICmp(pszOsAndVersion, RT_STR_TUPLE("Mageia")) == 0
++             && !RT_C_IS_ALNUM(pszOsAndVersion[6]))
++    {
++        *penmOsType = (VBOXOSTYPE)((*penmOsType & VBOXOSTYPE_ArchitectureMask) | VBOXOSTYPE_Mageia);
++        pszOsAndVersion = RTStrStripL(pszOsAndVersion + 6);
++    }
+     else if (   RTStrNICmp(pszOsAndVersion, RT_STR_TUPLE("CentOS")) == 0
+              && !RT_C_IS_ALNUM(pszOsAndVersion[6]))
+     {
+diff -up VirtualBox-7.1.2/src/VBox/Main/xml/Settings.cpp.mageia VirtualBox-7.1.2/src/VBox/Main/xml/Settings.cpp
+--- VirtualBox-7.1.2/src/VBox/Main/xml/Settings.cpp.mageia	2024-09-26 15:59:00.000000000 +0200
++++ VirtualBox-7.1.2/src/VBox/Main/xml/Settings.cpp	2024-10-15 14:28:19.302411008 +0200
+@@ -6884,6 +6884,7 @@ static struct
+     { "opensuse",       GUEST_OS_ID_STR_X86("OpenSUSE") },
+     { "fedoracore",     GUEST_OS_ID_STR_X86("Fedora") },
+     { "gentoo",         GUEST_OS_ID_STR_X86("Gentoo") },
++    { "mageia",         GUEST_OS_ID_STR_X86("Mageia") },
+     { "mandriva",       GUEST_OS_ID_STR_X86("Mandriva") },
+     { "redhat",         GUEST_OS_ID_STR_X86("RedHat") },
+     { "ubuntu",         GUEST_OS_ID_STR_X86("Ubuntu") },

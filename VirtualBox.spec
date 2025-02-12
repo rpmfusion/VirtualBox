@@ -17,7 +17,7 @@
 #%%if 0%%{?fedora} > 35
     #%%bcond_with webservice
 #%%else
-%bcond_without webservice
+%bcond_with webservice
 #%%endif
 # Now we use upstream pdf
 %bcond_with docs
@@ -49,8 +49,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.1.4
-Release:    2%{?dist}
+Version:    7.1.6
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -60,7 +60,7 @@ ExclusiveArch:  x86_64
 
 Requires:   %{name}-server%{?isa} = %{version}
 
-Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
+Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}a.tar.bz2
 Source1:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/UserManual.pdf
 Source2:    VirtualBox.appdata.xml
 Source3:    VirtualBox-60-vboxdrv.rules
@@ -86,14 +86,17 @@ Patch3:     VirtualBox-7.1.0-default-to-Fedora.patch
 Patch4:     VirtualBox-5.1.0-lib64-VBox.sh.patch
 
 # from Mageia
-Patch50:    VirtualBox-7.0.2-update-Mageia-support.patch
+Patch50:    VirtualBox-7.0.18-update-Mageia-support.patch
 Patch54:    VirtualBox-7.0.2-ExtPacks-VBoxDTrace-no-publisher-in-version.patch
+Patch55:    VirtualBox-7.1.4-python-3.13.patch
+Patch56:    VirtualBox-7.1.6-python-3.13-xpcom.patch
+Patch57:    VirtualBox-7.1.6-svn-107018.patch
 # from Fedora
 Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
-# from OpenSuse
-Patch65:    cxx17.patch
 # from Arch
 Patch70:    009-properly-handle-i3wm.patch
+#from Gentoo
+Patch80:    029_virtualbox-7.1.4_C23.patch
 
 
 BuildRequires:  gcc-c++
@@ -124,8 +127,7 @@ BuildRequires:  gsoap-devel
 %endif
 BuildRequires:  pam-devel
 BuildRequires:  genisoimage
-# we can't use java-11 because "kmk: wsimport: Command not found"
-BuildRequires:  java-1.8.0-devel
+BuildRequires:  java-devel
 %if %{with docs}
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  docbook-dtds
@@ -326,11 +328,14 @@ rm -r src/libs/libtpms-0.9.*/
 %patch -P 3 -p1 -b .default_os_fedora
 %patch -P 4 -p1 -b .lib64-VBox.sh
 
-#patch -P 50 -p1 -b .mageia-support
+%patch -P 50 -p1 -b .mageia-support
 %patch -P 54 -p1 -b .dtrace
+%patch -P 55 -p1 -b .py13
+%patch -P 56 -p1 -b .py13
+%patch -P 57 -p1 -b .fix
 %patch -P 60 -p1 -b .xclient
-%patch -P 65 -p1 -b .cxx17
 %patch -P 70 -p1 -b .i3wm
+%patch -P 80 -p1 -b .c23
 
 
 %build
@@ -409,6 +414,10 @@ kmk %{_smp_mflags}                                             \
     VBOX_WITH_VALIDATIONKIT=                \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
+#    VBOX_GCC_WERR= \
+#    TOOL_GCC3_CFLAGS="%{optflags}"   \
+#    TOOL_GCC3_CXXFLAGS="%{optflags}" \
+#    VBOX_GCC_OPT="%{optflags}" \
 #    VBOX_WITH_CLOUD_NET:=
 #    VBOX_WITH_VBOXSDL=1     \
 #    VBoxSDL_INCS += \
@@ -837,6 +846,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Feb 12 2025 Sérgio Basto <sergio@serjux.com> - 7.1.6-1
+- Update VirtualBox to 7.1.6
+
 * Tue Jan 28 2025 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 7.1.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
