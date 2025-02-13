@@ -1,7 +1,7 @@
 VERSION=7.1.6
 REL=1
-RAWHIDE=42
-REPOS="f41 f40 f39 el9"
+#RAWHIDE=42
+REPOS="f42 f41 f40"
 if [ -z "$1" ]
 then
       stage=0
@@ -20,7 +20,7 @@ git pull
     rm UserManual.pdf
     spectool -g VirtualBox.spec
     # we need update sources files to avoid download the wrong UserManual.pdf
-    rfpkg new-sources ./VirtualBox-$VERSION.tar.bz2 ./UserManual.pdf
+    rfpkg new-sources $(spectool -l --sources VirtualBox.spec | grep https | sed 's/.*: //;s#.*/##')
     echo "checking patches"
     rfpkg prep
   fi
