@@ -619,6 +619,18 @@ install -p -m 0644 -D %{SOURCE7} %{buildroot}%{_unitdir}/vboxservice.service
 install -p -m 0644 -D %{SOURCE8} %{buildroot}%{_presetdir}/96-vboxguest.preset
 install -p -m 0644 -D %{SOURCE5} %{buildroot}%{_udevrulesdir}/60-vboxguest.rules
 install -p -m 0644 -D %{SOURCE6} %{buildroot}%{_unitdir}/vboxclient.service
+
+# Create a sysusers.d config file
+cat >virtualbox-guest-additions.sysusers.conf <<EOF
+# Group "vboxsf" for Shared Folders access.
+# All users which want to access the auto-mounted Shared Folders
+# have to be added to this group.
+g vboxsf -
+u vboxadd -:1 - /var/run/vboxadd -
+EOF
+
+install -m0644 -D virtualbox-guest-additions.sysusers.conf %{buildroot}%{_sysusersdir}/virtualbox-guest-additions.conf
+
 %endif
 
 # Module Source Code
@@ -651,6 +663,7 @@ install -p -m 0644 -D %{SOURCE2} %{buildroot}%{_metainfodir}/%{name}.appdata.xml
 # Workaround kvm.ko usurping VMX.
 # (Linux kernel commit b4886fab6fb620b96ad7eeefb9801c42dfa91741 is the culprit.
 # See also https://lore.kernel.org/kvm/ZwQjUSOle6sWARsr@google.com/T/ )
+install -d %{buildroot}%{_modprobedir}
 echo options kvm enable_virt_at_load=0 > %{buildroot}%{_modprobedir}/50-virtualbox.conf
 
 #    --remove-key=DocPath
@@ -692,14 +705,6 @@ fi
 
 %postun webservice
 %systemd_postun_with_restart vboxweb.service
-
-%pre guest-additions
-# Add a group "vboxsf" for Shared Folders access
-# All users which want to access the auto-mounted Shared Folders have to
-# be added to this group.
-getent group vboxsf >/dev/null || groupadd -r vboxsf 2>&1
-getent passwd vboxadd >/dev/null || \
-    useradd -r -g 1 -d /var/run/vboxadd -s /sbin/nologin vboxadd 2>&1
 
 # Guest additions install
 %post guest-additions
@@ -846,6 +851,7 @@ getent passwd vboxadd >/dev/null || \
 %{_unitdir}/vboxservice.service
 %{_presetdir}/96-vboxguest.preset
 %{_udevrulesdir}/60-vboxguest.rules
+%{_sysusersdir}/virtualbox-guest-additions.conf
 %endif
 
 %files kmodsrc
@@ -854,6 +860,7 @@ getent passwd vboxadd >/dev/null || \
 %changelog
 * Thu Feb 13 2025 Sérgio Basto <sergio@serjux.com> - 7.1.6-2
 - Workaround kvm.ko usurping VMX, copied from OpenSuse
+- Add sysusers.d config file to allow rpm to create users/groups automatically
 
 * Wed Feb 12 2025 Sérgio Basto <sergio@serjux.com> - 7.1.6-1
 - Update VirtualBox to 7.1.6
