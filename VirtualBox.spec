@@ -91,7 +91,6 @@ Patch5:     VirtualBox-python3.13.patch
 
 # from Mageia
 Patch50:    VirtualBox-7.0.18-update-Mageia-support.patch
-Patch54:    VirtualBox-7.0.2-ExtPacks-VBoxDTrace-no-publisher-in-version.patch
 Patch57:    VirtualBox-7.1.6-svn-107018.patch
 # from Fedora
 Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
@@ -227,6 +226,14 @@ Requires:       %{name}-server%{?isa} = %{version}
 %description webservice
 webservice GUI part for %{name}.
 
+%package vnc
+Summary:        VNC desktop sharing
+Group:          System/Emulators/PC
+Requires:       %{name} = %{version}
+%description vnc
+Virtual Network Computing (VNC) is a graphical desktop sharing system that uses the Remote Frame Buffer
+protocol (RFB) to remotely control another computer. When this optional feature is desired, it is installed
+as an "extpack" for VirtualBox. The implementation is licensed under GPL.
 
 %package devel
 Summary:    %{name} SDK
@@ -331,7 +338,6 @@ rm -r src/libs/libtpms-0.9.*/
 %patch -P 5 -p1 -b .py3.13
 
 %patch -P 50 -p1 -b .mageia-support
-%patch -P 54 -p1 -b .dtrace
 %patch -P 57 -p1 -b .fix
 %patch -P 60 -p1 -b .xclient
 %patch -P 70 -p1 -b .i3wm
@@ -366,21 +372,20 @@ cp %{SOURCE1} UserManual.pdf
 . ./env.sh
 umask 0022
 
+# The function VBoxExtPackIsValidEditionString only allows uppercase characters (A-Z) in the suffix.
 %if "%{vendor}" == "RPM Fusion"
-%global publisher _rpmfusion
+%global publisher _RPMFUSION
 %else
 %global publisher _%{?vendor:%(echo "%{vendor}" | \
-     sed -e 's/[^[:alnum:]]//g; s/FedoraCopruser//' | cut -c -9)}%{?!vendor:custom}
+    sed -e 's/[^[:alnum:]]//g; s/FedoraCopruser//' | cut -c -9 | tr '[:lower:]' '[:upper:]')}%{?!vendor:CUSTOM}
 %endif
 
 # VirtualBox build system installs and builds in the same step,
 # not always looking for the installed files in places they have
 # really been installed to. Therefore we do not override any of
-# the installation paths, but install the tree with the default
-# layout under 'obj' and shuffle files around in %%install.
+# the installation paths
 kmk %{_smp_mflags}                                             \
     KBUILD_VERBOSE=2                                           \
-    PATH_OUT="$PWD/obj"                                        \
     TOOL_YASM_AS=yasm                                          \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox \
     VBOX_PATH_APP_PRIVATE_ARCH=%{_libdir}/virtualbox    \
@@ -412,6 +417,13 @@ kmk %{_smp_mflags}                                             \
     VBOX_WITH_UPDATE_REQUEST=               \
     VBOX_WITH_TESTCASES=                    \
     VBOX_BUILD_PUBLISHER=%{publisher}
+
+%if %{with vnc}
+echo "build VNC extension pack"
+# tar must use GNU, not POSIX, format here
+# sed -i 's/tar /tar --format=gnu /' src/VBox/ExtPacks/VNC/Makefile.kmk
+kmk -C src/VBox/ExtPacks/VNC packing KBUILD_VERBOSE=2
+%endif
 
 #    VBOX_GCC_WERR= \
 #    TOOL_GCC3_CFLAGS="%{optflags}"   \
@@ -484,51 +496,52 @@ install -d %{buildroot}%{_prefix}/src/%{name}-kmod-%{version}
 
 # Libs
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
-    obj/bin/*.so
+    out/linux.*/release/bin/*.so
 
 install -p -m 0644 -t %{buildroot}%{_libdir}/virtualbox \
-    obj/bin/VBoxEFI*.fd \
-    obj/bin/*.r0
+    out/linux.*/release/bin/VBoxEFI*.fd \
+    out/linux.*/release/bin/*.r0
 
 # Binaries
-install -p -m 0755 obj/bin/VBox.sh %{buildroot}%{_bindir}/VBox
+install -p -m 0755 out/linux.*/release/bin/VBox.sh %{buildroot}%{_bindir}/VBox
 
 # Executables
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
-    obj/bin/VirtualBox  \
-    obj/bin/VBoxHeadless    \
-    obj/bin/VBoxNetDHCP \
-    obj/bin/VBoxNetNAT \
-    obj/bin/VBoxNetAdpCtl   \
-    obj/bin/VBoxVolInfo \
-    obj/bin/SUPInstall \
-    obj/bin/SUPLoggerCtl \
-    obj/bin/SUPUninstall \
-    obj/bin/VBoxAutostart \
-    obj/bin/VBoxBalloonCtrl \
-    obj/bin/VBoxExtPackHelperApp \
-    obj/bin/VBoxManage  \
-    obj/bin/VBoxSVC     \
-    obj/bin/VBoxVMMPreload \
-    obj/bin/VBoxSysInfo.sh  \
-    obj/bin/vboxweb-service.sh \
+    out/linux.*/release/bin/VirtualBox  \
+    out/linux.*/release/bin/VBoxHeadless    \
+    out/linux.*/release/bin/VBoxNetDHCP \
+    out/linux.*/release/bin/VBoxNetNAT \
+    out/linux.*/release/bin/VBoxNetAdpCtl   \
+    out/linux.*/release/bin/VBoxVolInfo \
+    out/linux.*/release/bin/SUPInstall \
+    out/linux.*/release/bin/SUPLoggerCtl \
+    out/linux.*/release/bin/SUPUninstall \
+    out/linux.*/release/bin/VBoxAutostart \
+    out/linux.*/release/bin/VBoxBalloonCtrl \
+    out/linux.*/release/bin/VBoxExtPackHelperApp \
+    out/linux.*/release/bin/VBoxManage  \
+    out/linux.*/release/bin/VBoxSVC     \
+    out/linux.*/release/bin/VBoxVMMPreload \
+    out/linux.*/release/bin/VBoxSysInfo.sh  \
+    out/linux.*/release/bin/vboxweb-service.sh \
 %if %{with python3}
-    obj/bin/vboxshell.py    \
+    out/linux.*/release/bin/vboxshell.py    \
 %endif
-    obj/bin/vbox-img    \
-    obj/bin/vboximg-mount   \
-    obj/bin/VBoxDTrace    \
-    obj/bin/VBoxBugReport \
-    obj/bin/VirtualBoxVM    \
-    obj/bin/bldRTLdrCheckImports  \
-    obj/bin/iPxeBaseBin         \
-    obj/bin/VBoxCpuReport       \
+    out/linux.*/release/bin/vbox-img    \
+    out/linux.*/release/bin/vboximg-mount   \
+    out/linux.*/release/bin/VBoxDTrace    \
+    out/linux.*/release/bin/VBoxBugReport \
+    out/linux.*/release/bin/VirtualBoxVM    \
+    out/linux.*/release/bin/bldRTLdrCheckImports  \
+    out/linux.*/release/bin/iPxeBaseBin         \
+    out/linux.*/release/bin/VBoxCpuReport       \
+    out/linux.*/release/bin/VBoxAudioTest       \
 %if %{with webservice}
-    obj/bin/vboxwebsrv  \
-    obj/bin/webtest     \
+    out/linux.*/release/bin/vboxwebsrv  \
+    out/linux.*/release/bin/webtest     \
 %endif
 
-#    obj/bin/VBoxSDL   \
+#    out/linux.*/release/bin/VBoxSDL   \
 
 # Wrapper with Launchers
 ln -s VBox %{buildroot}%{_bindir}/VirtualBox
@@ -559,16 +572,16 @@ ln -s ../..%{_libdir}/virtualbox/vboximg-mount %{buildroot}%{_bindir}
 #ln -s /usr/share/virtualbox/src/vboxhost $RPM_BUILD_ROOT/usr/src/vboxhost-%VER%
 
 # Components, preserve symlinks
-cp -a obj/bin/components/* %{buildroot}%{_libdir}/virtualbox/components/
-cp obj/bin/UnattendedTemplates/* %{buildroot}%{_libdir}/virtualbox/UnattendedTemplates
+cp -a out/linux.*/release/bin/components/* %{buildroot}%{_libdir}/virtualbox/components/
+cp out/linux.*/release/bin/UnattendedTemplates/* %{buildroot}%{_libdir}/virtualbox/UnattendedTemplates
 
 # Language files
 install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox/nls \
-    obj/bin/nls/*
+    out/linux.*/release/bin/nls/*
 
 # Python
 %if %{with python3}
-pushd obj/bin/sdk/installer/python
+pushd out/linux.*/release/bin/sdk/installer/python
 export VBOX_INSTALL_PATH=%{_libdir}/virtualbox
 %{__python3} vboxapisetup.py install --prefix %{_prefix} --root %{buildroot}
 %py3_shebang_fix -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}${VBOX_INSTALL_PATH}/vboxshell.py
@@ -576,19 +589,19 @@ popd
 %endif
 
 # SDK
-cp -rp obj/bin/sdk/. %{buildroot}%{_libdir}/virtualbox/sdk
+cp -rp out/linux.*/release/bin/sdk/. %{buildroot}%{_libdir}/virtualbox/sdk
 rm -rf %{buildroot}%{_libdir}/virtualbox/sdk/installer
 
 %if %{with python3}
-pushd obj/bin/sdk/installer/python
+pushd out/linux.*/release/bin/sdk/installer/python
 %py_byte_compile %{__python3} %{buildroot}%{_libdir}/virtualbox/sdk/bindings/xpcom/python
 popd
 %endif
 
 # Icons
 install -p -m 0644 -t %{buildroot}%{_datadir}/pixmaps \
-    obj/bin/VBox.png
-for S in obj/bin/icons/*
+    out/linux.*/release/bin/VBox.png
+for S in out/linux.*/release/bin/icons/*
 do
     SIZE=$(basename $S)
     install -d %{buildroot}%{_datadir}/icons/hicolor/$SIZE/{mimetypes,apps}
@@ -597,7 +610,7 @@ do
         %{buildroot}%{_datadir}/icons/hicolor/$SIZE/mimetypes/virtualbox.png \
         %{buildroot}%{_datadir}/icons/hicolor/$SIZE/apps/virtualbox.png
 done
-install -p -m 0644 obj/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
+install -p -m 0644 out/linux.*/release/bin/virtualbox.xml %{buildroot}%{_datadir}/mime/packages
 
 %if %{with guest_additions}
 # Guest X.Org drivers
@@ -605,16 +618,16 @@ mkdir -p %{buildroot}%{_libdir}/security
 
 # Guest-additions tools
 install -m 0755 -t %{buildroot}%{_sbindir}   \
-    obj/bin/additions/VBoxService            \
-    obj/bin/additions/mount.vboxsf
+    out/linux.*/release/bin/additions/VBoxService            \
+    out/linux.*/release/bin/additions/mount.vboxsf
 install -m 0755 -t %{buildroot}%{_bindir}    \
-    obj/bin/additions/VBoxDRMClient          \
-    obj/bin/additions/VBoxClient             \
-    obj/bin/additions/VBoxControl
+    out/linux.*/release/bin/additions/VBoxDRMClient          \
+    out/linux.*/release/bin/additions/VBoxClient             \
+    out/linux.*/release/bin/additions/VBoxControl
 
 # Guest libraries
 install -m 0755 -t %{buildroot}%{_libdir}/security \
-    obj/bin/additions/pam_vbox.so
+    out/linux.*/release/bin/additions/pam_vbox.so
 
 # init/vboxadd-x11 code near call the function install_x11_startup_app
 install -p -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
@@ -650,7 +663,7 @@ install -m0644 -D virtualbox.sysusers.conf %{buildroot}%{_sysusersdir}/virtualbo
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
-cp -al obj/bin/src/vbox* obj/bin/additions/src/vbox* %{name}-kmod-%{version}
+cp -al out/linux.*/release/bin/src/vbox* out/linux.*/release/bin/additions/src/vbox* %{name}-kmod-%{version}
 install -d %{buildroot}%{_datadir}/%{name}-kmod-%{version}
 tar --use-compress-program xz -cf %{buildroot}%{_datadir}/%{name}-kmod-%{version}/%{name}-kmod-%{version}.tar.xz \
     %{name}-kmod-%{version}
@@ -661,7 +674,7 @@ install -m 0644 -D %{SOURCE10} \
 %endif
 
 # Install udev rules
-install -p -m 0755 -D obj/bin/VBoxCreateUSBNode.sh %{buildroot}%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
+install -p -m 0755 -D out/linux.*/release/bin/VBoxCreateUSBNode.sh %{buildroot}%{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 install -p -m 0644 -D %{SOURCE3} %{buildroot}%{_udevrulesdir}/60-vboxdrv.rules
 
 # Install service to load server modules
@@ -670,9 +683,9 @@ install -p -m 0644 -D %{SOURCE9} %{buildroot}%{_presetdir}/96-vboxhost.preset
 
 # Menu entry
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
-    obj/bin/virtualbox.desktop
+    out/linux.*/release/bin/virtualbox.desktop
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
-    obj/bin/virtualboxvm.desktop
+    out/linux.*/release/bin/virtualboxvm.desktop
 desktop-file-validate %{buildroot}%{_datadir}/applications/virtualbox.desktop
 desktop-file-validate %{buildroot}%{_datadir}/applications/virtualboxvm.desktop
 
@@ -684,14 +697,29 @@ install -p -m 0644 -D %{SOURCE2} %{buildroot}%{_metainfodir}/%{name}.appdata.xml
 install -d %{buildroot}%{_modprobedir}
 echo options kvm enable_virt_at_load=0 > %{buildroot}%{_modprobedir}/50-virtualbox.conf
 
-#    --remove-key=DocPath
+%if %{with vnc}
+echo "entering VNC extension install section"
+pushd out/linux.*/release/packages/
+mkdir -p %{buildroot}%{_libdir}/virtualbox/ExtensionPacks/VNC
+install -D -m 644 VNC-*.vbox-extpack %{buildroot}%{_libdir}/virtualbox/ExtensionPacks/VNC/VNC-%{version}.vbox-extpack
+popd
+%endif
+
 # to review:
-#if [ -d ExtensionPacks/VNC ]; then
-#  install -m 755 -d $RPM_BUILD_ROOT/usr/lib/virtualbox/ExtensionPacks
-#  mv ExtensionPacks/VNC $RPM_BUILD_ROOT/usr/lib/virtualbox/ExtensionPacks
-#fi
 #set_selinux_permissions /usr/lib/virtualbox /usr/share/virtualbox
 # vboxautostart-service
+
+%if %{with vnc}
+%post vnc
+EXTPACK="%{_libdir}/virtualbox/ExtensionPacks/VNC/VNC-%{version}.vbox-extpack"
+ACCEPT="$(tar --to-stdout -xf "${EXTPACK}" ./ExtPack-license.txt | sha256sum | head --bytes=64)"
+VBoxManage extpack install --replace "${EXTPACK}" --accept-license="${ACCEPT}" > /dev/null
+
+%files vnc
+%license COPYING
+%dir %{_libdir}/virtualbox/ExtensionPacks/VNC/
+%{_libdir}/virtualbox/ExtensionPacks/VNC/VNC-%{version}.vbox-extpack
+%endif
 
 %post server
 # Assign USB devices
@@ -752,7 +780,7 @@ fi
 %files server
 %doc doc/*cpp doc/VMM
 %if %{with docs}
-%doc obj/bin/UserManual*.pdf
+%doc out/linux.*/release/bin/UserManual*.pdf
 %else
 %doc UserManual.pdf
 %endif
@@ -782,7 +810,7 @@ fi
 %exclude %{_libdir}/virtualbox/VBoxDbg.so
 %exclude %{_libdir}/virtualbox/UICommon.so
 %exclude %{_libdir}/virtualbox/VirtualBoxVM.so
-%{_libdir}/virtualbox/components
+%{_libdir}/virtualbox/components/
 %{_libdir}/virtualbox/VBoxExtPackHelperApp
 %{_libdir}/virtualbox/VBoxManage
 %{_libdir}/virtualbox/VBoxSVC
@@ -800,6 +828,7 @@ fi
 %{_libdir}/virtualbox/iPxeBaseBin
 %{_libdir}/virtualbox/bldRTLdrCheckImports
 %{_libdir}/virtualbox/VBoxCpuReport
+%{_libdir}/virtualbox/VBoxAudioTest
 # This permissions have to be here, before generator of debuginfo need
 # permissions to read this files
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetNAT
