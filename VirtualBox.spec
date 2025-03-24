@@ -84,12 +84,11 @@ Patch1:     VirtualBox-7.0.2-noupdate.patch
 Patch2:     VirtualBox-6.1.0-strings.patch
 Patch3:     VirtualBox-7.1.0-default-to-Fedora.patch
 Patch4:     VirtualBox-5.1.0-lib64-VBox.sh.patch
+Patch5:     VirtualBox-python3.13.patch
 
 # from Mageia
 Patch50:    VirtualBox-7.0.18-update-Mageia-support.patch
 Patch54:    VirtualBox-7.0.2-ExtPacks-VBoxDTrace-no-publisher-in-version.patch
-Patch55:    VirtualBox-7.1.4-python-3.13.patch
-Patch56:    VirtualBox-7.1.6-python-3.13-xpcom.patch
 Patch57:    VirtualBox-7.1.6-svn-107018.patch
 # from Fedora
 Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
@@ -113,6 +112,7 @@ BuildRequires:  alsa-lib-devel
 BuildRequires:  opus-devel
 BuildRequires:  pulseaudio-libs-devel
 %if %{with python3}
+BuildRequires:  python-rpm-macros
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 %endif
@@ -327,11 +327,10 @@ rm -r src/libs/libtpms-0.9.*/
 %patch -P 2 -p1 -b .strings
 %patch -P 3 -p1 -b .default_os_fedora
 %patch -P 4 -p1 -b .lib64-VBox.sh
+%patch -P 5 -p1 -b .py3.13
 
 %patch -P 50 -p1 -b .mageia-support
 %patch -P 54 -p1 -b .dtrace
-%patch -P 55 -p1 -b .py13
-%patch -P 56 -p1 -b .py13
 %patch -P 57 -p1 -b .fix
 %patch -P 60 -p1 -b .xclient
 %patch -P 70 -p1 -b .i3wm
@@ -574,6 +573,12 @@ popd
 cp -rp obj/bin/sdk/. %{buildroot}%{_libdir}/virtualbox/sdk
 rm -rf %{buildroot}%{_libdir}/virtualbox/sdk/installer
 
+%if %{with python3}
+pushd obj/bin/sdk/installer/python
+%py_byte_compile %{__python3} %{buildroot}%{_libdir}/virtualbox/sdk/bindings/xpcom/python
+popd
+%endif
+
 # Icons
 install -p -m 0644 -t %{buildroot}%{_datadir}/pixmaps \
     obj/bin/VBox.png
@@ -768,9 +773,6 @@ fi
 %exclude %{_libdir}/virtualbox/VBoxDbg.so
 %exclude %{_libdir}/virtualbox/UICommon.so
 %exclude %{_libdir}/virtualbox/VirtualBoxVM.so
-%if %{with python3}
-%exclude %{_libdir}/virtualbox/VBoxPython3*.so
-%endif
 %{_libdir}/virtualbox/components
 %{_libdir}/virtualbox/VBoxExtPackHelperApp
 %{_libdir}/virtualbox/VBoxManage
@@ -831,8 +833,9 @@ fi
 %if %{with python3}
 %files -n python%{python3_pkgversion}-%{name}
 %{_libdir}/virtualbox/*.py*
-%{python3_sitelib}/vboxapi*
 %{_libdir}/virtualbox/VBoxPython3*.so
+%{python3_sitelib}/vboxapi-1*.egg-info
+%{python3_sitelib}/vboxapi
 %endif
 
 %if %{with guest_additions}
