@@ -17,7 +17,7 @@
 #%%if 0%%{?fedora} > 35
     #%%bcond_with webservice
 #%%else
-%bcond_with webservice
+%bcond_without webservice
 #%%endif
 # Now we use upstream pdf
 %bcond_with docs
@@ -127,7 +127,7 @@ BuildRequires:  gsoap-devel
 %endif
 BuildRequires:  pam-devel
 BuildRequires:  genisoimage
-BuildRequires:  java-devel
+#BuildRequires:  java-devel
 %if %{with docs}
 BuildRequires:  /usr/bin/pdflatex
 BuildRequires:  docbook-dtds
@@ -351,6 +351,7 @@ rm -r src/libs/libtpms-0.9.*/
 %if !%{with python3}
   --disable-python \
 %endif
+  --disable-java \
 
 %if !%{with docs}
 cp %{SOURCE1} UserManual.pdf
@@ -359,7 +360,6 @@ cp %{SOURCE1} UserManual.pdf
 #--enable-libogg --enable-libvorbis
 #--enable-vde
 #--build-headless --build-libxml2
-#--disable-java
 #--disable-xpcom
 . ./env.sh
 umask 0022
