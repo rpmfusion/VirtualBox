@@ -633,10 +633,14 @@ cat >virtualbox-guest-additions.sysusers.conf <<EOF
 g vboxsf -
 u vboxadd -:1 - /var/run/vboxadd -
 EOF
-
 install -m0644 -D virtualbox-guest-additions.sysusers.conf %{buildroot}%{_sysusersdir}/virtualbox-guest-additions.conf
 
 %endif
+
+cat >virtualbox.sysusers.conf << EOF
+g vboxusers - - - -
+EOF
+install -m0644 -D virtualbox.sysusers.conf %{buildroot}%{_sysusersdir}/virtualbox.conf
 
 # Module Source Code
 mkdir -p %{name}-kmod-%{version}
@@ -679,10 +683,6 @@ echo options kvm enable_virt_at_load=0 > %{buildroot}%{_modprobedir}/50-virtualb
 #fi
 #set_selinux_permissions /usr/lib/virtualbox /usr/share/virtualbox
 # vboxautostart-service
-
-%pre server
-# Group for USB devices
-getent group vboxusers >/dev/null || groupadd -r vboxusers
 
 %post server
 # Assign USB devices
@@ -801,6 +801,8 @@ fi
 %{_unitdir}/vboxdrv.service
 %{_modprobedir}/
 %{_presetdir}/96-vboxhost.preset
+# Group for USB devices
+%{_sysusersdir}/virtualbox.conf
 %{_prefix}/lib/udev/VBoxCreateUSBNode.sh
 
 %files
