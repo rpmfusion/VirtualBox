@@ -53,7 +53,7 @@
 
 Name:       VirtualBox
 Version:    7.1.6
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -905,6 +905,15 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun Mar 30 2025 Sérgio Basto <sergio@serjux.com> - 7.1.6-3
+- New support to python
+- Disable java because wsimport is not available
+- Enable webservice
+- Build vnc extension
+- Also add sysusers.d config file for vboxusers (server side)
+- Add files bldRTLdrCheckImports, iPxeBaseBin, VBoxCpuReport and virtualboxvm.desktop
+- Drop BR SDL
+
 * Thu Feb 13 2025 Sérgio Basto <sergio@serjux.com> - 7.1.6-2
 - Workaround kvm.ko usurping VMX, copied from OpenSuse
 - Add sysusers.d config file to allow rpm to create users/groups automatically
