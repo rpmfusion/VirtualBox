@@ -14,6 +14,9 @@
 #global prerel RC1
 %global prereltag %{?prerel:_%(awk 'BEGIN {print toupper("%{prerel}")}')}
 
+# Missing build-id in /builddir/build/BUILDROOT/VirtualBox-7.1.6-3.el9.x86_64/usr/lib64/virtualbox/iPxeBaseBin
+%undefine _missing_build_ids_terminate_build
+
 #%%if 0%%{?fedora} > 35
     #%%bcond_with webservice
 #%%else
@@ -100,16 +103,14 @@ Patch80:    029_virtualbox-7.1.4_C23.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3093
-BuildRequires:  pkgconfig(sdl)
 BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
 BuildRequires:  libxslt-devel
 BuildRequires:  libIDL-devel
-BuildRequires:  nasm
 BuildRequires:  yasm
 BuildRequires:  alsa-lib-devel
-BuildRequires:  opus-devel
+#BuildRequires:  opus-devel
 BuildRequires:  pulseaudio-libs-devel
 %if %{with python3}
 BuildRequires:  python-rpm-macros
@@ -352,6 +353,7 @@ rm -r src/libs/libtpms-0.9.*/
   --disable-python \
 %endif
   --disable-java \
+  --disable-sdl
 
 %if !%{with docs}
 cp %{SOURCE1} UserManual.pdf
@@ -369,7 +371,7 @@ umask 0022
 %else
 %global publisher _%{?vendor:%(echo "%{vendor}" | \
      sed -e 's/[^[:alnum:]]//g; s/FedoraCopruser//' | cut -c -9)}%{?!vendor:custom}
-%endif 
+%endif
 
 # VirtualBox build system installs and builds in the same step,
 # not always looking for the installed files in places they have
@@ -406,11 +408,9 @@ kmk %{_smp_mflags}                                             \
 %{!?with_dxvk_native: VBOX_WITH_DXVK= }             \
 %{?with_docs:   VBOX_WITH_DOCS=1 }                             \
     VBOX_JAVA_HOME=%{_prefix}/lib/jvm/java  \
+    VBOX_WITH_REGISTRATION_REQUEST=         \
     VBOX_WITH_UPDATE_REQUEST=               \
     VBOX_WITH_TESTCASES=                    \
-    VBOX_WITH_TESTSUITE=                    \
-    VBOX_WITH_HOST_SHIPPING_AUDIO_TEST=     \
-    VBOX_WITH_VALIDATIONKIT=                \
     VBOX_BUILD_PUBLISHER=%{publisher}
 
 #    VBOX_GCC_WERR= \
@@ -425,6 +425,9 @@ kmk %{_smp_mflags}                                             \
 #    VBOX_WITHOUT_PRECOMPILED_HEADERS=1      \
 #    VBOX_XCURSOR_LIBS="Xcursor Xext X11 GL"             \
 #    VBOX_DOCBOOK_WITH_LATEX    := 1
+#    VBOX_WITH_EXTPACK_VBOXDTRACE=           \
+#    VBOX_WITH_VBOXBFE :=
+#    VBOX_PATH_DOCBOOK_DTD := /usr/share/xml/docbook/schema/dtd/4/
 
 
 # build fails with system dxvk_native
@@ -517,6 +520,9 @@ install -p -m 0755 -t %{buildroot}%{_libdir}/virtualbox \
     obj/bin/VBoxDTrace    \
     obj/bin/VBoxBugReport \
     obj/bin/VirtualBoxVM    \
+    obj/bin/bldRTLdrCheckImports  \
+    obj/bin/iPxeBaseBin         \
+    obj/bin/VBoxCpuReport       \
 %if %{with webservice}
     obj/bin/vboxwebsrv  \
     obj/bin/webtest     \
@@ -664,8 +670,11 @@ install -p -m 0644 -D %{SOURCE9} %{buildroot}%{_presetdir}/96-vboxhost.preset
 
 # Menu entry
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
-    --remove-key=Encoding obj/bin/virtualbox.desktop
+    obj/bin/virtualbox.desktop
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications \
+    obj/bin/virtualboxvm.desktop
 desktop-file-validate %{buildroot}%{_datadir}/applications/virtualbox.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/virtualboxvm.desktop
 
 install -p -m 0644 -D %{SOURCE2} %{buildroot}%{_metainfodir}/%{name}.appdata.xml
 
@@ -788,6 +797,9 @@ fi
 %{_libdir}/virtualbox/VBoxDTrace
 %{_libdir}/virtualbox/vbox-img
 %{_libdir}/virtualbox/vboximg-mount
+%{_libdir}/virtualbox/iPxeBaseBin
+%{_libdir}/virtualbox/bldRTLdrCheckImports
+%{_libdir}/virtualbox/VBoxCpuReport
 # This permissions have to be here, before generator of debuginfo need
 # permissions to read this files
 %attr(4511,root,root) %{_libdir}/virtualbox/VBoxNetNAT
@@ -804,6 +816,7 @@ fi
 # Group for USB devices
 %{_sysusersdir}/virtualbox.conf
 %{_prefix}/lib/udev/VBoxCreateUSBNode.sh
+%{_datadir}/applications/virtualboxvm.desktop
 
 %files
 %{_bindir}/VirtualBox
@@ -814,7 +827,7 @@ fi
 %{_libdir}/virtualbox/VirtualBoxVM.so
 %{_libdir}/virtualbox/nls
 %{_datadir}/pixmaps/*.png
-%{_datadir}/applications/*.desktop
+%{_datadir}/applications/virtualbox.desktop
 %{_datadir}/icons/hicolor/*/apps/*.png
 %{_datadir}/icons/hicolor/*/mimetypes/*.png
 %{_datadir}/icons/hicolor/scalable/mimetypes/virtualbox.svg
