@@ -52,8 +52,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.1.6
-Release:    3%{?dist}
+Version:    7.1.8
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -63,7 +63,7 @@ ExclusiveArch:  x86_64
 
 Requires:   %{name}-server%{?isa} = %{version}
 
-Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}a.tar.bz2
+Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
 Source1:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/UserManual.pdf
 Source2:    VirtualBox.appdata.xml
 Source3:    VirtualBox-60-vboxdrv.rules
@@ -91,7 +91,6 @@ Patch5:     VirtualBox-python3.13.patch
 
 # from Mageia
 Patch50:    VirtualBox-7.0.18-update-Mageia-support.patch
-Patch57:    VirtualBox-7.1.6-svn-107018.patch
 # from Fedora
 Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 # from Arch
@@ -121,6 +120,7 @@ BuildRequires:  libcap-devel
 BuildRequires:  pkgconfig(Qt6Core)
 BuildRequires:  pkgconfig(Qt6Help)
 BuildRequires:  pkgconfig(Qt6Scxml)
+BuildRequires:  xz-devel
 
 %if %{with webservice}
 BuildRequires:  gsoap-devel
@@ -184,6 +184,7 @@ BuildRequires:	pkgconfig(ogg)
 BuildRequires:	pkgconfig(vorbis)
 %if %{with dxvk_native}
 BuildRequires:	glslang
+# build fails with system dxvk_native
 #BuildRequires:  dxvk-native-devel
 %endif
 
@@ -319,15 +320,17 @@ rm -r src/libs/liblzf-3.*/
 rm -r src/libs/libpng-1.6.*/
 rm -r src/libs/libxml2-2.*/
 rm -r src/libs/openssl-3.*/
-rm -r src/libs/zlib-1.2.*/
+rm -r src/libs/zlib-1.3.*/
 rm -r src/libs/curl-8.*/
 rm -r src/libs/libvorbis-1.3.*/
 rm -r src/libs/libogg-1.3.*/
+rm -r src/libs/liblzma-5.*/
+#rm -r src/libs/libslirp-4.*/
 %if %{with system_libtpms}
 rm -r src/libs/libtpms-0.9.*/
 %endif
 %if %{with dxvk_native}
-#rm -r src/libs/dxvk-native-1.9.*/
+#rm -r src/libs/dxvk-2.*/
 %endif
 #rm -r src/libs/softfloat-3e/
 
@@ -338,7 +341,6 @@ rm -r src/libs/libtpms-0.9.*/
 %patch -P 5 -p1 -b .py3.13
 
 %patch -P 50 -p1 -b .mageia-support
-%patch -P 57 -p1 -b .fix
 %patch -P 60 -p1 -b .xclient
 %patch -P 70 -p1 -b .i3wm
 %patch -P 80 -p1 -b .c23
@@ -441,24 +443,6 @@ kmk -C src/VBox/ExtPacks/VNC packing KBUILD_VERBOSE=2
 #    VBOX_WITH_VBOXBFE :=
 #    VBOX_PATH_DOCBOOK_DTD := /usr/share/xml/docbook/schema/dtd/4/
 
-
-# build fails with system dxvk_native
-#{?with_dxvk_native: SDK_VBoxDxVk_INCS="/usr/include/dxvk-native/native/directx /usr/include/dxvk-native/native/windows"}             \
-#
-# In file included from /usr/include/dxvk-native/native/windows/windows.h:3,
-#from /usr/include/dxvk-native/native/directx/d3d11_1.h:12,
-#from /builddir/build/BUILD/VirtualBox-7.0.2/src/VBox/Devices/Graphics/DevVGA-SVGA3d-win-dx.cpp:58:
-#/usr/include/dxvk-native/native/windows/windows_base.h:110:10: warning: ISO C++ prohibits anonymous structs [-Wpedantic]
-#110 |   struct {
-#|          ^
-#In file included from /builddir/build/BUILD/VirtualBox-7.0.2/src/VBox/Devices/Graphics/DevVGA.h:68,
-#from /builddir/build/BUILD/VirtualBox-7.0.2/src/VBox/Devices/Graphics/DevVGA-SVGA3d-win-dx.cpp:47:
-#/builddir/build/BUILD/VirtualBox-7.0.2/src/VBox/Devices/Graphics/DevVGA-SVGA.h:64:15: error: expected unqualified-id before numeric constant
-#64 | # define TRUE 1
-#|               ^
-#/usr/include/dxvk-native/native/windows/windows_base.h:161:16: note: in expansion of macro 'TRUE'
-#161 | constexpr BOOL TRUE  = 1;
-#|                ^~~~
 
 # doc/manual/fr_FR/ missing man_VBoxManage-debugvm.xml and man_VBoxManage-extpack.xml
 #    VBOX_WITH_DOCS_TRANSLATIONS=1 \
@@ -905,6 +889,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Apr 15 2025 Sérgio Basto <sergio@serjux.com> - 7.1.8-1
+- Update VirtualBox to 7.1.8
+
 * Sun Mar 30 2025 Sérgio Basto <sergio@serjux.com> - 7.1.6-3
 - New support to python
 - Disable java because wsimport is not available
