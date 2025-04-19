@@ -53,7 +53,7 @@
 
 Name:       VirtualBox
 Version:    7.1.8
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -120,7 +120,6 @@ BuildRequires:  libcap-devel
 BuildRequires:  pkgconfig(Qt6Core)
 BuildRequires:  pkgconfig(Qt6Help)
 BuildRequires:  pkgconfig(Qt6Scxml)
-BuildRequires:  xz-devel
 
 %if %{with webservice}
 BuildRequires:  gsoap-devel
@@ -143,6 +142,7 @@ BuildRequires:  boost-devel
 BuildRequires:  liblzf-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libpng-devel
+BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  libvpx-devel
@@ -169,6 +169,7 @@ BuildRequires:  libXcursor-devel
 BuildRequires:  libXdamage-devel
 BuildRequires:  libXinerama-devel
 BuildRequires:  libXmu-devel
+BuildRequires:  libX11-devel
 BuildRequires:  libXrandr-devel
 BuildRequires:  libXt-devel
 BuildRequires:  mesa-libEGL-devel
@@ -408,6 +409,7 @@ kmk %{_smp_mflags}                                             \
     SDK_VBoxLzf_INCS="/usr/include/liblzf"                    \
     SDK_VBoxOpenSslStatic_INCS="/usr/include/openssl"                                   \
     SDK_VBoxOpenSslStatic_LIBS="ssl crypto"                         \
+    SDK_VBoxLibLzma_INCS=""                                 \
     SDK_VBoxZlib_INCS=""                                      \
 %{?with_system_libtpms:   SDK_VBOX_LIBTPMS_INCS="/usr/include/libtpms"}  \
     SDK_VBoxLibVorbis_INCS="/usr/include/vorbis"                 \
@@ -607,13 +609,13 @@ install -m 0755 -t %{buildroot}%{_sbindir}   \
 install -m 0755 -t %{buildroot}%{_bindir}    \
     out/linux.*/release/bin/additions/VBoxDRMClient          \
     out/linux.*/release/bin/additions/VBoxClient             \
-    out/linux.*/release/bin/additions/VBoxControl
+    out/linux.*/release/bin/additions/VBoxControl            \
+    out/linux.*/release/bin/additions/vboxwl
 
 # Guest libraries
 install -m 0755 -t %{buildroot}%{_libdir}/security \
     out/linux.*/release/bin/additions/pam_vbox.so
 
-# init/vboxadd-x11 code near call the function install_x11_startup_app
 install -p -m 0755 -D src/VBox/Additions/x11/Installer/98vboxadd-xclient \
     %{buildroot}%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh
 ln -s ../..%{_sysconfdir}/X11/xinit/xinitrc.d/98vboxadd-xclient.sh \
@@ -734,7 +736,6 @@ fi
 
 # Guest additions install
 %post guest-additions
-/sbin/ldconfig
 %systemd_post vboxclient.service
 %systemd_post vboxservice.service
 
@@ -757,7 +758,6 @@ fi
 %systemd_preun vboxservice.service
 
 %postun guest-additions
-/sbin/ldconfig
 %systemd_postun_with_restart vboxclient.service
 %systemd_postun_with_restart vboxservice.service
 
@@ -869,6 +869,7 @@ fi
 %if %{with guest_additions}
 %files guest-additions
 %license COPYING*
+%{_bindir}/vboxwl
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
 %{_bindir}/VBoxClient-all
@@ -889,6 +890,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Apr 18 2025 Sérgio Basto <sergio@serjux.com>
+- Sync with Fedora
+
 * Tue Apr 15 2025 Sérgio Basto <sergio@serjux.com> - 7.1.8-1
 - Update VirtualBox to 7.1.8
 
