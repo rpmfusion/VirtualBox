@@ -53,15 +53,13 @@
 
 Name:       VirtualBox
 Version:    7.1.8
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
 URL:        https://www.virtualbox.org/wiki/VirtualBox
 
 ExclusiveArch:  x86_64
-
-Requires:   %{name}-server%{?isa} = %{version}
 
 Source0:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/VirtualBox-%{version}%{?prereltag}.tar.bz2
 Source1:    https://download.virtualbox.org/virtualbox/%{version}%{?prereltag}/UserManual.pdf
@@ -94,7 +92,7 @@ Patch50:    VirtualBox-7.0.18-update-Mageia-support.patch
 # from Fedora
 Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 # from Arch
-Patch70:    009-properly-handle-i3wm.patch
+#Patch70:    009-properly-handle-i3wm.patch
 #from Gentoo
 Patch80:    029_virtualbox-7.1.4_C23.patch
 
@@ -154,8 +152,8 @@ BuildRequires:  perl(lib)
 # for 32bit on 64
 %ifarch x86_64
 BuildRequires:  glibc-devel(x86-32)
-BuildRequires:  libgcc(x86-32)
-BuildRequires:  libstdc++-static(x86-32)
+#BuildRequires:  libgcc(x86-32)
+#BuildRequires:  libstdc++-static(x86-32)
 BuildRequires:  libstdc++-static(x86-64)
 %else
 BuildRequires:  libstdc++-static
@@ -191,6 +189,8 @@ BuildRequires:	glslang
 
 %{?systemd_requires}
 BuildRequires: systemd
+
+Requires:   %{name}-server%{?isa} = %{version}
 
 %description
 VirtualBox is a powerful x86 and AMD64/Intel64 virtualization product for
@@ -343,7 +343,7 @@ rm -r src/libs/libtpms-0.9.*/
 
 %patch -P 50 -p1 -b .mageia-support
 %patch -P 60 -p1 -b .xclient
-%patch -P 70 -p1 -b .i3wm
+#%%patch -P 70 -p1 -b .i3wm
 %patch -P 80 -p1 -b .c23
 
 
@@ -890,6 +890,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri May 23 2025 Sérgio Basto <sergio@serjux.com> - 7.1.8-3
+- Drop patch 009-properly-handle-i3wm.patch may cause problems
+
 * Fri Apr 18 2025 Sérgio Basto <sergio@serjux.com>
 - Sync with Fedora
 
