@@ -45,15 +45,15 @@
 %endif
 
 %if 0%{?fedora} > 40
-# Python is not detected, yet
+# PyGBase.cpp:225:28: error: ‘PyEval_CallObject’ was not declared in this scope; did you mean ‘PyObject_CallObject’
 %bcond_with python3
 %else
 %bcond_without python3
 %endif
 
 Name:       VirtualBox
-Version:    7.1.8
-Release:    3%{?dist}
+Version:    7.1.10
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -103,7 +103,6 @@ BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
 BuildRequires:  libxslt-devel
-BuildRequires:  libIDL-devel
 BuildRequires:  yasm
 BuildRequires:  alsa-lib-devel
 #BuildRequires:  opus-devel
@@ -890,6 +889,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Jun 05 2025 Sérgio Basto <sergio@serjux.com> - 7.1.10-1
+- Update VirtualBox to 7.1.10
+
 * Fri May 23 2025 Sérgio Basto <sergio@serjux.com> - 7.1.8-3
 - Drop patch 009-properly-handle-i3wm.patch may cause problems
 
