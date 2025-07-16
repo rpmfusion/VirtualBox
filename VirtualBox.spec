@@ -26,6 +26,12 @@
 %bcond_with docs
 %bcond_without vnc
 
+%if 0%{?rhel} > 8
+    %bcond_with 32bits
+%else
+    %bcond_without 32bits
+%endif
+
 %if 0%{?fedora} > 27 || 0%{?rhel} > 8
     %bcond_with guest_additions
 %else
@@ -53,7 +59,7 @@
 
 Name:       VirtualBox
 Version:    7.1.10
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -148,15 +154,15 @@ BuildRequires:  makeself
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
 
-# for 32bit on 64
+# for 32bits on 64
+%if %{with 32bits}
 %ifarch x86_64
 BuildRequires:  glibc-devel(x86-32)
 #BuildRequires:  libgcc(x86-32)
 #BuildRequires:  libstdc++-static(x86-32)
-BuildRequires:  libstdc++-static(x86-64)
-%else
-BuildRequires:  libstdc++-static
 %endif
+%endif
+BuildRequires:  libstdc++-static
 
 # For the X11 module
 BuildRequires:  libdrm-devel
@@ -354,11 +360,14 @@ rm -r src/libs/libtpms-0.9.*/
 %if %{with vnc}
   --enable-vnc \
 %endif
-%if !%{with docs}
+%if %{without docs}
   --disable-docs \
 %endif
-%if !%{with python3}
+%if %{without python3}
   --disable-python \
+%endif
+%if %{without 32bits}
+  --disable-vmmraw \
 %endif
   --disable-java \
   --disable-sdl
@@ -889,6 +898,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Jul 12 2025 Sérgio Basto <sergio@serjux.com> - 7.1.10-2
+- Disable i686 support on EL, adding --disable-vmmraw on ./configure
+
 * Thu Jun 05 2025 Sérgio Basto <sergio@serjux.com> - 7.1.10-1
 - Update VirtualBox to 7.1.10
 
