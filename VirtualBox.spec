@@ -59,7 +59,7 @@
 
 Name:       VirtualBox
 Version:    7.1.10
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -898,6 +898,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Jul 26 2025 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 7.1.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
 * Sat Jul 12 2025 Sérgio Basto <sergio@serjux.com> - 7.1.10-2
 - Disable i686 support on EL, adding --disable-vmmraw on ./configure
 
