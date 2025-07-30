@@ -45,7 +45,7 @@
 %bcond_without python3
 
 Name:       VirtualBox
-Version:    7.0.20
+Version:    7.0.26
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -318,7 +318,7 @@ rm -r src/libs/liblzf-3.*/
 rm -r src/libs/libpng-1.6.*/
 rm -r src/libs/libxml2-2.*/
 rm -r src/libs/openssl-3.*/
-rm -r src/libs/zlib-1.2.*/
+rm -r src/libs/zlib-1.3.*/
 rm -r src/libs/curl-8.*/
 rm -r src/libs/libvorbis-1.3.*/
 rm -r src/libs/libogg-1.3.*/
@@ -888,6 +888,9 @@ getent passwd vboxadd >/dev/null || \
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Jul 30 2025 Nicolas Chauvet <kwizart@gmail.com> - 7.0.26-1
+- Update to 7.0.26
+
 * Tue Jul 16 2024 Sérgio Basto <sergio@serjux.com> - 7.0.20-1
 - Update VirtualBox to 7.0.20
 
