@@ -26,7 +26,7 @@
 %bcond_with docs
 %bcond_without vnc
 
-%if 0%{?rhel} > 8
+%if 0%{?rhel} > 9
     %bcond_with 32bits
 %else
     %bcond_without 32bits
