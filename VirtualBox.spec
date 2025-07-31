@@ -58,8 +58,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.1.10
-Release:    3%{?dist}
+Version:    7.1.12
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -157,8 +157,9 @@ BuildRequires:  perl(lib)
 # for 32bits on 64
 %if %{with 32bits}
 %ifarch x86_64
+# or BuildRequires: glibc32
 BuildRequires:  glibc-devel(x86-32)
-#BuildRequires:  libgcc(x86-32)
+BuildRequires:  libgcc(x86-32)
 #BuildRequires:  libstdc++-static(x86-32)
 %endif
 %endif
@@ -898,6 +899,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Jul 30 2025 Sérgio Basto <sergio@serjux.com> - 7.1.12-1
+- Update VirtualBox to 7.1.12
+
 * Sat Jul 26 2025 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 7.1.10-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
