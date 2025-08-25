@@ -58,7 +58,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.1.12
+Version:    7.2.0
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -314,7 +314,7 @@ rm -r kBuild/
 rm -r tools/
 # Remove bundle X11 sources and some lib sources, before patching.
 rm -r src/VBox/Additions/x11/x11include/
-rm -r src/VBox/Additions/3D/mesa/mesa-21.3.8/
+rm -r src/VBox/Additions/3D/mesa/mesa-24.0.2/
 # wglext.h has typedefs for Windows-specific extensions
 #rm include/VBox/HostServices/wglext.h
 # src/VBox/GuestHost/OpenGL/include/GL/glext.h have VBOX definitions
@@ -334,7 +334,7 @@ rm -r src/libs/libogg-1.3.*/
 rm -r src/libs/liblzma-5.*/
 #rm -r src/libs/libslirp-4.*/
 %if %{with system_libtpms}
-rm -r src/libs/libtpms-0.9.*/
+rm -r src/libs/libtpms-0.10.*/
 %endif
 %if %{with dxvk_native}
 #rm -r src/libs/dxvk-2.*/
@@ -899,6 +899,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun Aug 24 2025 Sérgio Basto <sergio@serjux.com> - 7.2.0-1
+- Update VirtualBox to 7.2.0
+
 * Wed Jul 30 2025 Sérgio Basto <sergio@serjux.com> - 7.1.12-1
 - Update VirtualBox to 7.1.12
 
