@@ -59,7 +59,7 @@
 
 Name:       VirtualBox
 Version:    7.2.0
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -101,6 +101,8 @@ Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 #Patch70:    009-properly-handle-i3wm.patch
 #from Gentoo
 Patch80:    029_virtualbox-7.1.4_C23.patch
+#from https://github.com/VirtualBox/virtualbox/issues/70
+Patch81:    UITranslationEventListener_async_call.patch
 
 
 BuildRequires:  gcc-c++
@@ -351,6 +353,7 @@ rm -r src/libs/libtpms-0.10.*/
 %patch -P 60 -p1 -b .xclient
 #%%patch -P 70 -p1 -b .i3wm
 %patch -P 80 -p1 -b .c23
+%patch -P 81 -p1 -b .async_call
 
 
 %build
@@ -899,6 +902,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Aug 29 2025 Sérgio Basto <sergio@serjux.com> - 7.2.0-2
+- Add patch from Oracle rfbz#7238
+
 * Sun Aug 24 2025 Sérgio Basto <sergio@serjux.com> - 7.2.0-1
 - Update VirtualBox to 7.2.0
 
