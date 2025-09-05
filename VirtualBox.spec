@@ -106,7 +106,7 @@ Patch81:    UITranslationEventListener_async_call.patch
 
 
 BuildRequires:  gcc-c++
-BuildRequires:  kBuild >= 0.1.9998.r3093
+BuildRequires:  kBuild >= 0.1.9998.r3674
 BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
