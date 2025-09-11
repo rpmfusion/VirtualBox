@@ -1,0 +1,25 @@
+From 85b0054b10f58f929248e7e47e2d7a1280d27996 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=A9rgio=20M=2E=20Basto?= <sergio@serjux.com>
+Date: Tue, 26 Aug 2025 19:39:04 +0100
+Subject: [PATCH] Print qt6 version required
+
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 9e67b3289bb..0561dad368d 100755
+--- a/configure
++++ b/configure
+@@ -1695,7 +1695,7 @@ EOF
+       fail
+     fi
+   else
+-    log_failure "qt6 not found"
++    log_failure "qt6 >= $QT6MAJ.$QT6MIN.0 not found"
+     fail
+   fi
+ }
+-- 
+2.51.0
+

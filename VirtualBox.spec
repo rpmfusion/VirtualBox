@@ -58,8 +58,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.2.0
-Release:    2%{?dist}
+Version:    7.2.2
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -101,9 +101,7 @@ Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 #Patch70:    009-properly-handle-i3wm.patch
 #from Gentoo
 Patch80:    029_virtualbox-7.1.4_C23.patch
-#from https://github.com/VirtualBox/virtualbox/issues/70
-Patch81:    UITranslationEventListener_async_call.patch
-
+Patch82:    0001-Print-qt6-version-required.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3674
@@ -347,13 +345,13 @@ rm -r src/libs/libtpms-0.10.*/
 %patch -P 2 -p1 -b .strings
 %patch -P 3 -p1 -b .default_os_fedora
 %patch -P 4 -p1 -b .lib64-VBox.sh
-%patch -P 5 -p1 -b .py3.13
+#%%patch -P 5 -p1 -b .py3.13
 
 %patch -P 50 -p1 -b .mageia-support
 %patch -P 60 -p1 -b .xclient
 #%%patch -P 70 -p1 -b .i3wm
 %patch -P 80 -p1 -b .c23
-%patch -P 81 -p1 -b .async_call
+%patch -P 82 -p1 -b qt6_version
 
 
 %build
@@ -902,6 +900,12 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Sep 11 2025 Sérgio Basto <sergio@serjux.com> - 7.2.2-1
+- Update VirtualBox to 7.2.2
+
+* Mon Sep 01 2025 Sérgio Basto <sergio@serjux.com> - 7.2.0-3
+- Nat fixes, print qt6 version nedded
+
 * Fri Aug 29 2025 Sérgio Basto <sergio@serjux.com> - 7.2.0-2
 - Add patch from Oracle rfbz#7238
 
