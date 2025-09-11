@@ -902,9 +902,7 @@ fi
 %changelog
 * Thu Sep 11 2025 Sérgio Basto <sergio@serjux.com> - 7.2.2-1
 - Update VirtualBox to 7.2.2
-
-* Mon Sep 01 2025 Sérgio Basto <sergio@serjux.com> - 7.2.0-3
-- Nat fixes, print qt6 version nedded
+- Add patch to print qt6 version needed
 
 * Fri Aug 29 2025 Sérgio Basto <sergio@serjux.com> - 7.2.0-2
 - Add patch from Oracle rfbz#7238
