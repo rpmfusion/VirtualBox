@@ -59,7 +59,7 @@
 
 Name:       VirtualBox
 Version:    7.2.2
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -99,9 +99,12 @@ Patch50:    VirtualBox-7.0.18-update-Mageia-support.patch
 Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 # from Arch
 #Patch70:    009-properly-handle-i3wm.patch
-#from Gentoo
+# from Gentoo
 Patch80:    029_virtualbox-7.1.4_C23.patch
+
 Patch82:    0001-Print-qt6-version-required.patch
+# from Debian
+Patch83:     new-curl.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3674
@@ -352,6 +355,7 @@ rm -r src/libs/libtpms-0.10.*/
 #%%patch -P 70 -p1 -b .i3wm
 %patch -P 80 -p1 -b .c23
 %patch -P 82 -p1 -b qt6_version
+%patch -P 83 -p1 -b new_curl
 
 
 %build
@@ -900,6 +904,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Mon Sep 15 2025 Sérgio Basto <sergio@serjux.com> - 7.2.2-2
+- add new-curl.patch to fix build on Rawhide
+
 * Thu Sep 11 2025 Sérgio Basto <sergio@serjux.com> - 7.2.2-1
 - Update VirtualBox to 7.2.2
 - Add patch to print qt6 version needed
