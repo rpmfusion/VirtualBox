@@ -58,8 +58,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.2.2
-Release:    2%{?dist}
+Version:    7.2.4
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -904,6 +904,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Oct 25 2025 Sérgio Basto <sergio@serjux.com> - 7.2.4-1
+- Update VirtualBox to 7.2.4
+
 * Mon Sep 15 2025 Sérgio Basto <sergio@serjux.com> - 7.2.2-2
 - add new-curl.patch to fix build on Rawhide
 
