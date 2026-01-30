@@ -58,7 +58,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.2.4
+Version:    7.2.6
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -101,10 +101,6 @@ Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 #Patch70:    009-properly-handle-i3wm.patch
 # from Gentoo
 Patch80:    029_virtualbox-7.1.4_C23.patch
-
-Patch82:    0001-Print-qt6-version-required.patch
-# from Debian
-Patch83:     new-curl.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3674
@@ -311,7 +307,6 @@ cp -a %{SOURCE26} %{SOURCE27} src/VBox/Frontends/VirtualBox/images/x4/
 
 # Remove prebuilt binary tools
 find -name '*.py[co]' -delete
-rm -r src/VBox/Additions/WINNT
 rm -r src/VBox/Additions/os2
 rm -r kBuild/
 rm -r tools/
@@ -343,6 +338,8 @@ rm -r src/libs/libtpms-0.10.*/
 #rm -r src/libs/dxvk-2.*/
 %endif
 #rm -r src/libs/softfloat-3e/
+rm -r src/libs/libvpx-1.*
+#rm -r src/libs/libjpeg-turbo-3.*
 
 %patch -P 1 -p1 -b .noupdates
 %patch -P 2 -p1 -b .strings
@@ -354,8 +351,6 @@ rm -r src/libs/libtpms-0.10.*/
 %patch -P 60 -p1 -b .xclient
 #%%patch -P 70 -p1 -b .i3wm
 %patch -P 80 -p1 -b .c23
-%patch -P 82 -p1 -b qt6_version
-%patch -P 83 -p1 -b new_curl
 
 
 %build
@@ -403,6 +398,7 @@ umask 0022
 # the installation paths
 kmk %{_smp_mflags}                                             \
     KBUILD_VERBOSE=2                                           \
+    VBOX_GCC_fcf-protection_check="-fcf-protection=check -Wl,-z,notext" \
     TOOL_YASM_AS=yasm                                          \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox \
     VBOX_PATH_APP_PRIVATE_ARCH=%{_libdir}/virtualbox    \
@@ -904,6 +900,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Jan 28 2026 Sérgio Basto <sergio@serjux.com> - 7.2.6-1
+- Update VirtualBox to 7.2.6
+
 * Sat Oct 25 2025 Sérgio Basto <sergio@serjux.com> - 7.2.4-1
 - Update VirtualBox to 7.2.4
 
