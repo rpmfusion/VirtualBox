@@ -59,7 +59,7 @@
 
 Name:       VirtualBox
 Version:    7.2.6
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -900,6 +900,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Mar 20 2026 Nicolas Chauvet <kwizart@gmail.com> - 7.2.6-2
+- Rebuilt for libvpx-1.16.0
+
 * Wed Jan 28 2026 Sérgio Basto <sergio@serjux.com> - 7.2.6-1
 - Update VirtualBox to 7.2.6
 
