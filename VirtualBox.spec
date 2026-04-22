@@ -58,8 +58,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.2.6
-Release:    2%{?dist}
+Version:    7.2.8
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -307,6 +307,7 @@ cp -a %{SOURCE26} %{SOURCE27} src/VBox/Frontends/VirtualBox/images/x4/
 
 # Remove prebuilt binary tools
 find -name '*.py[co]' -delete
+rm -r src/VBox/Additions/win
 rm -r src/VBox/Additions/os2
 rm -r kBuild/
 rm -r tools/
@@ -900,6 +901,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Apr 22 2026 Sérgio Basto <sergio@serjux.com> - 7.2.8-1
+- Update VirtualBox to 7.2.8
+
 * Fri Mar 20 2026 Nicolas Chauvet <kwizart@gmail.com> - 7.2.6-2
 - Rebuilt for libvpx-1.16.0
 
