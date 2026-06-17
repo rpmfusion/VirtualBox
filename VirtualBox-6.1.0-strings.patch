@@ -90,8 +90,8 @@ diff -uNdr VirtualBox-6.0.6_orig/src/VBox/Installer/linux/VBox.sh VirtualBox-6.0
  
           You will not be able to start VMs until this problem is fixed.
  EOF
---- ./src/VBox/VMM/VMMR3/VM.cpp.orig	2019-12-19 22:54:59.342051984 +0000
-+++ ./src/VBox/VMM/VMMR3/VM.cpp	2019-12-19 23:14:50.172146453 +0000
+--- ./src/VBox/VMM/VMMR3/VMR3.cpp.orig	2019-12-19 22:54:59.342051984 +0000
++++ ./src/VBox/VMM/VMMR3/VMR3.cpp	2019-12-19 23:14:50.172146453 +0000
 @@ -266,7 +266,7 @@ VMMR3DECL(int)   VMR3Create(uint32_t cCp
                                    "Secure Boot that the modules are signed if necessary in the right "
                                    "way for your host system.  Then try to recompile and reload the "

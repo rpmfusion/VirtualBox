@@ -58,7 +58,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.1.18
+Version:    7.2.10
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -103,7 +103,7 @@ Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 Patch80:    029_virtualbox-7.1.4_C23.patch
 
 BuildRequires:  gcc-c++
-BuildRequires:  kBuild >= 0.1.9998.r3093
+BuildRequires:  kBuild >= 0.1.9998.r3674
 BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
@@ -313,7 +313,7 @@ rm -r kBuild/
 rm -r tools/
 # Remove bundle X11 sources and some lib sources, before patching.
 rm -r src/VBox/Additions/x11/x11include/
-rm -r src/VBox/Additions/3D/mesa/mesa-21.3.8/
+rm -r src/VBox/Additions/3D/mesa/mesa-24.0.2/
 # wglext.h has typedefs for Windows-specific extensions
 #rm include/VBox/HostServices/wglext.h
 # src/VBox/GuestHost/OpenGL/include/GL/glext.h have VBOX definitions
@@ -333,13 +333,14 @@ rm -r src/libs/libogg-1.3.*/
 rm -r src/libs/liblzma-5.*/
 #rm -r src/libs/libslirp-4.*/
 %if %{with system_libtpms}
-rm -r src/libs/libtpms-0.9.*/
+rm -r src/libs/libtpms-0.10.*/
 %endif
 %if %{with dxvk_native}
 #rm -r src/libs/dxvk-2.*/
 %endif
 #rm -r src/libs/softfloat-3e/
 rm -r src/libs/libvpx-1.*
+#rm -r src/libs/libjpeg-turbo-3.*
 
 %patch -P 1 -p1 -b .noupdates
 %patch -P 2 -p1 -b .strings
@@ -398,6 +399,7 @@ umask 0022
 # the installation paths
 kmk %{_smp_mflags}                                             \
     KBUILD_VERBOSE=2                                           \
+    VBOX_GCC_fcf-protection_check="-fcf-protection=check -Wl,-z,notext" \
     TOOL_YASM_AS=yasm                                          \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox \
     VBOX_PATH_APP_PRIVATE_ARCH=%{_libdir}/virtualbox    \
@@ -899,6 +901,31 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Jun 16 2026 Sérgio Basto <sergio@serjux.com> - 7.2.10-1
+- Update VirtualBox to 7.2.10
+
+* Wed Apr 22 2026 Sérgio Basto <sergio@serjux.com> - 7.2.8-1
+- Update VirtualBox to 7.2.8
+
+* Fri Mar 20 2026 Nicolas Chauvet <kwizart@gmail.com> - 7.2.6-2
+- Rebuilt for libvpx-1.16.0
+
+* Wed Jan 28 2026 Sérgio Basto <sergio@serjux.com> - 7.2.6-1
+- Update VirtualBox to 7.2.6
+
+* Sat Oct 25 2025 Sérgio Basto <sergio@serjux.com> - 7.2.4-1
+- Update VirtualBox to 7.2.4
+
+* Mon Sep 15 2025 Sérgio Basto <sergio@serjux.com> - 7.2.2-2
+- add new-curl.patch to fix build on Rawhide
+
+* Thu Sep 11 2025 Sérgio Basto <sergio@serjux.com> - 7.2.2-1
+- Update VirtualBox to 7.2.2
+- Add patch to print qt6 version needed
+
+* Fri Aug 29 2025 Sérgio Basto <sergio@serjux.com> - 7.2.0-2
+- Add patch from Oracle rfbz#7238
+
 * Fri Aug 28 2026 Sérgio Basto <sergio@serjux.com> - 7.1.18-1
 - Update VirtualBox to 7.1.18
 
