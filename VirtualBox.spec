@@ -58,7 +58,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.2.8
+Version:    7.2.10
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -901,6 +901,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Jun 16 2026 Sérgio Basto <sergio@serjux.com> - 7.2.10-1
+- Update VirtualBox to 7.2.10
+
 * Wed Apr 22 2026 Sérgio Basto <sergio@serjux.com> - 7.2.8-1
 - Update VirtualBox to 7.2.8
 
