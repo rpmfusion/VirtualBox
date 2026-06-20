@@ -59,7 +59,7 @@
 
 Name:       VirtualBox
 Version:    7.2.10
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -688,12 +688,6 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/virtualboxvm.desktop
 
 install -p -m 0644 -D %{SOURCE2} %{buildroot}%{_metainfodir}/%{name}.appdata.xml
 
-# Workaround kvm.ko usurping VMX.
-# (Linux kernel commit b4886fab6fb620b96ad7eeefb9801c42dfa91741 is the culprit.
-# See also https://lore.kernel.org/kvm/ZwQjUSOle6sWARsr@google.com/T/ )
-install -d %{buildroot}%{_modprobedir}
-echo options kvm enable_virt_at_load=0 > %{buildroot}%{_modprobedir}/50-virtualbox.conf
-
 %if %{with vnc}
 echo "entering VNC extension install section"
 pushd out/linux.*/release/packages/
@@ -835,7 +829,6 @@ fi
 %attr(4511,root,root) %{_libdir}/virtualbox/VirtualBoxVM
 %{_udevrulesdir}/60-vboxdrv.rules
 %{_unitdir}/vboxdrv.service
-%{_modprobedir}/
 %{_presetdir}/96-vboxhost.preset
 # Group for USB devices
 %{_sysusersdir}/virtualbox.conf
@@ -901,6 +894,10 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sat Jun 20 2026 Sérgio Basto <sergio@serjux.com> - 7.2.10-2
+- Drop workaround for kvm.ko usurping VMX, copied from OpenSuse
+  Bugfix: Host freeze on VM start (https://github.com/VirtualBox/virtualbox/issues/711)
+
 * Tue Jun 16 2026 Sérgio Basto <sergio@serjux.com> - 7.2.10-1
 - Update VirtualBox to 7.2.10
 
