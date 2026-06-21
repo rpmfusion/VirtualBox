@@ -91,7 +91,7 @@ Patch1:     VirtualBox-7.0.2-noupdate.patch
 Patch2:     VirtualBox-6.1.0-strings.patch
 Patch3:     VirtualBox-7.1.0-default-to-Fedora.patch
 Patch4:     VirtualBox-5.1.0-lib64-VBox.sh.patch
-Patch5:     VirtualBox-python3.13.patch
+#Patch5:     VirtualBox-python3.13.patch
 
 # from Mageia
 Patch50:    VirtualBox-7.0.18-update-Mageia-support.patch
@@ -298,7 +298,7 @@ which is generated during the build of main package.
 
 
 %prep
-%setup -q -n %{name}-%{version}%{?prereltag}
+%autosetup -p1 -n %{name}-%{version}%{?prereltag}
 # add Mageia images
 cp -a %{SOURCE20} %{SOURCE21} src/VBox/Frontends/VirtualBox/images/
 cp -a %{SOURCE22} %{SOURCE23} src/VBox/Frontends/VirtualBox/images/x2/
@@ -341,17 +341,6 @@ rm -r src/libs/libtpms-0.10.*/
 #rm -r src/libs/softfloat-3e/
 rm -r src/libs/libvpx-1.*
 #rm -r src/libs/libjpeg-turbo-3.*
-
-%patch -P 1 -p1 -b .noupdates
-%patch -P 2 -p1 -b .strings
-%patch -P 3 -p1 -b .default_os_fedora
-%patch -P 4 -p1 -b .lib64-VBox.sh
-#%%patch -P 5 -p1 -b .py3.13
-
-%patch -P 50 -p1 -b .mageia-support
-%patch -P 60 -p1 -b .xclient
-#%%patch -P 70 -p1 -b .i3wm
-%patch -P 80 -p1 -b .c23
 
 
 %build
