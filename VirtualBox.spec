@@ -403,6 +403,7 @@ kmk %{_smp_mflags}                                             \
     VBOX_USE_SYSTEM_XORG_HEADERS=1                             \
     VBOX_USE_SYSTEM_GL_HEADERS=1                               \
     VBOX_NO_LEGACY_XORG_X11=1                                  \
+    VBOX_WITHOUT_SPLIT_SOAPC=1 \
     SDK_VBoxLibPng_INCS=/usr/include/libpng16                 \
     SDK_VBoxLibXml2_INCS=/usr/include/libxml2                 \
     SDK_VBoxLzf_LIBS="lzf"                                    \
@@ -886,6 +887,8 @@ fi
 * Sat Jun 20 2026 Sérgio Basto <sergio@serjux.com> - 7.2.10-2
 - Drop workaround for kvm.ko usurping VMX, copied from OpenSuse
   Bugfix: Host freeze on VM start (https://github.com/VirtualBox/virtualbox/issues/711)
+- Set build parameter VBOX_WITHOUT_SPLIT_SOAPC=1, split-soapC (a virtualbox program) splits the gsoap-generated file at
+  silly boundaries, producing something unbuildable (by opensuse).
 
 * Tue Jun 16 2026 Sérgio Basto <sergio@serjux.com> - 7.2.10-1
 - Update VirtualBox to 7.2.10
