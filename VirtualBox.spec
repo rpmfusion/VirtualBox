@@ -104,7 +104,7 @@ Patch80:    029_virtualbox-7.1.4_C23.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  kBuild >= 0.1.9998.r3674
-BuildRequires:  openssl-devel
+BuildRequires:  openssl-devel < 1:4.0
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
 BuildRequires:  libxslt-devel
