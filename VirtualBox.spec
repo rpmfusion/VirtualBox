@@ -58,8 +58,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.2.10
-Release:    2%{?dist}
+Version:    7.2.12
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -884,6 +884,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Wed Jul 01 2026 Sérgio Basto <sergio@serjux.com> - 7.2.12-1
+- Update VirtualBox to 7.2.12
+
 * Sat Jun 20 2026 Sérgio Basto <sergio@serjux.com> - 7.2.10-2
 - Drop workaround for kvm.ko usurping VMX, copied from OpenSuse
   Bugfix: Host freeze on VM start (https://github.com/VirtualBox/virtualbox/issues/711)
