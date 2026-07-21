@@ -58,7 +58,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.2.12
+Version:    7.2.14
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -108,7 +108,7 @@ BuildRequires:  openssl-devel < 1:4.0
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
 BuildRequires:  libxslt-devel
-BuildRequires:  yasm
+BuildRequires:  nasm
 BuildRequires:  alsa-lib-devel
 #BuildRequires:  opus-devel
 BuildRequires:  pulseaudio-libs-devel
@@ -389,7 +389,8 @@ umask 0022
 kmk %{_smp_mflags}                                             \
     KBUILD_VERBOSE=2                                           \
     VBOX_GCC_fcf-protection_check="-fcf-protection=check -Wl,-z,notext" \
-    TOOL_YASM_AS=yasm                                          \
+    DONT_USE_YASM=1                                            \
+    TOOL_NASM_AS=nasm                                          \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox \
     VBOX_PATH_APP_PRIVATE_ARCH=%{_libdir}/virtualbox    \
     VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox    \
@@ -884,6 +885,10 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Tue Jul 21 2026 Sérgio Basto <sergio@serjux.com> - 7.2.14-1
+- Update VirtualBox to 7.2.14
+- Switch to building with nasm instead of yasm
+
 * Wed Jul 01 2026 Sérgio Basto <sergio@serjux.com> - 7.2.12-1
 - Update VirtualBox to 7.2.12
 
