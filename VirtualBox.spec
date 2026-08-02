@@ -59,7 +59,7 @@
 
 Name:       VirtualBox
 Version:    7.2.14
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -885,6 +885,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun Aug 02 2026 RPM Fusion Release Engineering <leigh123linux@rpmfusion.org> - 7.2.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Tue Jul 21 2026 Sérgio Basto <sergio@serjux.com> - 7.2.14-1
 - Update VirtualBox to 7.2.14
 - Switch to building with nasm instead of yasm
