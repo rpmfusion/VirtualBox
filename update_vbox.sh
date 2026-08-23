@@ -1,7 +1,7 @@
-VERSION=7.2.14
+VERSION=7.2.16
 REL=1
 #RAWHIDE=42
-REPOS="f44 f43 f42"
+REPOS="f45 f44 f43"
 if [ -z "$1" ]
 then
       stage=0
