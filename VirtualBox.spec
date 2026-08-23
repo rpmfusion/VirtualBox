@@ -58,8 +58,8 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.2.14
-Release:    2%{?dist}
+Version:    7.2.16
+Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
 License:    GPL-3.0-only AND (GPL-3.0-only OR CDDL-1.0)
@@ -612,7 +612,6 @@ install -m 0755 -t %{buildroot}%{_bindir}    \
     out/linux.*/release/bin/additions/VBoxDRMClient          \
     out/linux.*/release/bin/additions/VBoxClient             \
     out/linux.*/release/bin/additions/VBoxControl            \
-    out/linux.*/release/bin/additions/vboxwl
 
 # Guest libraries
 install -m 0755 -t %{buildroot}%{_libdir}/security \
@@ -864,7 +863,6 @@ fi
 %if %{with guest_additions}
 %files guest-additions
 %license COPYING*
-%{_bindir}/vboxwl
 %{_bindir}/VBoxClient
 %{_bindir}/VBoxControl
 %{_bindir}/VBoxClient-all
@@ -885,6 +883,13 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Sun Aug 23 2026 Sérgio Basto <sergio@serjux.com> - 7.2.16-1
+- Update VirtualBox to 7.2.16
+- Drop vboxwl from the installer and stop building it; its basic
+  functionality is now part of VBoxClient.
+  Based on upstream commit:
+  https://github.com/VirtualBox/virtualbox/commit/3501612c59703f6c03f7a94e97dc0bcd93949a9f
+
 * Sun Aug 02 2026 RPM Fusion Release Engineering <leigh123linux@rpmfusion.org> - 7.2.14-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
 
