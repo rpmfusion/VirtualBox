@@ -58,7 +58,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.1.12
+Version:    7.1.18
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -99,12 +99,11 @@ Patch50:    VirtualBox-7.0.18-update-Mageia-support.patch
 Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 # from Arch
 #Patch70:    009-properly-handle-i3wm.patch
-#from Gentoo
+# from Gentoo
 Patch80:    029_virtualbox-7.1.4_C23.patch
 
-
 BuildRequires:  gcc-c++
-BuildRequires:  kBuild >= 0.1.9998.r3093
+BuildRequires:  kBuild >= 0.1.9998.r3674
 BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
@@ -308,7 +307,7 @@ cp -a %{SOURCE26} %{SOURCE27} src/VBox/Frontends/VirtualBox/images/x4/
 
 # Remove prebuilt binary tools
 find -name '*.py[co]' -delete
-rm -r src/VBox/Additions/WINNT
+rm -r src/VBox/Additions/win
 rm -r src/VBox/Additions/os2
 rm -r kBuild/
 rm -r tools/
@@ -340,12 +339,13 @@ rm -r src/libs/libtpms-0.9.*/
 #rm -r src/libs/dxvk-2.*/
 %endif
 #rm -r src/libs/softfloat-3e/
+rm -r src/libs/libvpx-1.*
 
 %patch -P 1 -p1 -b .noupdates
 %patch -P 2 -p1 -b .strings
 %patch -P 3 -p1 -b .default_os_fedora
 %patch -P 4 -p1 -b .lib64-VBox.sh
-%patch -P 5 -p1 -b .py3.13
+#%%patch -P 5 -p1 -b .py3.13
 
 %patch -P 50 -p1 -b .mageia-support
 %patch -P 60 -p1 -b .xclient
@@ -899,6 +899,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Fri Aug 28 2026 Sérgio Basto <sergio@serjux.com> - 7.1.18-1
+- Update VirtualBox to 7.1.18
+
 * Wed Jul 30 2025 Sérgio Basto <sergio@serjux.com> - 7.1.12-1
 - Update VirtualBox to 7.1.12
 
