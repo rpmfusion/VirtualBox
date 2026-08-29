@@ -103,7 +103,7 @@ Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 Patch80:    029_virtualbox-7.1.4_C23.patch
 
 BuildRequires:  gcc-c++
-BuildRequires:  kBuild >= 0.1.9998.r3674
+BuildRequires:  kBuild >= 0.1.9998.r3093
 BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
