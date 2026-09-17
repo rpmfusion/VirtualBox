@@ -58,7 +58,7 @@
 %endif
 
 Name:       VirtualBox
-Version:    7.2.16
+Version:    7.2.18
 Release:    1%{?dist}
 Summary:    A general-purpose full virtualizer for PC hardware
 
@@ -883,6 +883,9 @@ fi
 %{_datadir}/%{name}-kmod-%{version}
 
 %changelog
+* Thu Sep 17 2026 Sérgio Basto <sergio@serjux.com> - 7.2.18-1
+- Update VirtualBox to 7.2.18
+
 * Sun Aug 23 2026 Sérgio Basto <sergio@serjux.com> - 7.2.16-1
 - Update VirtualBox to 7.2.16
 - Drop vboxwl from the installer and stop building it; its basic
