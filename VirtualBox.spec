@@ -109,7 +109,11 @@ Patch60:    VirtualBox-7.0.2-xclient-cleanups.patch
 Patch80:    029_virtualbox-7.1.4_C23.patch
 
 BuildRequires:  gcc-c++
+%if 0%{?rhel} && 0%{?rhel} < 10
+BuildRequires:  kBuild >= 0.1.9998.r3093
+%else
 BuildRequires:  kBuild >= 0.1.9998.r3674
+%endif
 BuildRequires:  openssl-devel < 1:4.0
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
