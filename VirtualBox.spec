@@ -57,6 +57,12 @@
 %bcond_without python3
 %endif
 
+%if 0%{?rhel} && 0%{?rhel} < 10
+%bcond_with new_asm
+%else
+%bcond_without new_asm
+%endif
+
 Name:       VirtualBox
 Version:    7.2.22
 Release:    1%{?dist}
@@ -108,7 +114,11 @@ BuildRequires:  openssl-devel < 1:4.0
 BuildRequires:  libcurl-devel
 BuildRequires:  iasl
 BuildRequires:  libxslt-devel
+%if %{with new_asm}
 BuildRequires:  nasm
+%else
+BuildRequires:  yasm
+%endif
 BuildRequires:  alsa-lib-devel
 #BuildRequires:  opus-devel
 BuildRequires:  pulseaudio-libs-devel
@@ -389,8 +399,8 @@ umask 0022
 kmk %{_smp_mflags}                                             \
     KBUILD_VERBOSE=2                                           \
     VBOX_GCC_fcf-protection_check="-fcf-protection=check -Wl,-z,notext" \
-    DONT_USE_YASM=1                                            \
-    TOOL_NASM_AS=nasm                                          \
+%{?with_new_asm: DONT_USE_YASM=1                         \
+    TOOL_NASM_AS=nasm }  \
     VBOX_PATH_APP_PRIVATE=%{_libdir}/virtualbox \
     VBOX_PATH_APP_PRIVATE_ARCH=%{_libdir}/virtualbox    \
     VBOX_PATH_APP_DOCS=%{_docdir}/VirtualBox    \
